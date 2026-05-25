@@ -1,9 +1,106 @@
-# AI 产品需求孵化流水线 · 项目无关骨架
+# claude-product-pipeline
+
+> **Turn a one-line product requirement into an engineer-ready delivery package — via an 8-agent [Claude Code](https://docs.claude.com/en/docs/claude-code) pipeline. Self-evolving, project-agnostic.**
+> 把一句话需求孵化成研发可直接施工的交付包 —— 8 个 Claude Code agent 的流水线引擎。越用越聪明，项目无关。
+
+![Built with Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-d97757)
+![Agents](https://img.shields.io/badge/agents-8%20+%202-blue)
+![Project agnostic](https://img.shields.io/badge/project-agnostic-2ea44f)
+![Self-evolving](https://img.shields.io/badge/self--evolving-eval%E2%86%92optimize%E2%86%92knowledge-purple)
+
+**English** · [中文](#中文)
+
+---
+
+## What is this
+
+A pipeline that turns *"I want feature X"* into a spec a developer (human or AI like Codex) can build from **without further clarification** — by routing it through **8 specialized Claude Code sub-agents + 5–6 human gates**, then sedimenting every run so the pipeline **gets smarter the more you use it**.
+
+It ships as a **project-agnostic skeleton**: clone it, run `/init-project`, and it reads your codebase to build *your* project's rules. All project-specific knowledge lives in a single file — `PROJECT-PROFILE.md`.
+
+## How it works
+
+```mermaid
+flowchart TD
+    REQ([📝 One-line requirement]) --> A1[A1 · Product<br/>refine + Q&A]
+    A1 --> A15[A1.5 · Visual spec<br/>UI needs only]
+    A15 --> A2[A2 · Requirement review]
+    A2 --> A3[A3 · Tech design]
+    A3 --> A4[A4 · Scope review]
+    A4 -->|large change| A5[A5 · Second check]
+    A4 -->|small change| A6[A6 · Test cases]
+    A5 --> A6
+    A6 --> A7[A7 · Case review]
+    A7 --> PKG([📦 Engineer-ready<br/>.draft package])
+    PKG -. retrospect .-> KB[(runs.csv · cases.csv<br/>knowledge/patterns)]
+    KB -. weekly /pipeline-review .-> KB
+    KB -. monthly /optimize-prompts .-> A1
+```
+
+- **8 agents**: A1 Product → A1.5 Visual spec *(UI only)* → A2 Requirement review → A3 Tech design → A4 Scope review → A5 Second check *(only if A4 flags a large change)* → A6 Test cases → A7 Case review
+- **2 meta-agents**: `pipeline-retrospector` (sediments each delivery) + `pipeline-evaluator` (weekly report)
+- **Output**: a `deliverables/*.draft` package = the blueprint a developer/Codex builds from directly
+- **Self-evolving loop**: every `.done` package writes to `runs.csv` / `cases.csv`; `/pipeline-review` produces a weekly report; `/optimize-prompts` folds recurring lessons back into the agent prompts
+
+## Quick start
+
+```bash
+git clone https://github.com/ayouaiyouwei-arch/claude-product-pipeline.git my-project-pm
+cd my-project-pm
+# Open in Claude Code — CLAUDE.md auto-detects a fresh skeleton and lists what to provide
+/init-project          # pulls your code, drafts rules, confirms with you, fills PROJECT-PROFILE.md
+/new-feature "<your one-line requirement>"
+```
+
+## Design principle: generic engine, project-specific knowledge
+
+| Layer | What | Portability |
+|---|---|---|
+| 🟢 **Engine** (process / reviews / evolution) | 8 agents + commands + evals/optimization/knowledge mechanics | **works as-is** |
+| 🟡 **Knowledge** (project-specific) | core-architecture blacklist / domain terms / tech stack / git & acceptance conventions | **filled by `/init-project` into `PROJECT-PROFILE.md`** |
+| 🔴 **Data** | each project's change logs / packages / learned patterns | **grows from empty** |
+
+The key move: **all project-specific knowledge collapses into one file (`PROJECT-PROFILE.md`)** that every agent references — so porting to a new project = refilling one file.
+
+## What's inside
+
+```
+PROJECT-PROFILE.md       # single source of project config
+CLAUDE.md                # session preamble + first-run onboarding trigger
+.claude/
+├── agents/   (10)       # 8 pipeline agents + 2 meta agents
+├── skills/   (19)       # packaging / promotion / testing / knowledge / baseline
+└── commands/ (6)        # /init-project /new-feature /pipeline-review /optimize-prompts /babysit-active /iterate-A7
+product-docs/baseline/   # version / diff / change ledgers (empty, grow as you go)
+deliverables/_template/  # delivery-package template (12 root docs + snapshot + demo)
+knowledge/patterns/      # 4 built-in generic methodologies + your project's learned ones
+evals/ · optimization/   # runs.csv + weekly reports · prompt patches + agent versions
+```
+
+## Built-in methodologies (ship with the skeleton)
+
+Four cross-project "battle rules" distilled from real projects:
+
+- **P001 — UI granularity**: specs must state each interaction's granularity / position / 5 states / visibility
+- **P002 — no tech-speak in PRDs**: requirements use business language, not routes / endpoints / file paths
+- **P003 — no AI over-reach**: when ambiguous, ask — don't invent
+- **P004 — no retrospect lag**: every `.done` must write `runs.csv` (3-layer guard built in)
+- **P007 — evidence-driven conventions**: grep real code before asserting any code convention, or mark it a guess
+
+Everything else (domain-term confusion, acceptance env, branch isolation…) **your project grows on its own** after a few runs.
+
+## Why "self-evolving"
+
+The engine is reusable; the smarts are regrown per project. The more deliveries you run, the better this pipeline understands *your* codebase — recurring mistakes get caught earlier, estimates get sharper, and lessons get baked into the agents automatically.
+
+---
+---
+
+<a name="中文"></a>
+# 中文
 
 > 一套"用 AI agent 团队把一句话需求孵化成研发可直接施工的交付包"的流水线引擎。
 > 本仓库是**项目无关骨架**——克隆下来接任何项目即可用，项目专属知识由 `/init-project` 向导梳理后写入 `PROJECT-PROFILE.md`。
-
----
 
 ## 这是什么
 
@@ -13,74 +110,30 @@
 - **自进化**：每次交付后 `pipeline-retrospector` 自动沉淀；`/pipeline-review` 周报；`/optimize-prompts` 月度把踩坑提炼进 agent prompt
 - **产物**：`deliverables/*.draft` 包 = 给研发/Codex 拿到就能干活的施工图
 
----
-
 ## 设计原则：引擎通用，知识专属
 
 | 层 | 内容 | 移植性 |
 |---|---|---|
-| 🟢 引擎（流程/审核/进化机制）| 8 agent + 5 command + evals/optimization/knowledge 机制 | **直接通用** |
+| 🟢 引擎（流程/审核/进化机制）| 8 agent + 命令 + evals/optimization/knowledge 机制 | **直接通用** |
 | 🟡 知识（项目专属）| 核心架构黑名单 / 领域术语 / 技术栈 / git 约定 / 验收环境 | **由 `/init-project` 梳理后填入 `PROJECT-PROFILE.md`** |
 | 🔴 数据 | 各项目的变更台账 / 交付包 / 实战 patterns | **随用随长，从空开始** |
 
 关键设计：**所有项目专属知识收敛到唯一一个文件 `PROJECT-PROFILE.md`**，所有 agent/skill 引用它，不在各自文件里硬编码。换项目 = 重填这一个文件。
 
----
-
 ## 怎么用（新项目接入 3 步）
 
-### 1. 克隆骨架到新工作空间
 ```bash
-git clone <本骨架仓库> my-project-pm && cd my-project-pm
+# 1. 克隆
+git clone https://github.com/ayouaiyouwei-arch/claude-product-pipeline.git my-project-pm && cd my-project-pm
+# 2. 在 Claude Code 里开第一段对话 —— CLAUDE.md 会自动检测到空白骨架并列出前置准备清单
+# 3. 运行接入向导
+/init-project        # 拉你的代码 → 主动梳理规则 → 逐项问你确认 → 填 PROJECT-PROFILE.md
+/new-feature "<你的一句话需求>"
 ```
 
-### 2. 在 Claude Code 里开第一段对话
-开场 `CLAUDE.md` 会**自动检测**到 `PROJECT-PROFILE.md` 还是占位，提示你这是空白骨架，并列出**前置准备清单**（git 地址/拉取分支/推送策略/项目名/验收环境）。
-
-### 3. 运行 `/init-project`
-向导会：
-1. 先告知你要准备哪些信息（git 等）
-2. 把你的代码拉到 `code/`
-3. **主动 grep/读代码**，梳理出【核心架构黑名单】【领域术语表】【技术栈/端结构】候选（带出处，遵守"实证驱动"）
-4. **写入前逐项问你确认**（绝不自作主张写 LOCKED）
-5. 确认后落 `PROJECT-PROFILE.md` + 初始化 agent 版本 + baseline 空台账
-
-完成后即可：
-```
-/new-feature <你的一句话需求>
-```
-
----
-
-## 目录结构
-
-```
-PROJECT-PROFILE.md       ← 项目唯一配置源（git/技术栈/核心架构黑名单/领域术语/验收环境）
-CLAUDE.md                ← 开场必读（含首次使用检测 + onboarding 触发）
-.claude/
-├── agents/   (10)       ← 8 流水线 agent + 2 评估/反思 agent
-├── skills/   (19)       ← 打包/升级/测试/知识/基线 等机制
-└── commands/ (6)        ← /init-project /new-feature /pipeline-review /optimize-prompts /babysit-active /iterate-A7
-product-docs/
-├── baseline/            ← 版本/差异/变更 三台账（空，随用随登记）
-└── _drafts/             ← /new-feature 流水线中间产物
-deliverables/
-├── _template/           ← 交付包模板（12 根文件 + snapshot + demo）
-└── 提交记录.md          ← 业务侧提交账本（空）
-test/                    ← 用例 + 自动化资产 + 报告（骨架）
-knowledge/
-├── patterns/            ← P001/P002/P003/通用方法论自带 + 项目实战沉淀
-├── cases.csv / graph    ← 案例库 + 知识图谱（空）
-evals/                   ← runs.csv + regression-set + weekly 周报（空）
-optimization/            ← patches-pending/applied + agent-versions.json
-code/                    ← 新项目只读代码快照（/init-project 拉进来）
-```
-
----
+`/init-project` 会：① 先告知你要准备哪些信息（git 等）② 拉代码到 `code/` ③ **主动 grep/读代码**梳理【核心架构黑名单】【领域术语表】【技术栈/端结构】候选（带出处，遵守"实证驱动"）④ **写入前逐项问你确认**（绝不自作主张写 LOCKED）⑤ 确认后落 `PROJECT-PROFILE.md` + 初始化 agent 版本 + baseline 空台账。
 
 ## 自带的通用方法论（不随项目变）
-
-骨架预置 5 条跨项目通用的"踩坑铁律"（来自真实项目实战提炼）：
 
 - **P001 UI 颗粒度缺失** —— 需求要写清每个交互的粒度/位置/5 态/可见性
 - **P002 需求文档混入技术语言** —— PRD 用业务语言，不写路由/接口/文件名
@@ -89,8 +142,6 @@ code/                    ← 新项目只读代码快照（/init-project 拉进�
 - **P007 约定必须实证驱动** —— 任何代码约定先 grep 实证或标"推测"，不凭印象
 
 其余 patterns（领域术语混淆、验收环境、分支隔离等）由你的项目跑几轮后**自己长出来**。
-
----
 
 ## 它的价值主张
 
