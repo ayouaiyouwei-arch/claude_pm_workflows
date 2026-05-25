@@ -97,6 +97,6 @@ grep -q "未初始化 · 待 /init-project" PROJECT-PROFILE.md && echo "FRESH" |
 ## 📎 本项目专属 LOCKED 经验（初始为空 · 越用越多）
 
 > `/init-project` 完成后，把本项目实战沉淀的 LOCKED 经验追加到这里（对齐 robobus 原工作空间 CLAUDE.md 的 P004/P006/P008/P015 等做法）。
-> 通用方法论 P007（上方）+ P001/P002/P003（见 knowledge/patterns/）随骨架自带，其余由本项目长出。
+> 通用方法论 P007（上方）+ P001/P002/P003/P004（见 knowledge/patterns/）随骨架自带，其余由本项目长出。
 
 `<待 /init-project 后按需追加>`
