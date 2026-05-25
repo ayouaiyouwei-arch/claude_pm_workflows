@@ -1,0 +1,16 @@
+# 新项目拉进来的只读代码快照——不进骨架自己的 git
+code/*
+!code/.gitkeep
+
+# 流水线运行产物（按需，默认保留以便追溯；如不想带可取消注释）
+# product-docs/_drafts/*
+# deliverables/*.draft/
+# deliverables/*.active/
+
+# 系统文件
+.DS_Store
+*.log
+node_modules/
+
+# Claude Code 本地设置（每台机器/每个项目自己生成）
+.claude/settings.local.json

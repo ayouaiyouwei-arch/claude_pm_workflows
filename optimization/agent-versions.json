@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "last_updated": "<YYYY-MM-DD · 由 /init-project 初始化>",
+  "agents": {
+    "product-expert": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
+    "requirement-reviewer": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
+    "tech-architect": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
+    "scope-reviewer": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
+    "secondary-reviewer": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
+    "test-case-author": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
+    "test-case-reviewer": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
+    "visual-spec-author": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
+    "pipeline-evaluator": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
+    "pipeline-retrospector": { "version": "1.0", "last_patch": null, "last_updated": "<init>" }
+  }
+}
