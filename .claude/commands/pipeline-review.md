@@ -43,6 +43,24 @@ awk -F',' -v s="$WEEK_START" -v e="$WEEK_END" 'NR>1 && $2>=s && $2<=e {print $1}
 ls evals/rubrics/$(date +%Y-%m-%d)*.md 2>/dev/null > /tmp/rubrics-this-week.txt
 ```
 
+### 第 1.5 步：🚨 retrospect 漏审告警（**必跑**）
+
+> 已知失败模式：包从 `.active → .done`（尤其**批量追认 / 历史回填**）时若跳过 retrospect 落 runs.csv，会导致 runs.csv 滞后、周报漏审（误判"本周 0 done 包"）。本步全量比对 `.done` 目录数 vs runs.csv 行数兜底。
+
+```bash
+ls -d deliverables/*.done 2>/dev/null | sed 's#deliverables/##; s#\.done$##' | sort > /tmp/done-on-disk.txt
+awk -F',' 'NR>1 && $1!="run_id"{print $1}' evals/runs.csv | sort > /tmp/done-in-runs.txt
+MISSING=$(comm -23 /tmp/done-on-disk.txt /tmp/done-in-runs.txt)
+if [ -n "$MISSING" ]; then
+  echo "🚨 retrospect 漏审告警：以下 .done 包未登 runs.csv："; echo "$MISSING"
+  echo "→ 必须先补登 runs.csv + cases.csv 再出周报。"
+else
+  echo "✅ .done 目录数 = runs.csv 行数，无 retrospect 滞后"
+fi
+```
+
+**处置**：有漏登 → 先停下提示 PM（A 批量回填 / B 周报标"样本不全"继续）；无漏登 → 进第 2 步。
+
 ## 第 2 步：提示 PM 完成 rubric 抽样
 
 按 `evals/rubrics/_rubric模板.md § 抽样规则`：每周 5 包，**优先抽**：

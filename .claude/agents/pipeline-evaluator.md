@@ -71,6 +71,31 @@ pipeline-evaluator 在每周周报 § 七 给 PM 的建议中**必检差异漂�
 
 <!-- LOCKED:END -->
 
+## retrospect 滞后检测（**周报必检项**）
+
+pipeline-evaluator 在每周周报 **§ 六 异常/预警** 中**必检 retrospect 滞后**——防止包升 .done（尤其批量追认 / 历史回填）时漏登 runs.csv 导致周报数据残缺。
+
+### 检测方法
+
+```bash
+ls -d deliverables/*.done 2>/dev/null | sed 's#deliverables/##; s#\.done$##' | sort > /tmp/done-on-disk.txt
+awk -F',' 'NR>1 && $1!="run_id"{print $1}' evals/runs.csv | sort > /tmp/done-in-runs.txt
+comm -23 /tmp/done-on-disk.txt /tmp/done-in-runs.txt   # 差集 = 漏登包
+```
+
+### 预警阈值
+
+| 漏登 .done 包数 | 严重度 | 周报必写位置 |
+|---|---|---|
+| ≥ 5 包 | 🆘 **阻塞** | § 六 第 1 条 + § 七 建议补回填机制 |
+| 1~4 包 | 🚨 **高优** | § 六 列出漏登 run_id |
+| 0 包 | 正常 | § 六 标"✅ 无 retrospect 滞后" |
+
+### 根因与正确做法
+
+- ❌ 包升 .done 只做状态/文档同步、跳过 retrospect 落 runs.csv → runs.csv 行数 < 磁盘 .done 数 → 周报漏审（原 robobus 实战教训：一次漏 11 包导致整周复盘跑不起来）
+- ✅ ① 升 .done 时同步落 runs.csv（追认/promote 流程强制）② 周报前 `/pipeline-review` 第 1.5 步全量比对告警 ③ 本必检项兜底
+
 ## 工作流程
 
 ### 1. 算窗口
