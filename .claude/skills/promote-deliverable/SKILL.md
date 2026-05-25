@@ -60,8 +60,13 @@ description: 研发交付包状态机闸门——驱动 .draft → .active → .
 | B1 06 § 七 9 项硬检查 | 数 `- [x]` 个数 | = 9 |
 | B2 08 至少有 1 条 ROUND-N | 正则匹配 | ≥ 1 |
 | B3 自动化用例自跑结果 | 读 08 最新 ROUND-N 段的"自动化用例运行结果" | 全 pass |
-| B4 测试执行清单 | `test/execution/<B1.0.x>-<本期>/执行清单.csv` | P0 全 pass |
+| B4 测试执行清单 | `test/execution/<基线>-<本期>/执行清单.csv` | P0 全 pass |
 | B5 关联 CHG 状态 | baseline/03 内对应行 | = `已上线` 或 `已修复` |
+
+> ⚠️ **B-后置强制动作 · retrospect 落库（不可跳过）**：`.active → .done` 完成 mv 后，**必须**立即给本包补 retrospect——追加 1 行到 `evals/runs.csv`（18 列 · done_date = 本次升 done 日期）+ 1 行到 `knowledge/cases.csv`（9 列）。
+> - 走 `/new-feature` 全流水线的包：第 9 步会调 `pipeline-retrospector` 完成，promote 时确认已落即可。
+> - **手动 mv / 批量升 done / 历史回填的包**：promote 这里**强制补**（否则 runs.csv 滞后 → `/pipeline-review` 漏审，会误判"本周 0 done 包"）。
+> - 自检：`comm -23 <(ls -d deliverables/*.done|sed 's#.*/##;s#\.done$##'|sort) <(awk -F, 'NR>1{print $1}' evals/runs.csv|sort)` 应为空。
 
 ### C. `.done → archive/`
 
