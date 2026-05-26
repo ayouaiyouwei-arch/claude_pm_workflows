@@ -79,13 +79,14 @@ evals/ · optimization/   # runs.csv + weekly reports · prompt patches + agent 
 
 ## Built-in methodologies (ship with the skeleton)
 
-Six cross-project "battle rules" distilled from real projects:
+Seven cross-project "battle rules" distilled from real projects:
 
 - **P001 — UI granularity**: specs must state each interaction's granularity / position / 5 states / visibility
 - **P002 — no tech-speak in PRDs**: requirements use business language, not routes / endpoints / file paths
 - **P003 — no AI over-reach**: when ambiguous, ask — don't invent
 - **P004 — no retrospect lag**: every `.done` must write `runs.csv` (3-layer guard built in)
 - **P005 — dev-gray smoke verify**: after every `.done`, PM independently clicks through dev gray (`/dev-verify` · 3-layer guard built in)
+- **P006 — A4 → A5 → G-gate → DRIFT 4-tier intercept**: technical commitments get challenged at A5, gated at G-checks, drift-logged on mismatch — zero rework on contract-fact misalignment
 - **P007 — evidence-driven conventions**: grep real code before asserting any code convention, or mark it a guess
 
 Everything else (domain-term confusion, acceptance env, branch isolation…) **your project grows on its own** after a few runs.
@@ -141,6 +142,7 @@ git clone https://github.com/ayouaiyouwei-arch/claude-product-pipeline.git my-pr
 - **P003 AI 过度发挥** —— 含糊处问人，不自由发挥
 - **P004 retrospect 滞后漏审** —— 升 .done 必落 runs.csv（三层防护已内置）
 - **P005 dev 灰度 smoke 验证** —— 升 .done 后 PM 端独立到 dev 灰度真 click 一次（三层防护已内置 · `/dev-verify`）
+- **P006 二次校验硬约束 G 门触发链** —— A4 质询 → A5 LOCKED 硬约束 → 06 验收 G 门 → 04 契约 DRIFT 流程 · 施工期主动拦截技术承诺与事实不符（四级机制已内置）
 - **P007 约定必须实证驱动** —— 任何代码约定先 grep 实证或标"推测"，不凭印象
 
 其余 patterns（领域术语混淆、验收环境、分支隔离等）由你的项目跑几轮后**自己长出来**。
