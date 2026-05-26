@@ -68,6 +68,12 @@ description: 研发交付包状态机闸门——驱动 .draft → .active → .
 > - **手动 mv / 批量升 done / 历史回填的包**：promote 这里**强制补**（否则 runs.csv 滞后 → `/pipeline-review` 漏审，会误判"本周 0 done 包"）。
 > - 自检：`comm -23 <(ls -d deliverables/*.done|sed 's#.*/##;s#\.done$##'|sort) <(awk -F, 'NR>1{print $1}' evals/runs.csv|sort)` 应为空。
 
+> 📋 **B-后置推荐动作 · dev 灰度 smoke 验证（best-effort · 不阻断）**：retrospect 落库后，跑 `/dev-verify <PKG>` 用 `dev-gray-deep-verify` skill 真到 dev 灰度 click 一次，确认功能落地。
+> - 自动 captcha + UI 登录 + 路由可达 + 关键元素渲染 + API 真实调用四件套
+> - 结果归档到 `<包>/evidence/dev-verify-<日期>.json` + 截图
+> - 失败 ⚠️ 标 99-状态 § 验收痕迹但**不回滚** .done（dev gray 数据问题 ≠ 代码 bug）
+> - 完整模式见 `knowledge/patterns/P005-dev灰度smoke验证.md`
+
 ### C. `.done → archive/`
 
 | 校验 | 检查 | 通过条件 |

@@ -91,6 +91,7 @@ grep -q "未初始化 · 待 /init-project" PROJECT-PROFILE.md && echo "FRESH" |
 4. **业务侧提交流程**（见 `PROJECT-PROFILE.md § 二` · 是否双向隔离按项目定）
 5. **append-only**（deliverables/提交记录.md / 各包 08-修复历史.md / evals/runs.csv / knowledge 各 csv 只追加）
 6. **升 .done 必同步 retrospect 落 runs.csv + cases.csv（默认执行）**：任何包升 `.done`（含 /new-feature 第 9 步 / promote-deliverable B-后置 / 手动追认）都必须当场补 runs.csv 18 列 + cases.csv 9 列 · 缺它 = 周报漏审 · `/pipeline-review` 第 1.5 步 + pipeline-evaluator 必检项兜底
+7. **升 .done 后跑 dev 灰度 smoke 验证（默认执行 · best-effort 不阻断）**：任何包升 `.done` 都应跑 `/dev-verify <PKG>` 确认 dev 灰度功能真落地 · 用 `dev-gray-deep-verify` skill（自动 captcha + UI 登录 + 截图）· 失败 ⚠️ 写入 99-状态 § 验收痕迹但不回滚 · 完整模式见 `knowledge/patterns/P005-dev灰度smoke验证.md`
 
 ---
 
