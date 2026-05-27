@@ -1,6 +1,6 @@
 ---
 模式编号: P007
-标题: 业务侧 push 完成后必须主动调 write-fix-prompt 生成 Codex 派活提示词
+标题: 派活提示词必须在 push **之前**生成并落到交付包内（与镜像一起 push · 不是 push 后再生成）
 首次发现: <本项目实战中触发时填>
 出现次数: 0（骨架自带 · 防遗忘 · 待本项目验证）
 最近出现: -
@@ -8,7 +8,7 @@
 状态: active（骨架自带 · 待本项目验证）
 ---
 
-# P007 · 业务侧 push 完成后必须主动调 write-fix-prompt 生成派活提示词
+# P007 · 派活提示词必须在 push **之前**生成并落到交付包内
 
 > 🔧 骨架自带通用方法论。**仅适用于"研发对端是 Codex / AI 编程使用人"的项目** · 不适用于"研发是手写代码人"的项目。
 
@@ -17,100 +17,115 @@
 当工作空间端**对接的研发是 Codex / AI 编程使用人**（而不是手写代码人）时：
 - 研发拿到 business 分支 commit 后 · 不会直接读代码 · 而是把"派活提示词"复制粘贴给 Codex
 - Codex 需要明确知道："去读哪个目录的哪些文件 + 按什么顺序 + 注意什么"
-- **业务侧 push 只是把 .draft 包推到 git · 不等于派活完成**
+- **业务侧 push 只是把 .draft 包推到 git · 不等于派活完成 · 还需要"派活提示词"作为指南**
 
-因此：**`/new-feature` 流水线第 8 步打包 + 业务侧 push 完成后** · 主对话**必须主动调 `write-fix-prompt` skill** 生成顶层派活提示词。
+**关键 v2 修正（2026-05-27 实战沉淀）**：派活提示词必须**先生成 + 落到交付包内** · **再 push business**（提示词随镜像一起到 docs/acceptance/）· 而**不是** push 之后再生成。
 
-## 为什么需要这个？
+## 为什么必须 push 前生成？（v1 v2 对比）
 
 ```
-❌ 误判（push commit 就够）：
-   PM push business commit → 默认研发能看到 → 实际研发不知道要做哪个包
-   ↓
-   研发拉取 + 自行决定看哪个目录 + 自行决定先看哪个文件
-   ↓
-   信息密度低 · 容易漏 G 门 · 容易跳步
+❌ v1（错）：push 后生成
+  打包 .draft → push business → 调 write-fix-prompt 输出文本 → PM 通过外部渠道（IM / 邮件）传 dengyunpan
+  问题：
+  - 提示词不进 git · 无留痕
+  - 外部渠道易丢失 / 历史难追溯
+  - PM 二次操作（复制粘贴外部传）= 额外步骤
+  - 反工时无地方追溯"上次派的什么"
 
-✅ 正确（push + write-fix-prompt 双步）：
-   PM push business commit
-   ↓
-   主对话主动调 write-fix-prompt skill 生成提示词
-   ↓
-   PM 把提示词文本复制粘贴给研发
-   ↓
-   研发把提示词喂给 Codex
-   ↓
-   Codex 知道：读 docs/acceptance/<日期>-<slug>/ + 先看 AGENTS.md + 00-给Codex的导读 + 04-接口契约 + 06 § 〇 G 门
-   ↓
-   Codex 实施 + push release commit
-   ↓
-   P008 6 步追认 → .done
+✅ v2（对）：push 前生成 · 提示词进包
+  打包 .draft → 调 write-fix-prompt 生成提示词 → 落到 .draft 包根 `00-Codex派活提示词.md`
+                → 镜像 .draft 包到 code/<仓库>/docs/acceptance/<日期>-<slug>/
+                → push business（提示词随镜像一起推上去）
+  优势：
+  - 提示词进 git · 永久留痕 · 可追溯
+  - dengyunpan 拉 business 即可在镜像目录读 · 不需 PM 外部传
+  - 多轮反工时 [ROUND-N] 历史与提示词并存
+  - 跨人协作（多 PM / 多研发）时 single source of truth
 ```
 
 ## 触发条件
 
-- 主对话刚完成 `/new-feature` 全流水线第 8 步打包 + push
-- 或刚单独 push 业务侧 commit
-- PM 明确指出"是 Codex / AI 编程派活" 项目
+- 主对话刚完成 `/new-feature` 流水线第 8 步打包 `.draft`（generate-research-deliverable）
+- **打包后立即调 write-fix-prompt**（**不等 push**）· 落到 `.draft` 包根
+- 然后再镜像到 `code/<仓库>/docs/acceptance/<日期>-<slug>/`
+- 最后 push business
 
 ## 反例（**禁止重犯**）
 
-### ❌ 反例 1：把 write-fix-prompt 当成"可选下一步"
+### ❌ v1 反例：push 后才生成提示词
 
 ```
-"push 完成 · 流程已圆满"
-"下一步建议：A. promote .active  B. write-fix-prompt  C. 结束"
+1. 打包 .draft
+2. 镜像 + push business commit
+3. 主对话："✅ push 完成 · 流程已圆满"
+4. PM："等等 · 提示词呢？"
+5. 主对话："调 write-fix-prompt 生成..."输出文本到聊天框
+6. PM 复制粘贴外部传 dengyunpan
 ```
 
-不应该把 write-fix-prompt 排成"可选项" · 应该**默认主动调** · 不询问 PM。
+**问题**：提示词不进 git · 后续反工无地方追溯 · PM 二次操作。
 
-### ❌ 反例 2：把 dengyunpan 当成手写代码人
+### ❌ 反例 2：把 write-fix-prompt 当"可选下一步"
 
-看到 commit message 是人写的（`feat(dispatch): implement OPT-XXX...`）就以为研发是手写代码人 · 跳过 write-fix-prompt。
+```
+"下一步建议：
+  A. promote .active
+  B. write-fix-prompt
+  C. 结束"
+```
 
-实际上 commit message 可能是 Codex 自动生成的 · 也可能是研发手写后让 Codex 实施。
+不应该把 write-fix-prompt 排成"可选项" · 应该**默认主动调** · 而且**在 push 之前**。
+
+### ❌ 反例 3：把 dengyunpan 当成手写代码人
+
+看到 commit message 是人写的（`feat(xxx): implement ...`）就以为研发是手写 · 跳过 write-fix-prompt。
 
 **对策**：`/init-project` 时必须问 PM "研发对端是 Codex 使用人还是手写人？" 默认假设是 Codex 使用人。
 
-### ❌ 反例 3：调 promote-deliverable 但不调 write-fix-prompt
-
-```
-promote-deliverable .draft → .active 后
-说："状态已变 · 流程完成"
-```
-
-但 promote 只是改后缀 · 没产出"派活语料"。.active 状态需要配合 write-fix-prompt 才完整。
-
 ## 操作模板
 
-```python
-# /new-feature 第 8 步打包完成 + 业务侧 push 后立即执行
-# 不需要询问 PM "需要写提示词吗" · 默认调
+### 标准工作流（v2）
 
-Skill(skill="write-fix-prompt", args="<.draft 包路径>")
+```bash
+# Step 1 · 打包 .draft
+Skill(generate-research-deliverable)
+# → 生成 deliverables/<日期>-<编号>-<短名>.draft/（含 12 根 .md + AGENTS + demo + snapshot）
+
+# Step 2 · 立即调 write-fix-prompt（push 之前）
+Skill(write-fix-prompt, args=".draft 包路径 · 落位包根/00-Codex派活提示词.md")
+# → 在 .draft 包根新增 00-Codex派活提示词.md（与 AGENTS.md 同级）
+
+# Step 3 · 镜像到 code/<仓库>/docs/acceptance/<日期>-<slug>/
+cp -R deliverables/<日期>-<编号>-<短名>.draft/* \
+      code/<仓库>/docs/acceptance/问题说明/<短日期>-<短名>/
+# 提示词随镜像一起复制（已含在 .draft/ 内）
+
+# Step 4 · push business
+cd code/<仓库>
+git checkout feature/business-submit-<日期>
+git add "docs/acceptance/问题说明/<短日期>-<短名>/"
+git commit -m "biz(req): <编号> <一句话>"
+git push origin feature/business-submit-<日期>
+# 提示词随 commit 一起到 git · dengyunpan 拉 business 即可在镜像目录读
 ```
 
-write-fix-prompt 产出格式（让 PM 复制粘贴）：
+### 提示词必含项（write-fix-prompt skill 模板）
 
-```
-# === 复制以下文本给研发 · 研发喂给 Codex ===
+文件落位：`<.draft>/00-Codex派活提示词.md`（00 开头 + 中文 · 确保 ls 排序最前）
 
-请实施 <CHG-XXX-X>（<一句话短描述>）· 施工图位于：
-
-  code/<repo>/docs/acceptance/问题说明/<日期>-<slug>/
-
-施工第一步：
-1. 读 AGENTS.md（包级铁律）
-2. 读 00-给Codex的导读.md（详细操作手册）
-3. 读 04-接口契约.md（接口签名 + DRIFT 流程）
-4. 读 06-验收标准.md § 〇（实施前置 G 门 · grep/curl/SQL 验证清单）
-
-任何 G 门失败 → 在 08-修复历史.md 标 [CONTRACT-DRIFT-N] · 等 PM 决策 · 严禁自适应实现。
-
-完成后在 08 追加 [ROUND-N] 段 + 提交 release commit。
-
-# === 复制结束 ===
-```
+内容必含 12 段：
+1. **§ 任务编号** + 一句话需求 + 包路径
+2. **§ 启动前自检**（grep / git diff 命令 · Codex 拿到必跑）
+3. **§ 强制阅读顺序**（含 AGENTS.md / 00-给Codex的导读.md / 99-状态 / 01-08 / 视觉规范 / demo / screenshots）
+4. **§ 视觉契约铁律**（UI 类需求 · 含 demo 100% 事实源 · px 偏差 · token 不写死 hex · 5 态完整 · 含糊问 PM）
+5. **§ 施工第一步 G 门自检**（A5 LOCKED 的 G1~GN grep 命令）
+6. **§ 五条铁律**（单 active · 物理隔离 · 必读强制 · 白黑名单 · 留痕强制）
+7. **§ 修改白名单**（具体路径）
+8. **§ 修改黑名单**（具体路径 · 含"不准 pnpm add 第三方库"等约束）
+9. **§ 本轮交付要求**（修改文件清单 + G 门自检结果 + 截图清单 + 5 角色组合 + 风险）
+10. **§ 越界 / 疑问处置**（[QUESTION-N] / [CONTRACT-DRIFT-N]）
+11. **§ 验收对接**（9 项硬检查 + UI 类 V1-V5 + dev gray smoke）
+12. **§ 本轮重点 + A5 兜底裁定**（解决 A3 § 七 不确定点）
 
 ## 给新项目的提示
 
@@ -125,12 +140,12 @@ B. 手写代码人（不需要 write-fix-prompt · 跳过 P007）
 C. 混合（部分人 Codex · 部分手写）"
 ```
 
-- 选 A → 启用 P007（每次 push 后强制调 write-fix-prompt）
+- 选 A → 启用 P007 v2（每次打包 .draft 后强制调 write-fix-prompt · 提示词进包 · 再 push）
 - 选 B → 不启用 P007（write-fix-prompt skill 仍存在 · 但不强制）
 - 选 C → 默认按 A · PM 自己控制何时调
 
 ## 关联机制
 
-- write-fix-prompt skill：`/SKILL.md`（生成派活提示词）
-- generate-research-deliverable skill：生成 .draft 包 + 镜像到 code/
-- P008（research 自主实施 · 工作空间不追同步）：派活后流程
+- write-fix-prompt skill：`.claude/skills/write-fix-prompt/SKILL.md`（生成派活提示词 v2）
+- generate-research-deliverable skill：生成 .draft 包 · 在 .draft 包根留位 `00-Codex派活提示词.md`
+- P006（研发自主实施 · v2 流程）：派活后流程
