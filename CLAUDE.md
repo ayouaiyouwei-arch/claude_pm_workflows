@@ -92,6 +92,12 @@ grep -q "未初始化 · 待 /init-project" PROJECT-PROFILE.md && echo "FRESH" |
 5. **append-only**（deliverables/提交记录.md / 各包 08-修复历史.md / evals/runs.csv / knowledge 各 csv 只追加）
 6. **升 .done 必同步 retrospect 落 runs.csv + cases.csv（默认执行）**：任何包升 `.done`（含 /new-feature 第 9 步 / promote-deliverable B-后置 / 手动追认）都必须当场补 runs.csv 18 列 + cases.csv 9 列 · 缺它 = 周报漏审 · `/pipeline-review` 第 1.5 步 + pipeline-evaluator 必检项兜底
 7. **升 .done 后跑 dev 灰度 smoke 验证（默认执行 · best-effort 不阻断）**：任何包升 `.done` 都应跑 `/dev-verify <PKG>` 确认 dev 灰度功能真落地 · 用 `dev-gray-deep-verify` skill（自动 captcha + UI 登录 + 截图）· 失败 ⚠️ 写入 99-状态 § 验收痕迹但不回滚 · 完整模式见 `knowledge/patterns/P005-dev灰度smoke验证.md`
+8. **P013 LOCKED · PM 灰度主观体验 5 分钟过一遍（默认建议 · 与 P005 并列）**：任何包升 `.done` 后 · 即使 P005 dev-verify 通过 + 全量回归 100% + 0 blocker · PM 仍应**亲自在 dev 灰度环境 5 分钟体验核心场景**（小屏 + 大屏各开一次 · 切换 2 个常见过滤态 · 触发 1 个边界态）· 写主观体验摘要到 99-状态 § 五（✅ / ⚠️ / 🚨 三档）· 发现 P0 阻断 → 立即开 followup · 主对话在 `.done` 升级后**主动提醒** PM 跑 P013。教训：自动化 100% PASS · 但 PM 灰度实拍发现新问题（流水线"自进化"的根本输入）· 完整模式见 `knowledge/patterns/P013-PM灰度主观体验5分钟过一遍.md`
+9. **P010/P011/P012 LOCKED · 流水线深层防御（通用方法论 · 2026-05-27 新增）**：
+   - **P010**（A1+A3+A6+A7）· 硬编码 fallback 数据源 grep 自检（`_DATA / MOCK_ / FALLBACK_ / DEFAULT_` 模式）+ `[REGRESSION-REVERSE]` 反向回归用例（A→B→A 模式）
+   - **P011**（A1.5+A6+A7）· 视觉规范禁用模糊形容词（胶囊/气泡/椭圆/...）+ BAD vs GOOD 对比图 + 整页 2 断点 demo
+   - **P012**（A1）· 数据层过滤需求必有 UI 联动 4 要素（标题/placeholder/视觉标识/聚焦）
+   触发包：实战中"8 agent 全过 + 全量回归 100% + 但 PM 实拍发现新问题"反思 · 5 agent prompt 新增 7 处 LOCKED 段
 
 ---
 

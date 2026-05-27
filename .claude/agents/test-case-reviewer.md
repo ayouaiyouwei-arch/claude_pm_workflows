@@ -136,6 +136,38 @@ echo "P0:$P0 P1:$P1 P2:$P2 / 共 $TOTAL"
 | 03 § 2.1 每个新增接口 | ≥ 1 用例 | grep 接口 path 是否在 CSV 出现 |
 | 01 § 6 列出的关键链路 | 都有对应主流程用例 | 人工对照 |
 | 回归用例 | ≥ 1，且明确指向相关现有页面 | 检查 `06-用例说明.md § 三` |
+| **`[REGRESSION-REVERSE]` 反向回归用例（P010 LOCKED）** | 触发条件下 ≥ 1 · 缺即打回 | 见下方 P010 触发条件 + 检查命令 |
+| **禁用模糊形容词（P011 LOCKED）** | grep 0 命中 | `grep -E "胶囊\|气泡\|椭圆\|圆乎乎\|大致\|类似\|差不多" "$CSV" "$DOC"` |
+
+<!-- LOCKED:START reason="P010 通用方法论 · A7 必检反向回归 · 防 A6 漏" -->
+
+### P010 LOCKED · 反向回归用例必检（通用方法论）
+
+**触发条件**（任一命中 = 必含 `[REGRESSION-REVERSE]` 标签用例 ≥ 1）：
+
+```bash
+# 触发条件 1：需求含切换 / 筛选 / 模式
+TRIGGER1=$(grep -cE "切换|筛选|切.*ID|身份切换|模式切换" 03-PRD片段.md 01-需求范围与边界.md)
+
+# 触发条件 2：A3 § 四"已识别的硬编码 fallback 数据源数量" > 0
+TRIGGER2=$(awk '/已识别的硬编码 fallback/ {gsub(/[^0-9]/, "", $NF); print $NF}' 03-技术方案.md)
+TRIGGER2=${TRIGGER2:-0}
+
+if [ "$TRIGGER1" -gt 0 ] || [ "$TRIGGER2" -gt 0 ]; then
+  REVERSE=$(grep -c "\[REGRESSION-REVERSE\]" "$CSV")
+  if [ "$REVERSE" -lt 1 ]; then
+    echo "❌ Pass2 打回 · P010 LOCKED 触发但 CSV 缺 [REGRESSION-REVERSE] 用例（通用方法论必检）"
+  else
+    echo "✅ P010 LOCKED 通过 · [REGRESSION-REVERSE]=$REVERSE"
+  fi
+fi
+```
+
+**打回条件**：触发条件命中 + `[REGRESSION-REVERSE]` 用例 = 0 → Pass2 直接打回 · 不允许 A6 用 `[EG]` / `[REG]` 替代。
+
+**触发理由**：实战教训 · 用 `[EG]` 标签只验证单向 · 没验证 A→B→A 反向回归 → A7 没发现 · Codex 漏写 fallback。
+
+<!-- LOCKED:END -->
 
 ---
 
