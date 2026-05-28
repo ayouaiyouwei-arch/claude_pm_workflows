@@ -169,6 +169,49 @@ fi
 
 <!-- LOCKED:END -->
 
+<!-- LOCKED:START reason="P014 通用方法论 · A7 必检 UI 文案语义边界 + property-based test INFO 推荐 · 灰度首次实战触发类 BUG 兜底" -->
+
+### P014 LOCKED · UI 文案语义边界用例必检（通用方法论）
+
+**触发条件**（任一命中 = 必含 `[BV-LABEL]` 标签用例 ≥ 3 条）：
+
+```bash
+# 触发条件 1：A1 § 4.3.x P014 LOCKED 表存在
+TRIGGER1=$(grep -c "P014 LOCKED · UI 文案" 01-需求细化.md)
+
+# 触发条件 2：需求含 preset 按钮 / 快捷过滤 / 时间区间
+TRIGGER2=$(grep -cE "近 [0-9]+ 天|近 [0-9]+ 个月|最近 [0-9]+|Top [0-9]+|Last [0-9]+|preset|快捷过滤|时间区间" 03-PRD片段.md 01-需求范围与边界.md 2>/dev/null | awk -F: '{sum+=$NF} END {print sum+0}')
+
+if [ "$TRIGGER1" -gt 0 ] || [ "$TRIGGER2" -gt 0 ]; then
+  BV_LABEL=$(grep -c "\[BV-LABEL\]" "$CSV")
+  if [ "$BV_LABEL" -lt 3 ]; then
+    echo "❌ Pass2 打回 · P014 LOCKED 触发但 CSV 缺 [BV-LABEL] 用例 ≥ 3（通用方法论必检）"
+  else
+    echo "✅ P014 LOCKED 通过 · [BV-LABEL]=$BV_LABEL"
+  fi
+
+  # 推荐检查（不打回 · INFO）：是否用 property-based test
+  PROP_BASED=$(grep -cE "fast-check|fc\.property|fc\.assert" "$CSV" 2>/dev/null || true)
+  if [ "$PROP_BASED" -eq 0 ]; then
+    echo "ℹ️ 推荐：前端类需求 · 用 property-based test (fast-check + vitest) 替代手写 [BV-LABEL] · 单 fc.property 可覆盖 1000+ 边界日 · 不强制"
+  fi
+fi
+```
+
+**打回条件**：触发条件命中 + `[BV-LABEL]` 用例 < 3 → Pass2 直接打回 · 不允许 A6 用 `[BV]` / `[EG]` 替代（含义宽泛 · 不专指 UI 文案语义边界）。
+
+**推荐（不强制）** · property-based test 替代手写 `[BV-LABEL]`：
+- 行业事实标准（2025+）：`@fast-check/vitest` · `vi.useFakeTimers + vi.setSystemTime + fc.date()` 自动随机化生成边界日
+- 单 `fc.property([fc.date(...)])` 跑 100~1000 次随机日期 = 比手写 6 条 [BV-LABEL] 覆盖强 100~1000 倍
+- A6 可自由选择"手写 ≥ 3 [BV-LABEL]" / "fast-check property" / "两者都做"· A7 不强制 fast-check
+
+**关联长期工程方案**（不在本 LOCKED 内 · PM 应知）：
+- 代码层引入 **TypeScript discriminated union + readonly const PRESETS[]** 编译期强绑定 label/impl/semantic
+- 测试层引入 **@fast-check/vitest** property-based test 覆盖 4000+ 边界日
+- 工程层落地后 · 本 LOCKED 可降级为 INFO 提醒（编译器已保证 label/impl 绑定）
+
+<!-- LOCKED:END -->
+
 ---
 
 ## 审核 Pass 3 · 与说明文档一致性

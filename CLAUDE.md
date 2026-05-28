@@ -98,6 +98,10 @@ grep -q "未初始化 · 待 /init-project" PROJECT-PROFILE.md && echo "FRESH" |
    - **P011**（A1.5+A6+A7）· 视觉规范禁用模糊形容词（胶囊/气泡/椭圆/...）+ BAD vs GOOD 对比图 + 整页 2 断点 demo
    - **P012**（A1）· 数据层过滤需求必有 UI 联动 4 要素（标题/placeholder/视觉标识/聚焦）
    触发包：实战中"8 agent 全过 + 全量回归 100% + 但 PM 实拍发现新问题"反思 · 5 agent prompt 新增 7 处 LOCKED 段
+10. **P014 LOCKED · UI 文案语义一致性校验（通用方法论 · 2026-05-28 新增 · 灰度首次实战触发类 BUG 防护）**：
+    - **P014**（A1+A6+A7）· UI 文案 "近 N 天" / "Last N days" / "本周" / "Top N" 等含数字 / 范围的预设按钮 · A1 § 4.3.x 必产 LOCKED 表（4 列 · 含 semantic 类型 rolling/calendar/point-in-time/event-based · 行业事实标准）· A6 必产 `[BV-LABEL]` 用例 ≥ 3（与 [BV] 区别：UI 文案语义边界 vs 经典边界值）· A7 Pass2 触发判定 + property-based test (`@fast-check/vitest`) INFO 推荐
+    - **触发包**：实战中"8 agent 全过 + 25 用例全过 + dev-verify 通过 + 9 硬检查通过 + 全量回归 100% PASS → 仍漏 30+ 天"反思 · PM 灰度 5 分钟主观体验首次点 preset 按钮才触发
+    - **长期工程方案**（推荐 · 不在 prompt LOCKED 内）：L1 工程层 TypeScript discriminated union + readonly const PRESETS[] · L2 测试层 @fast-check/vitest property-based test 覆盖 4000+ 边界日 · 工程层落地后 A7 P014 LOCKED 可降级为 INFO 提醒
 
 ---
 

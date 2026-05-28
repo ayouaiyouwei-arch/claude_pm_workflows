@@ -156,6 +156,44 @@ A → B → A 模式：从默认状态 A 切到 B 后 · 再切回 A · 验证 3
 
 **触发理由**（通用经验）：用 `[EG]` 标签只验证单向（切到 B 后数据重拉）· 没验证 "再切回原态时是否破坏" → 反向回归缺失 → Codex 实施单向逻辑 → fallback 漏触发。
 
+<!-- LOCKED:START reason="P014 通用方法论 · UI 文案语义边界专属约束 · 与 A1 § 4.3.x P014 LOCKED 配套" -->
+
+## `[BV-LABEL]` UI 文案语义边界专属约束（P014 LOCKED · 通用方法论）
+
+### 触发条件（任一命中即必含 `[BV-LABEL]` 标签用例 ≥ 3 条）
+
+- A1 § 4.3.x P014 LOCKED 表填了 ≥ 1 个 UI 文案元素
+- 需求含 "preset 按钮 / 快捷过滤 / 时间区间选择"（grep 03-PRD片段.md 命中"近 N 天" / "Last N days" / "Top N" / "最近 X"）
+
+### 必含用例模板（按 A1 § 4.3.x 表逐行展开）
+
+对每个 UI 文案元素（如"近 7 天"）· 必产以下边界用例：
+
+```
+1. [BV-LABEL] 边界日 1：mock 系统时间为周一 / 月初 / 季初 → 点击 preset → 断言精确结果
+2. [BV-LABEL] 边界日 2：mock 系统时间为周日 / 月末 / 季末 → 同上
+3. [BV-LABEL] 跨周期：mock 系统时间为跨年 / 闰年 / 夏令时（如适用）→ 同上
+```
+
+### 自检（写完 CSV 后必跑）
+
+```bash
+UI_LABEL_COUNT=$(grep -cE "近 [0-9]+ 天|近 [0-9]+ 个月|最近 [0-9]+|Top [0-9]+|Last [0-9]+ days" 03-PRD片段.md 01-需求细化.md 2>/dev/null | awk -F: '{sum+=$NF} END {print sum+0}')
+BV_LABEL_COUNT=$(grep -c "\[BV-LABEL\]" 06-用例.csv)
+[ "$BV_LABEL_COUNT" -lt $((UI_LABEL_COUNT * 3)) ] && echo "❌ P014: [BV-LABEL] 用例数 < UI 文案元素数 × 3 · 不合规"
+```
+
+### [BV-LABEL] 与 [BV] 的区别
+
+- `[BV]` = 经典边界值（数值 / 长度 / 格式 / 数量边界 · 如长度=0/1/255/256）
+- `[BV-LABEL]` = **UI 文案语义边界**（系统时钟在文案语义临界点时的行为 · 如"近 7 天"在工作日 / 周末的差异）
+
+### 推荐长期工程方案
+
+property-based test (`@fast-check/vitest` + `vi.setSystemTime` + `fc.date()`) 自动随机化 1000+ 边界日 = 比手写 6 条 [BV-LABEL] 强 100~1000 倍。A6 可选择手写或 fast-check 或两者都做。
+
+<!-- LOCKED:END -->
+
 ## 禁用模糊形容词（P011 LOCKED · 与 A1.5 同步）
 
 - ❌ 严禁出现：`胶囊` / `气泡` / `椭圆` / `圆乎乎` / `大致` / `类似` / `差不多`

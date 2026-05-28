@@ -247,6 +247,48 @@ grep -nE '\b[a-z]+_[a-z]+\b|\b[a-z]+[A-Z][a-z]+\b' "$DRAFT" | head -20
 ### 4.1 用户角色与场景（按端拆）
 ### 4.2 核心流程（步骤 1→N，标注每步在哪个端）
 ### 4.3 字段清单（含必填 / 可选 / 校验；跨端字段口径必须一致）
+
+<!-- LOCKED:START reason="P014 通用方法论 · UI 文案语义 vs 实际计算实现偏离类盲区 · 灰度首次实战触发类 BUG 防护 · 工程层 TS discriminated union 铺路" -->
+
+#### 4.3.x · P014 LOCKED · UI 文案语义一致性校验（含数字/范围的 UI 元素必跑）
+
+凡需求涉及以下 UI 元素 · A1 § 4.3 字段清单段必产 "UI 文案语义 LOCKED 表"：
+
+| 触发场景 | 示例 |
+|---|---|
+| 含数字的 preset 按钮 | "近 7 天" / "近 30 天" / "Last N days" / "Top 5" |
+| 含范围的时间区间选择器 | "今天" / "昨天" / "本周" / "本月" / "This week" |
+| 含数字的快捷操作 | "前 10" / "近 24h" |
+| 含状态的快捷过滤 | "已完成" / "进行中" / "Last 24h" |
+
+**LOCKED 表必填字段**（每个 UI 元素一行 · 4 列）：
+
+| UI 文案 | semantic 类型 | PM 期望的精确语义 | 边界示例 |
+|---|---|---|---|
+| 例："近 7 天" / "Last 7 days" | **rolling** | `today - 6 days ~ today`（含今天共 7 天）· 跨周自然 | 周一点击：上周二 ~ 本周一（跨周 OK）|
+| 例："本周" / "This week" | **calendar** | 本 ISO 周一 ~ 本周日（含未来）| 周一点击：本周一 ~ 本周日（含 6 天未来）|
+| 例："今天" / "Today" | **point-in-time** | `today 00:00:00 ~ today 23:59:59` 或 `today 00:00:00 ~ now`？必须明确 | 0 点点击 vs 23:59 点击是否同结果 |
+| 例："上次登录到现在" | **event-based** | `lastLoginAt ~ now` | 用户从未登录 → fallback 注册时间 |
+
+**`semantic` 列三选一**（编译期友好 · 为 TS discriminated union 工程改造铺路）：
+- `rolling`：滑动窗口 · `today-(N-1) ~ today`（行业事实标准：UXPatterns.dev / MUI / shadcn / Stripe / Linear）
+- `calendar`：自然日历周期 · 本周一/本月 1 号/本季首 ~ 周日/月末/季末（**含未来日期 · 后端通常 reject**）
+- `point-in-time` / `event-based`：单点 / 事件触发型 · 需特殊定义
+
+**强制要求**：
+- ❌ 严禁缺"边界示例"列（防止研发对 today 是否含 23:59 / 跨周是否包含等细节误解）
+- ❌ 严禁混用"近 N 天" UI 文案 + calendar 实现（行业反模式 · 后端日期校验通常会拒未来 endDate）
+- ✅ 必须用：精确数学表达式 + 至少 1 个边界示例
+- ✅ A6 必须基于本表产 `[BV-LABEL]` 用例（边界示例转化为单测）
+
+**触发理由**（通用经验）：UI 文案"近 N 天"在 PM 头脑中 = rolling window · 但研发凭直觉可能实现"本 ISO 周/月/季" = calendar window（含未来）→ 后端 reject endDate > today → 整页加载失败 → PM 灰度才首次点 preset 按钮触发 → BUG 可能潜伏 30+ 天。
+
+**长期工程方案**（不在本 LOCKED 内 · 但 PM 应知）：
+- 推荐代码层引入 **TypeScript discriminated union + readonly const PRESETS[]**（编译期强绑定 label/impl/semantic 三者）
+- 推荐测试层引入 **@fast-check/vitest property-based test**（单 `fc.property([fc.date(...)])` 跑 1000+ 边界日 · 取代手写 6 条 [BV-LABEL]）
+
+<!-- LOCKED:END -->
+
 ### 4.4 边界态（按端列 5 态）
 ### 4.5 与现有功能的关系（替换 / 扩展 / 不冲突）
 ### 4.6 跨端一致性约束（如有多端）
