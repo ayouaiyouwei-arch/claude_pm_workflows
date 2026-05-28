@@ -27,6 +27,21 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
 3. 拿到 agent 产物后，把关键结论一句话告知用户
 4. 在 **5 ~ 6 个 gate** 处（含新增 Gate 1.5a / 1.5b）**强制停下来等用户答复**，不允许自动继续
 
+### ⚠️ P015 LOCKED · 主对话在所有 Gate / Ask 都必须用业务语言
+
+<!-- LOCKED:START reason="P015 守护 · 骨架默认开启 · /optimize-prompts 禁止改动" -->
+
+每个 Gate 都涉及主对话**把 agent 输出转给 PM** + **AskUserQuestion 给 PM 选** · 主对话必须满足 4 条（详见 `knowledge/patterns/P015-问PM必用业务语言.md`）：
+
+1. **业务影响必先说**：把 agent 产物（特别是 A2 打回 / A4 触发 A5 / A5 加固 / A7 打回）转给 PM 时**第一段必须用业务语言重新讲述"为什么 PM 应该关注 / 不修会发生什么"**
+2. **技术词必括号翻译 / 替换**：agent 产物里的 `import.meta.env.PROD` / `interceptor` / `hostname` 等技术词 · 主对话**必须翻译**才转给 PM（参考 `knowledge/patterns/P015 § 强约束 2` 的 30 词翻译表）
+3. **AskUserQuestion 每个 option 的 description 必含业务后果**："如果选 A · 用户 / 客户 / 演示场景会看到/经历什么"
+4. **返回 PM 前 grep 自检**：每条问题清单跑一遍 30 词黑名单 · 命中即重写
+
+例外：① 文件名 / 路径 / commit SHA ② PM 自己先用过的术语 ③ 选项 label（label 短 · 详细业务后果放 description）
+
+<!-- LOCKED:END -->
+
 ---
 
 ## 第 0 步：准备工作目录

@@ -102,6 +102,10 @@ grep -q "未初始化 · 待 /init-project" PROJECT-PROFILE.md && echo "FRESH" |
     - **P014**（A1+A6+A7）· UI 文案 "近 N 天" / "Last N days" / "本周" / "Top N" 等含数字 / 范围的预设按钮 · A1 § 4.3.x 必产 LOCKED 表（4 列 · 含 semantic 类型 rolling/calendar/point-in-time/event-based · 行业事实标准）· A6 必产 `[BV-LABEL]` 用例 ≥ 3（与 [BV] 区别：UI 文案语义边界 vs 经典边界值）· A7 Pass2 触发判定 + property-based test (`@fast-check/vitest`) INFO 推荐
     - **触发包**：实战中"8 agent 全过 + 25 用例全过 + dev-verify 通过 + 9 硬检查通过 + 全量回归 100% PASS → 仍漏 30+ 天"反思 · PM 灰度 5 分钟主观体验首次点 preset 按钮才触发
     - **长期工程方案**（推荐 · 不在 prompt LOCKED 内）：L1 工程层 TypeScript discriminated union + readonly const PRESETS[] · L2 测试层 @fast-check/vitest property-based test 覆盖 4000+ 边界日 · 工程层落地后 A7 P014 LOCKED 可降级为 INFO 提醒
+11. **P015 LOCKED · 问 PM 必用业务语言（通用方法论 · 2026-05-28 新增 · 骨架默认开启）**：
+    - **P015**（A1 + A1.5 + A2 + A3 + A4 + A5 + A7 + 主对话）· agent 向 PM 提任何问题清单 / 打回原因 / Gate 决策必满足 4 条：① 业务影响必先说（"用户/客户/演示场景会看到/经历什么"）② 技术词必括号翻译（30 词黑名单翻译表）③ A/B/C 选项必各带业务后果 ④ 返回前 30 词技术黑名单 grep 自检 ≤ 0
+    - **触发包**：实战中"agent 给 PM 的问题清单大量塞 `import.meta.env.PROD` / `interceptor` / `hostname` 等技术黑话 · PM 看不懂 · 决策卡住或拍错"反思 · 7 agent prompt + new-feature command 全部加 LOCKED 段
+    - **覆盖范围**：骨架默认开启 · 所有新项目无需 init 即生效
 
 ---
 

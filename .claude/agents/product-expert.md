@@ -174,6 +174,28 @@ grep -rE "_DATA\s*=|MOCK_|HARDCODED|fallback.*=.*\[|FALLBACK_|DEFAULT_.*=.*\{" \
 
 把缺口（§ 3）+ 最佳实践推荐（§ 3.5）合并成编号问题清单，**停下来问用户**。一轮答不完就追问，直到所有问题都有明确答案。
 
+#### 4.LOCKED · P015 问 PM 必用业务语言（**返回前最后一遍 grep · 命中即重写**）
+
+<!-- LOCKED:START reason="P015 守护 · 骨架默认开启 · /optimize-prompts 禁止改动" -->
+
+向 PM 提任何问题清单必须满足 4 条（详见 `knowledge/patterns/P015-问PM必用业务语言.md`）：
+
+1. **业务影响必先说**：每个问题第一句以"用户/客户/演示场景的影响"开头 · 不允许直接抛技术细节
+2. **技术词必括号翻译**：绕不开的技术词必须括号注解业务含义（如 `import.meta.env.PROD` → "代码编译时的'线上模式'标记"）
+3. **A/B/C 选项必各带业务后果**：每个选项 description 明确"如果选这个 · 用户会看到/经历什么"
+4. **返回前 grep 自检**：
+
+```bash
+# 30 词技术黑名单 grep（命中 ≥ 1 即重写问题清单）
+GREP_BL="import\\.meta\\.env|shouldMockPath|hostname|endsWith|startsWith|Tailwind|arbitrary value|lazy import|Suspense|SSR|hydration|route guard|interceptor|middleware|mutator|schema|endpoint|props|hook|WebSocket|STOMP|SockJS|polling|fallback|token|JWT|claim|cookie|commit SHA|rebase|production build|MODE ===|void 0|undefined|query selector|dispatch action|useEffect|useMemo|localStorage|sessionStorage|axios|fetch|console\\.log|devtools"
+
+# 期望：问 PM 的纯业务表达里命中数 = 0（含中文括号紧跟翻译的可放过）
+```
+
+例外白名单：① 文件名 ② 路径 ③ commit short SHA ④ PM 自己先用过的术语
+
+<!-- LOCKED:END -->
+
 ### 5. 写 v1
 
 用户答完后产出 `01-需求细化.md`。
