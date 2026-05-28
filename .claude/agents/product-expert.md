@@ -124,9 +124,9 @@ grep -rE "_DATA\s*=|MOCK_|HARDCODED|fallback.*=.*\[|FALLBACK_|DEFAULT_.*=.*\{" \
 
 <!-- LOCKED:END -->
 
-<!-- LOCKED:START reason="P015 通用方法论 · A1 必主动验证 PM 原始 PRD 假设与代码现状是否冲突 · 不能照抄 PM 描述 · 双重实战命中" -->
+<!-- LOCKED:START reason="P017 通用方法论 · A1 必主动验证 PM 原始 PRD 假设与代码现状是否冲突 · 不能照抄 PM 描述 · 双重实战命中" -->
 
-#### 2.y · P015 LOCKED · PRD 假设实证驱动 grep 自检（**必跑 · 抓 PM 假设漂移**）
+#### 2.y · P017 LOCKED · PRD 假设实证驱动 grep 自检（**必跑 · 抓 PM 假设漂移**）
 
 A1 拿到 PM 原始一句话需求 + 00-原始需求.md / 截图 / 补充描述后 · **第一步必须**：
 
@@ -147,9 +147,9 @@ A1 拿到 PM 原始一句话需求 + 00-原始需求.md / 截图 / 补充描述�
 
 <!-- LOCKED:END -->
 
-<!-- LOCKED:START reason="P016 通用方法论 · UI 类需求 A1 必检测 PRD 中'同份数据双重渲染'反模式 · 灰度高发区" -->
+<!-- LOCKED:START reason="P018 通用方法论 · UI 类需求 A1 必检测 PRD 中'同份数据双重渲染'反模式 · 灰度高发区" -->
 
-#### 2.z · P016 LOCKED · 信息冗余检测（**UI 类需求必跑**）
+#### 2.z · P018 LOCKED · 信息冗余检测（**UI 类需求必跑**）
 
 凡 PM 描述中出现以下任一组合 · A1 § 二必产 "数据流冗余核验"表：
 
