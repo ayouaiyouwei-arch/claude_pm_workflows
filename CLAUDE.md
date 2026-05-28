@@ -98,6 +98,13 @@ grep -q "未初始化 · 待 /init-project" PROJECT-PROFILE.md && echo "FRESH" |
    - **P011**（A1.5+A6+A7）· 视觉规范禁用模糊形容词（胶囊/气泡/椭圆/...）+ BAD vs GOOD 对比图 + 整页 2 断点 demo
    - **P012**（A1）· 数据层过滤需求必有 UI 联动 4 要素（标题/placeholder/视觉标识/聚焦）
    触发包：实战中"8 agent 全过 + 全量回归 100% + 但 PM 实拍发现新问题"反思 · 5 agent prompt 新增 7 处 LOCKED 段
+11. **P015+P016 LOCKED · "验证冲突写 PRD" 反模式防护（通用方法论 · 2026-05-28 新增 · A1 阶段实证驱动 + 信息冗余检测）**：
+    - **P015**（A1 § 2.y）· **PRD 假设实证驱动** · A1 拿到 PM 原始 PRD 后必跑 4 步：提取假设句（"复用 X" / "X 字段已存在" / "X 直接复用 Y"等）→ grep 验证 → 产"PRD 假设核验"表 → 任一冲突 Gate 1 抓出来让 PM 拍板。**严禁照抄 PM PRD 描述就开始写需求细化**
+    - **P016**（A1 § 2.z）· **信息冗余检测** · 凡 PM 描述含"列表+时间线" / "卡片+抽屉" / "概览+详情" / "主区+底部辅助区" / "多 Tab 同数据集" 5 类组合 · A1 必产"数据流冗余核验"表 · 是否同源=是 → Gate 1 必问"PM 是否真要保留两份渲染"
+    - **触发场景**：流水线 8 agent 全过 + 自动化 100% PASS · 但 PM PRD 中的假设与代码现状漂移时 / PM 默认"两份都保留"+ 研发默认"按 PRD 实现两份" → BUG / 信息冗余流到生产
+    - **与之前 LOCKED 关系**：P015 是 P007（通用铁律）在 A1 阶段的执行步骤本地化 · P016 与 P012/P014 共构 UI 类需求三层防御
+    - **行业最佳实践对照**：Hypothesis-Driven Development（Etsy/Spotify）· Information Architecture Audit（Nielsen Norman Group）
+
 10. **P014 LOCKED · UI 文案语义一致性校验（通用方法论 · 2026-05-28 新增 · 灰度首次实战触发类 BUG 防护）**：
     - **P014**（A1+A6+A7）· UI 文案 "近 N 天" / "Last N days" / "本周" / "Top N" 等含数字 / 范围的预设按钮 · A1 § 4.3.x 必产 LOCKED 表（4 列 · 含 semantic 类型 rolling/calendar/point-in-time/event-based · 行业事实标准）· A6 必产 `[BV-LABEL]` 用例 ≥ 3（与 [BV] 区别：UI 文案语义边界 vs 经典边界值）· A7 Pass2 触发判定 + property-based test (`@fast-check/vitest`) INFO 推荐
     - **触发包**：实战中"8 agent 全过 + 25 用例全过 + dev-verify 通过 + 9 硬检查通过 + 全量回归 100% PASS → 仍漏 30+ 天"反思 · PM 灰度 5 分钟主观体验首次点 preset 按钮才触发
