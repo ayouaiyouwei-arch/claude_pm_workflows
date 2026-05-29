@@ -86,7 +86,12 @@ grep -q "未初始化 · 待 /init-project" PROJECT-PROFILE.md && echo "FRESH" |
 ## 📌 关键约束（项目无关，初始化后生效）
 
 1. **从不修改 `code/`**（只读快照）
-2. **单 .active 约束**（同时最多 1 个 .active 包 · hotfix 独立）
+2. **并行规则 · D1-D5 冲突自检**（多 .draft 并行无上限 · 命中 D1-D4 任一 = 禁并行）：
+   - **D5 single-active 闸保留**：同一时刻最多 1 个 .active 包（hotfix 独立）· dev-verify smoke（P005）/ 用户灰度主观体验（P013）独占灰度环境 · 多 .active 同时验收会互相污染
+   - **多 .draft 并行无上限**（前提：通过 D1-D4 冲突自检）
+   - **D1-D4 任一命中 = 禁并行**：D1 修改白名单文件交集 / D2 核心架构同项触动（见 PROJECT-PROFILE.md § 三）/ D3 schema 同表 / D4 OpenAPI 同路径
+   - **判定流程**：开新对话前必跑 `pre-parallel-check` skill · 5 维度自检后输出 ✅ 完全独立 / 🟡 仅 D5 排队 / ⛔ 禁并行 三档
+   - 完整模式见 `knowledge/patterns/P019-多包并行D1-D5冲突自检.md`
 3. **核心架构黑名单**（见 `PROJECT-PROFILE.md § 三` · 动这些必须走变更登记）
 4. **业务侧提交流程**（见 `PROJECT-PROFILE.md § 二` · 是否双向隔离按项目定）
 5. **append-only**（deliverables/提交记录.md / 各包 08-修复历史.md / evals/runs.csv / knowledge 各 csv 只追加）
