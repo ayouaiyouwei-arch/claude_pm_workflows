@@ -1,0 +1,33 @@
+{
+  "name": "@acceptance/e2e-scripts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "独立验收回归 E2E（项目无关骨架 · Playwright + 真实环境黑盒 · 配 acceptance-regression L2 引擎）",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test tests/smoke",
+    "test:regression": "playwright test tests/regression",
+    "test:scenario": "playwright test tests/scenario",
+    "test:permission": "playwright test tests/permission",
+    "test:visual": "playwright test tests/visual-regression",
+    "test:acceptance": "playwright test tests/smoke tests/regression tests/permission tests/scenario",
+    "acceptance:report": "node \"$HOME/.claude/skills/acceptance-regression/lib/acceptance-report.mjs\"",
+    "acceptance:full": "pnpm test:acceptance; pnpm acceptance:report",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "pm:gen": "node ../../../scripts/csv-to-spec.mjs",
+    "report": "playwright show-report ../../reports/${BASELINE_VERSION:-B1.0.0}/playwright-results/html-report",
+    "type-check": "tsc --noEmit",
+    "codegen": "playwright codegen ${ADMIN_BASE_URL:-http://localhost:5173}"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^20.11.0",
+    "dotenv": "^16.4.5",
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

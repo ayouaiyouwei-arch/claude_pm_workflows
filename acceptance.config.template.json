@@ -1,0 +1,14 @@
+{
+  "projectLabel": "<项目名·报告标题前缀>",
+  "baseURL": "https://<真实环境地址>",
+  "localBaseURL": "http://localhost:5173",
+  "reportsDir": "test/reports",
+  "resultsSubpath": "playwright-results/results.json",
+  "reportFileName": "独立验收回归报告.md",
+  "codeRepoForSha": "<研发快照仓相对路径·无则删此行>",
+  "devRunnerLabel": "<报告里点名独立于的研发 runner·无则删此行>",
+  "defaultBaseline": "B1.0.0",
+  "modules": {
+    "ABC": "<模块缩写到中文名·tag 归因与报告模块表用>"
+  }
+}
