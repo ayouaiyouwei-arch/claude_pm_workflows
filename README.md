@@ -101,9 +101,16 @@ A **second track, separate from dev self-tests**: real-environment, black-box, P
 - **Generic report engine** at `~/.claude/skills/acceptance-regression/`: aggregates Playwright `results.json` → a Markdown acceptance report (by layer / module / priority + role matrix + P0 red-line gate). Project values injected via `acceptance.config.json`.
 - **New project**: drop an `acceptance.config.json` + write black-box specs → `pnpm acceptance:full` → an independent acceptance report. Engine reused, zero rewrite.
 
-## Why "self-evolving"
+## The self-evolving loop
 
-The engine is reusable; the smarts are regrown per project. The more deliveries you run, the better this pipeline understands *your* codebase — recurring mistakes get caught earlier, estimates get sharper, and lessons get baked into the agents automatically.
+Every delivery feeds back into the engine — so it sharpens *per project*:
+
+- **Sediment** — each `.done` package auto-writes `runs.csv` + `cases.csv`; a recurring lesson lands a `knowledge/patterns/` entry (via the `pipeline-retrospector` meta-agent).
+- **Review** — `/pipeline-review` runs weekly: the `pipeline-evaluator` emits a report (pass rate, recurring misses, rubric sampling).
+- **Optimize** — `/optimize-prompts` runs monthly: lessons raised ≥ N times **fold back into the agent prompts** (agent version bumped + changelogged), so the *next* feature is reviewed by smarter agents.
+- **Highest-signal inputs** — not just test failures, but **independent-acceptance findings** (real-env black-box) and **PM gray-env hands-on** — exactly the signals a mocked dev runner misses.
+
+Net effect: the engine ports as-is; the smarts regrow per project — recurring mistakes get caught earlier, estimates sharpen, and the agents themselves improve, automatically.
 
 ---
 ---
@@ -165,6 +172,17 @@ git clone https://github.com/ayouaiyouwei-arch/claude-product-pipeline.git my-pr
 - **L0–L5 分层**：登录冒烟 / 模块回归 / 角色权限矩阵 / 跨模块场景 / 视觉回归 / 一键编排
 - **通用报告引擎** `~/.claude/skills/acceptance-regression/`：读 Playwright `results.json` → 出 Markdown 验收报告（按层级/模块/优先级 + 角色权限矩阵 + P0 红线）。项目专属值由 `acceptance.config.json` 注入。
 - **新项目接入**：放一个 `acceptance.config.json` + 写黑盒 spec → `pnpm acceptance:full` → 独立验收报告。引擎复用，无需重写。
+
+## 自迭代闭环（越用越聪明的引擎）
+
+每次交付都反哺引擎，让它对**你的项目**越来越懂：
+
+- **沉淀** —— 每个 `.done` 包由 `pipeline-retrospector` 自动写入 `runs.csv` + `cases.csv`；反复出现的教训再落一条 `knowledge/patterns/`。
+- **复盘** —— `/pipeline-review` 每周跑：`pipeline-evaluator` 出周报（通过率 / 反复踩的坑 / rubric 抽样）。
+- **优化** —— `/optimize-prompts` 每月跑：被反复提出 ≥ N 次的教训**折回 agent prompt**（agent 版本号 bump + CHANGELOG），下一个需求就由更聪明的 agent 来审。
+- **最关键的输入** —— 不只是用例失败，更是**独立验收的发现**（真实环境黑盒）和 **PM 灰度实操体验**——正是带 mock 的研发 runner 漏掉的信号。
+
+净效果：引擎照搬、聪明重长——反复的错误更早被抓、估算更准、agent 自己变强，全自动。
 
 ## 它的价值主张
 
