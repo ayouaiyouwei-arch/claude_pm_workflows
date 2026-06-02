@@ -69,10 +69,11 @@ PROJECT-PROFILE.md       # single source of project config
 CLAUDE.md                # session preamble + first-run onboarding trigger
 .claude/
 ├── agents/   (10)       # 8 pipeline agents + 2 meta agents
-├── skills/   (19)       # packaging / promotion / testing / knowledge / baseline
+├── skills/   (22)       # packaging / promotion / testing / acceptance-regression / knowledge / baseline
 └── commands/ (6)        # /init-project /new-feature /pipeline-review /optimize-prompts /babysit-active /iterate-A7
 product-docs/baseline/   # version / diff / change ledgers (empty, grow as you go)
 deliverables/_template/  # delivery-package template (12 root docs + snapshot + demo)
+test/tools/e2e-scripts/  # independent acceptance e2e skeleton (L0–L5 + role matrix + config template)
 knowledge/patterns/      # 4 built-in generic methodologies + your project's learned ones
 evals/ · optimization/   # runs.csv + weekly reports · prompt patches + agent versions
 ```
@@ -90,6 +91,15 @@ Seven cross-project "battle rules" distilled from real projects:
 - **P007 — evidence-driven conventions**: grep real code before asserting any code convention, or mark it a guess
 
 Everything else (domain-term confusion, acceptance env, branch isolation…) **your project grows on its own** after a few runs.
+
+## Independent acceptance regression (built-in)
+
+A **second track, separate from dev self-tests**: real-environment, black-box, PM-owned acceptance. Reusing the dev team's (often mocked) runner means your acceptance adds no independent signal — so the skeleton ships its own.
+
+- **3 principles**: real env (no mock) · black-box behavior (no source/SQL peeking) · independent assertions (acceptance cases, not dev contracts) → never drifts from implementation
+- **L0–L5 layers**: login smoke / module regression / role permission matrix / cross-module scenario / visual regression / one-command orchestration
+- **Generic report engine** at `~/.claude/skills/acceptance-regression/`: aggregates Playwright `results.json` → a Markdown acceptance report (by layer / module / priority + role matrix + P0 red-line gate). Project values injected via `acceptance.config.json`.
+- **New project**: drop an `acceptance.config.json` + write black-box specs → `pnpm acceptance:full` → an independent acceptance report. Engine reused, zero rewrite.
 
 ## Why "self-evolving"
 
@@ -146,6 +156,15 @@ git clone https://github.com/ayouaiyouwei-arch/claude-product-pipeline.git my-pr
 - **P007 约定必须实证驱动** —— 任何代码约定先 grep 实证或标"推测"，不凭印象
 
 其余 patterns（领域术语混淆、验收环境、分支隔离等）由你的项目跑几轮后**自己长出来**。
+
+## 自带的独立验收回归（与流水线并行的第二轨）
+
+**独立于研发自测的一轨**：打真实环境、黑盒、PM 主导的验收。复用研发那套（常带 mock 的）runner，验收就失去独立意义——所以骨架自带一套。
+
+- **三原则**：真实环境（不 mock）· 黑盒行为（不抓源码/SQL）· 独立断言源（验收用例，非研发契约）→ 天然不与实现漂移
+- **L0–L5 分层**：登录冒烟 / 模块回归 / 角色权限矩阵 / 跨模块场景 / 视觉回归 / 一键编排
+- **通用报告引擎** `~/.claude/skills/acceptance-regression/`：读 Playwright `results.json` → 出 Markdown 验收报告（按层级/模块/优先级 + 角色权限矩阵 + P0 红线）。项目专属值由 `acceptance.config.json` 注入。
+- **新项目接入**：放一个 `acceptance.config.json` + 写黑盒 spec → `pnpm acceptance:full` → 独立验收报告。引擎复用，无需重写。
 
 ## 它的价值主张
 
