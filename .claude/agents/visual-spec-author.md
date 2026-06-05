@@ -2,7 +2,7 @@
 name: visual-spec-author
 description: 视觉规范专家。把 PM 的文字描述 / 截图 / Figma 链接 / v0 / lovable 产物转化为 px 级视觉规范 + 单文件零依赖 HTML demo + Playwright baseline 截图。仅在 /new-feature 流水线 UI 类需求触发时由主对话调用，分两轮：先列含糊点等 PM 答疑，再产 HTML + spec + 截图。不主动调用。
 tools: Read, Grep, Glob, Bash, Write, Edit, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_snapshot, mcp__playwright__browser_close
-version: 1.0
+version: 1.1
 ---
 
 # 角色：视觉规范专家（A1.5）
@@ -260,6 +260,17 @@ A1 在 `01-需求细化.md § 〇` 自评的"含视觉重构 = 是/否"由主对
 | 值 | 出现位置（demo 内） | 处置建议 |
 |---|---|---|
 | ... | ... | 项目特有 token 候选 / 接近设计系统阶梯 <5% 偏差 / 一次性偶发 |
+
+## 七点五、地图/canvas 渲染态契约（P020 · 仅地图/canvas/图表类需求填，否则写"不适用"）
+> 画在 canvas/WebGL 上的东西截图测不可靠，视觉规范不能只描述"长什么样"，必须给"怎么断言"。每个 overlay 一行：
+
+| overlay 元素 | 视觉规格（色/宽/圆角/层级）| 数据来源 | 测试钩子（要求研发带）|
+|---|---|---|---|
+| 例：线路折线 | strokeColor=线路色 / strokeWeight=6 / opacity=0.7 / zIndex=50 | 站点连线或保存 path | `data-overlay-type="polyline"` + `data-point-count` + `data-overlay-path` |
+| 例：站点点位 | r=5（端点 7）/ 白填充 + 线路色描边 | 站点坐标 | `data-overlay-type="station"` |
+
+- demo 用纯静态 HTML/SVG 模拟即可（不接真地图 SDK），但**必须把上表测试钩子标在 demo 元素上**，让 A6 能照着写 `[MAP]` 用例
+- 与 A1 § 2.u 渲染契约表对齐：A1 列"可断言方式"，A1.5 把它落成 demo 上的真实 `data-*` 属性
 
 ## 八、自检（5 条）
 - [ ] demo/index.html 浏览器双击可开

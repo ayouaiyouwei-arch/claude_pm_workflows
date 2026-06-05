@@ -118,6 +118,11 @@ grep -q "未初始化 · 待 /init-project" PROJECT-PROFILE.md && echo "FRESH" |
     - **P015**（A1 + A1.5 + A2 + A3 + A4 + A5 + A7 + 主对话）· agent 向 PM 提任何问题清单 / 打回原因 / Gate 决策必满足 4 条：① 业务影响必先说（"用户/客户/演示场景会看到/经历什么"）② 技术词必括号翻译（30 词黑名单翻译表）③ A/B/C 选项必各带业务后果 ④ 返回前 30 词技术黑名单 grep 自检 ≤ 0
     - **触发包**：实战中"agent 给 PM 的问题清单大量塞 `import.meta.env.PROD` / `interceptor` / `hostname` 等技术黑话 · PM 看不懂 · 决策卡住或拍错"反思 · 7 agent prompt + new-feature command 全部加 LOCKED 段
     - **覆盖范围**：骨架默认开启 · 所有新项目无需 init 即生效
+12. **P020+P021 LOCKED · 可渲染必可验证 + 跨端数据流契约（通用方法论 · 2026-06-05 新增 · 地图/canvas 渲染缺陷复盘）**：
+    - **P020**（A1 § 2.u + A1.5 § 七点五 + A3 检查项#8 + A6 `[MAP]` + P013 M1~M5）· **可渲染必可验证** · 地图/canvas 类需求 A1 必产"渲染契约表"（可见元素/数据源/预期/可断言方式）· canvas-only 元素必把"研发补 `data-overlay-type`/`data-point-count`/`data-overlay-path` 测试钩子"列为验收硬指标 · A6 必产 `[MAP]` 用例断言 overlay 存在+数量+几何坐标（**严禁用 `[VR]` 截图替代** · canvas 截图不可靠）
+    - **P021**（A1 § 2.v + A3 检查项#9 + A6 round-trip）· **跨端数据流契约** · 写入端↔读取端必产"跨端数据流契约表"· "非同源(重建)" → Gate 1 必问 PM · 接口 `unknown`/`any` 黑盒字段 A3 必 grep 展开真实结构
+    - **触发场景**：编辑端存几何进 `payload:unknown` 黑盒、展示端用别的字段重建 + 渲染输出在 canvas/验收 Mock/截图三条路都无可断言抓手 → 渲染缺陷 8 agent 全过 + 全量回归 100% 仍漏 → 灰度人肉才逮到
+    - **四层收口**：L3 需求(A1 契约表)+L3 方案(A3 方案无效门槛)+L2 测试(A6 `[MAP]` DOM 断言 / A1.5 demo 落 data 钩子)+L4 灰度机制(P013 M1~M5)
 
 ---
 
