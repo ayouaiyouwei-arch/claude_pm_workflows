@@ -119,10 +119,11 @@ grep -q "未初始化 · 待 /init-project" PROJECT-PROFILE.md && echo "FRESH" |
     - **触发包**：实战中"agent 给 PM 的问题清单大量塞 `import.meta.env.PROD` / `interceptor` / `hostname` 等技术黑话 · PM 看不懂 · 决策卡住或拍错"反思 · 7 agent prompt + new-feature command 全部加 LOCKED 段
     - **覆盖范围**：骨架默认开启 · 所有新项目无需 init 即生效
 12. **P020+P021 LOCKED · 可渲染必可验证 + 跨端数据流契约（通用方法论 · 2026-06-05 新增 · 地图/canvas 渲染缺陷复盘）**：
-    - **P020**（A1 § 2.u + A1.5 § 七点五 + A3 检查项#8 + A6 `[MAP]` + P013 M1~M5）· **可渲染必可验证** · 地图/canvas 类需求 A1 必产"渲染契约表"（可见元素/数据源/预期/可断言方式）· canvas-only 元素必把"研发补 `data-overlay-type`/`data-point-count`/`data-overlay-path` 测试钩子"列为验收硬指标 · A6 必产 `[MAP]` 用例断言 overlay 存在+数量+几何坐标（**严禁用 `[VR]` 截图替代** · canvas 截图不可靠）
-    - **P021**（A1 § 2.v + A3 检查项#9 + A6 round-trip）· **跨端数据流契约** · 写入端↔读取端必产"跨端数据流契约表"· "非同源(重建)" → Gate 1 必问 PM · 接口 `unknown`/`any` 黑盒字段 A3 必 grep 展开真实结构
-    - **触发场景**：编辑端存几何进 `payload:unknown` 黑盒、展示端用别的字段重建 + 渲染输出在 canvas/验收 Mock/截图三条路都无可断言抓手 → 渲染缺陷 8 agent 全过 + 全量回归 100% 仍漏 → 灰度人肉才逮到
-    - **四层收口**：L3 需求(A1 契约表)+L3 方案(A3 方案无效门槛)+L2 测试(A6 `[MAP]` DOM 断言 / A1.5 demo 落 data 钩子)+L4 灰度机制(P013 M1~M5)
+    - **核心立场**：渲染缺陷（如脊线没画出来）是**验收盲区，不是需求没写清** → 防御火力在**测试用例 + 验收流水线**，**不在 A1/A3 拦截需求/方案设计**
+    - **P020 可渲染必可验证**（火力重心 = A6 + 验收框架）· A6 对每个 overlay 产 `[MAP]` 用例（存在+数量+几何坐标 · **严禁 `[VR]` 截图替代**）· 独立验收框架 `acceptance-regression` 加 `@map` 断言能力（真实 DOM `data-*` 钩子）· 钩子缺失 = **test-blocker**（测试前置条件/验收对接项 · **非设计否决**）· A1 §2.u 仅"渲染元素清单"轻量输入 · A1.5 demo 落 data 钩子 · P013 M1~M5 灰度兜底
+    - **P021 跨端数据流契约** · A1 §2.v 识别写入端↔读取端 · "非同源(重建)"→ **唯一保留的设计动作 = Gate 1 问 PM"两端是否应一致"（产品决策）**· 一致性靠 A6 round-trip 用例兜，**A3 不设方案硬闸**
+    - **分工铁律**：设计阶段"想清楚要什么"，测试/验收阶段"确认做对没有"。渲染缺陷属后者
+    - **改动**：P020/P021 pattern + A1 v1.3（撤硬闸只留跨端问 PM）+ A3 v1.2（撤硬闸改建议）+ A6 v1.2（加厚 [MAP]+round-trip）+ A1.5 v1.1 + P013 M1~M5 + L2 skill `acceptance-regression` § 九 `@map` 断言
 
 ---
 

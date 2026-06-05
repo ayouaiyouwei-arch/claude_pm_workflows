@@ -199,15 +199,17 @@ property-based test (`@fast-check/vitest` + `vi.setSystemTime` + `fc.date()`) �
 
 ## `[MAP]` 渲染可验证专属约束（P020 LOCKED）
 
+> **本约束是渲染缺陷防护的火力重心**（渲染缺陷靠"加厚测试用例 + 完善验收流水线"兜，不靠 A1/A3 拦设计）。A6 是地图渲染正确性的第一道、也是主要一道防线。
+
 ### 触发条件（任一命中即必含 `[MAP]` 用例）
 
 - 需求触及地图 overlay：折线/脊线 / 站点 / 实体 marker / 轨迹 / 热力图 / 聚焦 fitView / 缩放拖拽交互
 - 需求触及 canvas / WebGL / SVG 动态绘制图表（ECharts、自绘甘特、OD 矩阵等）
-- A1 § 2.u P020 "渲染契约表" 行数 > 0
+- A1 § 2.u "渲染元素清单" 行数 > 0
 
 ### 必含用例模板（标签 `[MAP]`）
 
-对 A1 渲染契约表里**每个肉眼可见 overlay**，至少 1 条 `[MAP]` 用例，断言三件事：
+对 A1 渲染元素清单里**每个肉眼可见 overlay**，至少 1 条 `[MAP]` 用例，断言三件事：
 
 ```
 1. 存在性：overlay DOM 节点 / 属性存在（如 [data-overlay-type="polyline"] 至少 1 个）
@@ -221,14 +223,18 @@ property-based test (`@fast-check/vitest` + `vi.setSystemTime` + `fc.date()`) �
 
 - ❌ **严禁用 `[VR]` 截图比对替代 `[MAP]` 断言**——canvas/WebGL 截图随瓦片、时刻、设备像素比漂移，"没画出来"截图照样可能"通过"
 - ❌ 严禁 `[MAP]` 用例 expected 写"地图显示正常 / 可见"这种目测话术 · 必须可程序断言的 DOM/属性/坐标
-- ✅ overlay 无 `data-*` 钩子（canvas-only）→ 用例 `precondition` 注明"依赖 A1 § 2.u 列出的研发交付钩子"，并在 06-用例说明 § 四标注"本组 [MAP] 用例阻塞于研发补钩子"
+- ✅ overlay 无 `data-*` 钩子（canvas-only · DOM 测不到）→ **这是"测试前置条件未满足"（test-blocker），不是设计阶段不予验收**：用例 `precondition` 注明"需研发补测试钩子 `data-overlay-type`/`data-point-count`/`data-overlay-path` 方可断言"，并在 06-用例说明 § 四登记"本组 [MAP] 用例阻塞于研发补钩子（验收对接项）"
+
+### 跨端 round-trip 用例（P021 触发时必含 ≥ 1 条）
+
+A1 § 2.v 跨端识别表中 "是否同一份 = 是 / PM 确认应一致" 的领域对象 → 必产 1 条 round-trip 用例：**写入端保存 → 读取端打开 → 断言渲染结果与保存输入一致**。
 
 ### 自检（写完 CSV 后必跑）
 
 ```bash
-RENDER_CONTRACT=$(grep -c "渲染契约\|data-overlay-type" product-docs/_drafts/<日期>-<短名>/01-需求细化.md 2>/dev/null || echo 0)
+RENDER_LIST=$(grep -c "渲染元素清单\|data-overlay-type\|canvas-only" product-docs/_drafts/<日期>-<短名>/01-需求细化.md 2>/dev/null || echo 0)
 MAP_COUNT=$(grep -c "\[MAP\]" product-docs/_drafts/<日期>-<短名>/06-用例.csv)
-[ "$RENDER_CONTRACT" -gt 0 ] && [ "$MAP_COUNT" -lt 1 ] && echo "❌ P020: 命中渲染契约但 [MAP] 用例数为 0 · 不合规"
+[ "$RENDER_LIST" -gt 0 ] && [ "$MAP_COUNT" -lt 1 ] && echo "❌ P020: 命中渲染元素清单但 [MAP] 用例数为 0 · 不合规"
 ```
 
 ### 触发理由（通用经验）
