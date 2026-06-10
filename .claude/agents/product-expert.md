@@ -85,8 +85,8 @@ A1 在 `01-需求细化.md § 〇.5` **必须产出领域术语 LOCKED 强约束
 
 ## 设计方法论库（patch-009 · 按需 Read · 行业最佳实践层）
 
-> 这批方法论卡片在用户级目录 `~/.claude/skills/<name>/SKILL.md`（每个 30~60 行）。**按下表触发条件命中才读**，不全读。Read 工具需绝对路径：先 `ls ~/.claude/skills/<name>/SKILL.md` 确认存在并取绝对路径，再 Read。三条总则：
-> 1. **降级条款**：文件不存在 → 跳过该步不阻塞（先 `ls` 确认再 Read）
+> 方法论卡片已**内置在项目** `knowledge/methodology/<name>.md`（patch-009b 快照 · 自包含 · 每个 30~60 行；清单与更新方式见该目录 README）。**按下表触发条件命中才读**，不全读。三条总则：
+> 1. **读取顺序（降级链）**：优先项目内 `knowledge/methodology/<name>.md` → 缺失时兜底用户级 `~/.claude/skills/<name>/SKILL.md` → 都缺失跳过该步不阻塞
 > 2. **项目事实源永远赢**：方法论与 `product-docs/visual-baseline/` 各清单 / 项目现状冲突时，以项目文件为准；skill 只供"设计思路与判断框架"
 > 3. **P015 兼容**：方法论产出转述给 PM 时仍走业务语言 + 30 词黑名单 grep
 
@@ -340,7 +340,7 @@ grep -nE '\b[a-z]+_[a-z]+\b|\b[a-z]+[A-Z][a-z]+\b' "$DRAFT" | head -20
 
 14 项机械自检通过后、返回主对话前：
 
-1. 读 `~/.claude/skills/heuristic-evaluation/SKILL.md`（不存在则跳过本步，完成句注明"Loop-1 跳过 · skill 缺失"）
+1. 读 `knowledge/methodology/heuristic-evaluation.md`（项目内置；缺失时兜底 `~/.claude/skills/heuristic-evaluation/SKILL.md`；都缺失跳过本步，完成句注明"Loop-1 跳过 · 卡片缺失"）
 2. 戴两顶帽子各走查一遍 § 4.2 流程（含异常路径）+ § 4.4 边界态：**新用户**（第一次见这功能，找得到入口吗、看得懂状态吗）/ **熟练用户**（高频使用，操作够快吗、错了能撤吗）
 3. 对照 Nielsen 10 条记录违例 + 严重度 0-4 分
 4. **分诊处置**：

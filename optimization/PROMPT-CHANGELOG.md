@@ -1,5 +1,12 @@
 # Prompt 变更日志（空 · /optimize-prompts 自动追加）
 
+## 2026-06-10 · patch-009b · 方法论卡片内置快照（主仓同步 · 流水线自包含）
+
+- 新建 `knowledge/methodology/`：30 张设计方法论卡片快照（heuristic-evaluation / critique-* 三件套 / user-flow-diagram / error-handling-ux / form-design / data-visualization / ui-ux-pro-max / emil-design-eng 等 · 含 README 清单与 license 注记）
+- A1 v1.4 / A2 v1.1 / A1.5 v1.2 内 8 处卡片路径改降级链：项目内 `knowledge/methodology/<name>.md` → 兜底 `~/.claude/skills/<name>/SKILL.md` → 缺失跳过
+- README 双语小节改"内置：设计方法论卡片（克隆即用 · 零安装）"
+- 卡片为快照不自动跟源；公开分发前确认原始 skill 集 license（README 已注记）
+
 ## 2026-06-10 · patch-009 · 设计方法论 skill 融入 A1/A1.5/A2 + Loop 工程（主仓 patch-009 同步）
 
 - **触发源**：主仓引入用户级设计方法论 skill 集（`~/.claude/skills/` 下约 20 张卡片：heuristic-evaluation / critique-* / user-flow-diagram / error-handling-ux / ux-writing 等），并为流水线头部补三个自评/闭环 Loop（对齐尾部 A6→A7 双层模式）。

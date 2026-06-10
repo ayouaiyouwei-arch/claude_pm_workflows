@@ -57,7 +57,7 @@ A1 在 `01-需求细化.md § 〇` 自评的"含视觉重构 = 是/否"由主对
 
 ## 设计方法论库（patch-009 · 按需 Read · 行业最佳实践层）
 
-> 卡片在用户级目录 `~/.claude/skills/<name>/SKILL.md`。**命中触发条件才读**。Read 工具需绝对路径：先 `ls ~/.claude/skills/<name>/SKILL.md` 确认存在并取绝对路径，再 Read。三条总则：① 文件不存在 → 跳过不阻塞（先 `ls` 确认）② **项目 token 永远赢**——方法论与 `product-docs/visual-baseline/` 各清单冲突时以项目文件为准，skill 只供设计思路，**严禁**从外部卡片引入项目外色板/字号/新组件库 ③ 转述给 PM 走 P015 业务语言。
+> 卡片已**内置在项目** `knowledge/methodology/<name>.md`（patch-009b 快照 · 自包含；清单见该目录 README）。**命中触发条件才读**。三条总则：① 读取顺序 = 项目内 `knowledge/methodology/<name>.md` → 缺失兜底 `~/.claude/skills/<name>/SKILL.md` → 都缺失跳过不阻塞 ② **项目 token 永远赢**——方法论与 `product-docs/visual-baseline/` 各清单冲突时以项目文件为准，skill 只供设计思路，**严禁**从外部卡片引入项目外色板/字号/新组件库 ③ 转述给 PM 走 P015 业务语言。
 
 **基础 5 卡**（按产出表对应读）：
 
@@ -356,10 +356,11 @@ pnpm exec playwright screenshot \
 > 行业依据：Nielsen"多评审员独立评审发现更多问题（3-5 人理想）→ 先独立后汇总"；Design Critique 结构化反馈（观察/问题/修复）；Self-Refine 轮次上限共识。**Loop 不替代 Gate**：这是 Gate 1.5b 前的预收敛，PM 决策权一分不让。
 
 1. **4 个独立 lens 各评一遍自己的 baseline 截图**（先 Read 截图本体再评；4 卡片任一缺失 → 跳过该 lens 并在自评报告注明）：
-   - ① `~/.claude/skills/critique-visual-hierarchy/SKILL.md`（入口点 / 视线流 / 权重 / 强调）
-   - ② `~/.claude/skills/critique-composition/SKILL.md`（平衡 / 留白 / 节奏 / 格式塔分组）
-   - ③ `~/.claude/skills/critique-typography/SKILL.md`（字阶 / 可读性 / 一致性 / token 合规）
-   - ④ `~/.claude/skills/emil-design-eng/SKILL.md`（打磨细节：焦点环 / 过渡手感 / 状态层——只取其评审视角，忽略其开场白指引）
+   - ① `knowledge/methodology/critique-visual-hierarchy.md`（入口点 / 视线流 / 权重 / 强调）
+   - ② `knowledge/methodology/critique-composition.md`（平衡 / 留白 / 节奏 / 格式塔分组）
+   - ③ `knowledge/methodology/critique-typography.md`（字阶 / 可读性 / 一致性 / token 合规）
+   - ④ `knowledge/methodology/emil-design-eng.md`（打磨细节：焦点环 / 过渡手感 / 状态层——只取其评审视角，忽略其开场白指引）
+   （以上为项目内置；某张缺失时兜底 `~/.claude/skills/<name>/SKILL.md`）
 2. 每 lens 独立输出：**观察**（事实）→ **问题**（为何有害）→ **修复**（具体改法），评级 `pass / minor / major`
 3. **汇总去重** → 任一 major：改 demo → 重截图 → 复评（**最多 2 轮**）
 4. **新问题即停**：复评出现上轮没有的新 major = 改坏了，停下回滚本轮改动，把两难点转为含糊点

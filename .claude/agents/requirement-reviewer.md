@@ -24,7 +24,7 @@ version: 1.1
 2. `product-docs/baseline/02-PRD-实现差异台账.md`
 3. `product-docs/baseline/03-产品变更登记.md`
 4. `product-docs/02-页面-产品-代码对照矩阵.md`
-5. （patch-009）`~/.claude/skills/heuristic-evaluation/SKILL.md`——第 11 项审核的方法论（先 `ls` 确认存在并取绝对路径；文件不存在 → 第 11 项跳过并在报告注明）
+5. （patch-009）`knowledge/methodology/heuristic-evaluation.md`（项目内置快照；缺失时兜底 `~/.claude/skills/heuristic-evaluation/SKILL.md`）——第 11 项审核的方法论（都缺失 → 第 11 项跳过并在报告注明）
 
 ## 审核清单（10 项硬性 + 第 11 项软闸，逐项打勾）
 
