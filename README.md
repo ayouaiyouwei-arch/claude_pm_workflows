@@ -52,6 +52,10 @@ cd my-project-pm
 /new-feature "<your one-line requirement>"
 ```
 
+### Optional: design methodology skills
+
+A1 / A1.5 / A2 read user-level design-methodology cards from `~/.claude/skills/` on demand (~20 cards: `heuristic-evaluation`, `critique-visual-hierarchy` / `critique-composition` / `critique-typography`, `user-flow-diagram`, `error-handling-ux`, `ux-writing`, …) to ground flow design, edge-state design, demo self-critique and the A2 usability scan in industry best practice. **Missing cards are skipped automatically — the pipeline never blocks on them**; install them and product specs + visual specs simply get better. Project facts always win over methodology.
+
 ## Design principle: generic engine, project-specific knowledge
 
 | Layer | What | Portability |
@@ -151,6 +155,10 @@ git clone https://github.com/ayouaiyouwei-arch/claude-product-pipeline.git my-pr
 ```
 
 `/init-project` 会：① 先告知你要准备哪些信息（git 等）② 拉代码到 `code/` ③ **主动 grep/读代码**梳理【核心架构黑名单】【领域术语表】【技术栈/端结构】候选（带出处，遵守"实证驱动"）④ **写入前逐项问你确认**（绝不自作主张写 LOCKED）⑤ 确认后落 `PROJECT-PROFILE.md` + 初始化 agent 版本 + baseline 空台账。
+
+### 可选：设计方法论 skill 集
+
+A1 / A1.5 / A2 会按需读用户级 `~/.claude/skills/` 下的设计方法论卡片（约 20 个：`heuristic-evaluation`、`critique-visual-hierarchy` / `critique-composition` / `critique-typography`、`user-flow-diagram`、`error-handling-ux`、`ux-writing` 等），为流程设计、边界态设计、demo 自评与 A2 可用性快扫提供行业最佳实践依据。**卡片缺失时自动跳过，不阻塞流水线**；装上后产品方案与视觉规范质量更佳。方法论与项目事实源冲突时，永远以项目文件为准。
 
 ## 自带的通用方法论（不随项目变）
 

@@ -1,5 +1,18 @@
 # Prompt 变更日志（空 · /optimize-prompts 自动追加）
 
+## 2026-06-10 · patch-009 · 设计方法论 skill 融入 A1/A1.5/A2 + Loop 工程（主仓 patch-009 同步）
+
+- **触发源**：主仓引入用户级设计方法论 skill 集（`~/.claude/skills/` 下约 20 张卡片：heuristic-evaluation / critique-* / user-flow-diagram / error-handling-ux / ux-writing 等），并为流水线头部补三个自评/闭环 Loop（对齐尾部 A6→A7 双层模式）。
+- **决议**：方法论 = 按需 Read 的"行业最佳实践层"——降级条款（缺卡跳过不阻塞）+ 项目事实源永远赢 + 转述 PM 走 P015 业务语言；A2 第 11 项可用性快扫 = **软闸**（可用性取舍是产品决策 · AI 亮问题、PM 拍板，不参与打回）。
+- **Loop 工程五原则**（一句话）：事件驱动非定时 / 硬上限（Loop-1 1 轮 · Loop-3 ≤ 2 轮 · /iterate-A2 ≤ 2 轮）/ 新问题即停 / 决策类升 PM 不自转 / 全程留痕可抽查（§ 〇.7 残留表 + self-critique.md）。
+- **改动文件 + 版本**：
+  - product-expert v1.3 → **v1.4**（设计方法论库 9 行触发表 + § 3.5 定律依据补充 + § 4.1 JTBD 注 + § 4.2 流程三段式 + § 4.3 ux-writing 注 + § 4.4 五态 checklist + § 6.5 Loop-1 自走查 + § 〇.7 残留表）
+  - requirement-reviewer v1.0 → **v1.1**（第 11 项可用性启发式快扫·软闸 + 结论三态 + P1 分诊标注【形式类/决策类】）
+  - visual-spec-author v1.1 → **v1.2**（设计方法论库：基础 5 卡 + 层级三问 + 类型触发卡 + 丙档 2 卡；§ 2.35 Loop-3 demo 自评循环；§ 2.6 Loop-4 before/after 对比图）
+  - new-feature.md（Gate 1.5b 附 Loop-3 自评摘要 + 第 2 步 A2 三分支：打回按分诊推荐 /iterate-A2 · 通过带警告强制亮 PM 三选一处置）
+  - **新增** `.claude/commands/iterate-A2.md`（Loop-2 · A2 打回自动闭环 · 最多 2 轮 · 决策类先升 PM）
+- **编号泛化**：主仓 P026/P027/P029/P030/P023 → 骨架 P014/P015/P018/P017/P011；skill 路径统一 `~/.claude/skills/`（缺失自动跳过，不阻塞流水线）。
+
 ## 2026-06-05 · P020 + P021 LOCKED · 可渲染必可验证 + 跨端数据流契约（通用方法论 · 实战命中后合并 · v2 终版）
 
 - **核心立场**：渲染缺陷是**验收盲区，不是需求没写清** → 防御火力在**测试用例 + 验收流水线**，不在 A1/A3 拦截需求/方案设计。（初稿曾在 A1/A3 加设计阶段硬闸，当日纠偏撤掉。）
