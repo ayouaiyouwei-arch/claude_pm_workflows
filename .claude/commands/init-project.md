@@ -82,14 +82,30 @@ grep -rohE "class [A-Z][A-Za-z]+|enum [A-Z][A-Za-z]+" --include=*.java --include
 
 > ⚠️ 全程遵守 P007 实证驱动：每个候选都标出**它来自哪个文件/类**（commit SHA），不凭印象。
 
+### 2.4 视觉基线提取（patch-010 · 有前端 UI 时必做）
+
+先检测项目有无前端：
+
+```bash
+# package.json 含 react/vue/svelte/angular 任一，或存在 *.tsx / *.vue 文件 → 有前端
+grep -lE '"(react|vue|svelte|@angular/core)"' code/<仓库名>/package.json code/<仓库名>/*/package.json 2>/dev/null
+find code/<仓库名> -name "*.tsx" -o -name "*.vue" | grep -v node_modules | head -3
+```
+
+- **有前端** → 按 `extract-visual-baseline` skill 第 1~4 步跑提取（`python3 scripts/visual-baseline-scan.py --dirs <各前端端 src/> --out /tmp/visual-baseline-result-<日期>.json`），整理出"视觉基线候选"：实测主色族 / 中性族 / 语义色候选 / 品牌色候选（高频硬编码 hex）/ 字号阶梯 / 间距阶梯 / 圆角阴影惯例 / 组件清单 / UI 依赖（检出自建体系则提名"不引"的组件库黑名单）
+- **无前端（纯后端）** → 跳过，§ 七记"是否常含 UI 类需求 = 否 / 视觉基线目录 = 无"
+
+> 这一步兑现 A1.5 必读里"`product-docs/visual-baseline/` 各文件由 /init-project 在有设计系统时生成"的承诺——不做这步，A1.5 跑 UI 需求时没有项目风格事实源，只能凭通用最佳实践自由发挥（不会长得像你的项目）。
+
 ---
 
 ## 第 3 步：整理梳理结果（对话里呈现，仍不写文件）
 
-把第 2 步的候选整理成一张"待确认清单"，分 3 块：
+把第 2 步的候选整理成一张"待确认清单"，分 4 块：
 - A. 技术栈 + 端结构（带证据文件）
 - B. 核心架构黑名单候选（N 项，每项带"动它的回归半径"+ 判定路径）
 - C. 领域术语候选（每对带"易混淆于"+ 来源实体）
+- D. 视觉基线候选（有前端时 · 主色/品牌色/允许色系白名单/字号间距阶梯 · 每项带频次与样例文件）
 
 ---
 
@@ -100,7 +116,8 @@ grep -rohE "class [A-Z][A-Za-z]+|enum [A-Z][A-Za-z]+" --include=*.java --include
 > "我梳理出了你项目的候选配置（基于实际代码，标了出处）。**在写进 PROJECT-PROFILE 之前请你确认**：
 >  - 核心架构黑名单：我提名了这 N 项，你要增 / 删 / 改哪些？
 >  - 领域术语：这几对易混淆术语对吗？还有要补的吗？
->  - 技术栈/端清单：对吗？"
+>  - 技术栈/端清单：对吗？
+>  - （有前端时）视觉基线：实测主色是 X 系、品牌色候选 #XXX（出现 N 次）、允许色系白名单 [...]——对吗？此后 UI 设计将被强制贴着这套风格走，超出白名单的颜色会被打回"
 
 用户可能：
 - 确认全部 → 进第 5 步
@@ -123,6 +140,7 @@ grep -rohE "class [A-Z][A-Za-z]+|enum [A-Z][A-Za-z]+" --include=*.java --include
    - 如启用双向分支隔离 → 在"本项目专属 LOCKED 经验"段追加一条"分支隔离"铁律（参 robobus P015 做法）
 3. **`optimization/agent-versions.json`**：初始化 10 个 agent 版本号为 v1.0
 4. **`product-docs/baseline/`**：确认 3 个空台账（01 版本/02 差异/03 变更）就位，写入首条"基线建立"记录
+4.5.（有前端时）**`product-docs/visual-baseline/`**：按 `extract-visual-baseline` skill 第 4 步模板落 01~06 草稿（确认后去"待 PM 确认"标），`00-调查方法.md` 登记本次扫描（日期/范围/文件数/commit SHA）；`08-交互最佳实践参考.md` 从通用模板起步（行业沉淀 · 非提取物）；PROJECT-PROFILE § 七回填"视觉基线目录 = product-docs/visual-baseline/"
 5.（可选）如用户给了验收环境 → 生成本项目的"验收环境必读"草稿到 `knowledge/patterns/`（参 robobus P006）
 
 ---

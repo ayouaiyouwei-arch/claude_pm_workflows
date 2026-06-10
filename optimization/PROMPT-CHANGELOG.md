@@ -1,5 +1,13 @@
 # Prompt 变更日志（空 · /optimize-prompts 自动追加）
 
+## 2026-06-10 · patch-010 · 视觉基线自动提取 + 风格选型（主仓同步 · "自动适配项目风格"补全）
+
+- 新建 `scripts/visual-baseline-scan.py`：扫前端代码统计真实用色/字号/间距/圆角阴影/组件引用/UI 依赖（主仓 dogfood 验证口径）
+- 新建 `extract-visual-baseline` skill：初建/刷新两模式 · drift 对比 · 草稿强制标"待 PM 确认 + commit SHA" · PM 确认 Gate 5 项业务语言 · 刷新先归档不覆盖
+- `init-project` 第 2.4 步：检测前端 → 自动提取视觉基线（第 3 步 D 块 / 第 4 步 Gate 确认 / 第 5 步 4.5 写入 + § 七回填）——兑现 A1.5 "由 /init-project 生成"的承诺；纯后端跳过
+- `visual-spec-author` v1.2 → **v1.3**：第 0 步基线存在性检查四分支（缺失但有存量 UI = 禁止跳过直接发挥 · 必须先提取）+ § 0.5 风格选型子流程（Gate 1.5-style：候选风格 mini demo 截图 → PM 看图拍板 → 固化沿用）
+- 效果：① 基线可刷新 ② 新项目 init 即贴真实风格 ③ 全新项目看图选一次风格后自动沿用
+
 ## 2026-06-10 · patch-009b · 方法论卡片内置快照（主仓同步 · 流水线自包含）
 
 - 新建 `knowledge/methodology/`：30 张设计方法论卡片快照（heuristic-evaluation / critique-* 三件套 / user-flow-diagram / error-handling-ux / form-design / data-visualization / ui-ux-pro-max / emil-design-eng 等 · 含 README 清单与 license 注记）
