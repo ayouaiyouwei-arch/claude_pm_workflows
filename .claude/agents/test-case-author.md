@@ -2,7 +2,7 @@
 name: test-case-author
 description: 测试用例专家。基于通过的需求细化 + 技术方案（+ 视觉规范，UI 类需求时）产出严格符合 test/test-cases/_用例字段说明.md 的 18 列 CSV。UI 类需求必含 [VR] 视觉回归用例 ≥ 30%。仅在 /new-feature 流水线第 6 步触发。
 tools: Read, Grep, Glob, Bash, Write, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_snapshot, mcp__playwright__browser_close
-version: 1.2
+version: 1.3
 ---
 
 # 角色：测试用例专家（A6）
@@ -76,6 +76,10 @@ grep -rn "<易混淆术语B>" code/<仓库名>/<相关模块路径>/
 ```
 
 <!-- LOCKED:END -->
+
+7. **（patch-011 · 历史经验检索 · 必跑）按 `.claude/skills/query-knowledge/SKILL.md` 执行检索**——确认本期类型后跑：
+   - 入参：触及端 / 类型 / 调用方 = A6
+   - 同模块历史包的 test-cases-snapshot 是 case_id 续号与风格第一参考；关联 patterns 中带"用例对策"的（如 P022 反向回归 / P026 [BV-LABEL]）必有对应用例
 
 ## CSV 硬约束（任意违反 = A7 必打回）
 

@@ -44,6 +44,8 @@ grep -q "未初始化 · 待 /init-project" PROJECT-PROFILE.md && echo "FRESH" |
 
 ## ⚠️ P007 · 约定必须实证驱动（通用铁律 · 骨架自带）
 
+> ⚠️ 编号澄清（patch-011）：本段的 "P007" 沿用主仓编号，与本骨架 `knowledge/patterns/P007-Codex派活提示词必生成.md` 是**两条不同规则**（历史撞号）。两套编号互译以 `knowledge/patterns/_编号映射.md` 为唯一权威。
+
 **核心约束**：任何"代码相关的约定 / 实体命名 / 字段命名 / 架构假设"必须三选一：
 
 | 选项 | 适用 | 落地要求 |

@@ -1,5 +1,13 @@
 # Prompt 变更日志（空 · /optimize-prompts 自动追加）
 
+## 2026-06-10 · patch-011 · 知识库治理（主仓同步 · 消费断链修复 + 生命周期 + 编号映射）
+
+- A1 v1.5 / A3 v1.3 / A6 v1.3：必读段接线 query-knowledge（历史案例检索必跑 · 不再"只写不读"）
+- query-knowledge SKILL：状态匹配 bug 修复（case 模糊：active/LOCKED=活跃 · dormant=休眠不返回）+ 产出尾部图谱需求积累引导
+- `knowledge/README § 一.5`：热温冷知识生命周期（晋升/降级标准 + active⇄dormant 状态机 · 降级 PM 拍板）；`/optimize-prompts` 第 0.5 步月更降级检查；`pipeline-evaluator` 周报 dormant 候选提示
+- 新建 `knowledge/patterns/_编号映射.md`：主仓↔骨架编号唯一互译权威（同步 patch 照表机械替换）；CLAUDE.md P007 撞号段加注澄清（与 patterns/P007 是两条规则）
+- `_模式模板.md` 状态规范值改 active/dormant
+
 ## 2026-06-10 · patch-010 · 视觉基线自动提取 + 风格选型（主仓同步 · "自动适配项目风格"补全）
 
 - 新建 `scripts/visual-baseline-scan.py`：扫前端代码统计真实用色/字号/间距/圆角阴影/组件引用/UI 依赖（主仓 dogfood 验证口径）

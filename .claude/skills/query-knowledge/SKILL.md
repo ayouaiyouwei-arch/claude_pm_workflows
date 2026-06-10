@@ -47,7 +47,11 @@ for f in knowledge/patterns/P*.md; do
   STATUS=$(awk -F': ' '/^状态:/ {print $2}' "$f")
   RECENT=$(awk -F': ' '/^最近出现:/ {print $2}' "$f")
   AGENT=$(awk -F': ' '/^关联agent:/ {print $2}' "$f")
-  [ "$STATUS" = "active" ] && echo "$RECENT | $f | $AGENT"
+  # 状态匹配规则（patch-011 修正）：含 active 或 LOCKED = 活跃；含 dormant/已规避 = 休眠不返回
+  case "$STATUS" in
+    *dormant*|*已规避*) ;;                      # 休眠：跳过
+    *active*|*LOCKED*) echo "$RECENT | $f | $AGENT" ;;
+  esac
 done | sort -r | head -10
 ```
 
@@ -79,13 +83,21 @@ done | sort -r | head -10
   - 读 knowledge/patterns/P003-...md（看对策段是否已避开）
 ```
 
+### 5. （patch-011）图谱需求积累引导（产出末尾固定附一句）
+
+```
+本次检索若没找到你想要的（如"想按组件名找所有用过它的包"这类 cases.csv 列维度覆盖不了的查询），
+请把想要的检索方式一句话告诉 PM 记入 knowledge/_graph-schema.md § 七——
+积累 ≥ 5 条真实需求是启用知识图谱（graph.jsonl）的硬门槛之一。
+```
+
 ## 输出规则
 
-- **只读不写**——本 skill 不允许写任何文件
+- **只读不写**——本 skill 不允许写任何文件（§ 七需求记录由 PM 决定后人工写入）
 - **结果不上下文淹没**：每类至多列 5 条，过多则要求调用方收紧筛选条件
 - **降级**：knowledge/cases.csv 行数 < 3 时，直接返回 "样本不足，跳过"，不要硬凑
 
-## 上游 agent 接入方式（待 /optimize-prompts 通过补丁正式注入到 .md）
+## 上游 agent 接入方式（✅ patch-011 已接线：A1 必读第 11 项 / A3 必读第 7 项 / A6 必读第 7 项）
 
 ```md
 ## 必读

@@ -2,7 +2,7 @@
 name: product-expert
 description: 产品专家。把用户的一句话需求扩展为完整的需求细化文档，必须先识别需求触及的端、读各端 code/ 现状与 baseline，再与用户多轮 Q&A 把空白补齐，最后调 pm-prd-writer skill 跑 14 项质量自检（UI 完整性 + 无技术语言为硬指标）。仅在 /new-feature 流水线第 1 步触发，不主动调用。
 tools: Read, Grep, Glob, Bash, Write, Edit
-version: 1.4
+version: 1.5
 ---
 
 # 角色：产品专家（A1）
@@ -82,6 +82,12 @@ A1 在 `01-需求细化.md § 〇.5` **必须产出领域术语 LOCKED 强约束
    | `<端2>` | `code/<仓库名>/<端2 源码根>/` | 同上 |
    | `<共享层>` | `code/<仓库名>/<共享层源码根>/{api,hooks,types,ui}/` | 跨端契约层 |
    | 后端 | `code/<仓库名>/<后端源码根>/{controller,service,domain}/` + 后端 AGENTS.md（如有） | 按 § 五 后端技术栈 |
+
+
+11. **（patch-011 · 历史经验检索 · 必跑）按 `.claude/skills/query-knowledge/SKILL.md` 执行检索**——完成触及端识别后立即跑：
+    - 入参：触及端 = <本期触及端> / 类型 = <新增/优化/UI重构> / 调用方 = A1
+    - 输出 = 触及端重叠的最近 5 个 .done 包（关键决策摘要 + 包路径）+ 相关 active 模式
+    - **有 P 编号 active 模式与本期高度相关 → 必须读完对应 patterns 文件再继续**；历史包决策与本期需求重叠/冲突 → § 二现状梳理引用并在 Gate 1 向 PM 提示（"上次类似需求踩过 X"）
 
 ## 设计方法论库（patch-009 · 按需 Read · 行业最佳实践层）
 

@@ -15,6 +15,28 @@
 | **Layer A.5**：问题模式 | `patterns/Pxxx-<标题>.md` | PM 在 `/optimize-prompts` 中提炼（≥ 2 次合并的同类补丁） | A1/A3/A6 必读 + retrospector 检测重复模式 | **第一次合并 ≥ 2 次同类补丁后启用** |
 | **Layer B**：实体-关系图谱 | `graph.jsonl` + `_graph-schema.md` | （后续）专用 skill 自动抽取 | `query-knowledge` skill | **≥ 20 个 .done 包后启用** |
 
+
+---
+
+## 一.5、知识生命周期（patch-011 · 热 / 温 / 冷三层 + 晋升降级规则）
+
+> 解决的问题：知识只增不减——pattern 全部 active 平铺、agent 必读越来越长、出现 1 次和 4 次的同权重。
+
+| 层 | 落点 | 进入标准（晋升） | 消费方式 | 离开标准（降级） |
+|---|---|---|---|---|
+| **热** | agent prompt 内联 LOCKED 段 + CLAUDE.md 一行指针 | **≥ 2 次实战命中** 且规则**可机械执行**（grep 自检 / 表格模板 / 禁用词），或 PM 显式决议紧急合并 | 每次执行强制走 | 对应 pattern 转 dormant 后，下次 /optimize-prompts 评估撤回内联段（保留 pattern 文件） |
+| **温** | `patterns/Pxxx.md`（状态 = active） | 1 次实战命中即可立文件 | query-knowledge 按需检索 + agent 必读触发式引用 | **连续 5 个 .done 包未复现** → 月更时标 dormant |
+| **冷** | `cases.csv` + `.done` 包 + `architecture/` `research/` 长文 | 自动（retrospector 每包写入） | query-knowledge 检索可达 | 永不删除（append-only） |
+
+**状态机**：`active`（温/热 · 检索返回）→ `dormant`（休眠 · 检索不返回 · 文件保留可追溯）→ 复发时改回 `active` 并把"出现次数 +1"。旧值 `已规避` 等同 dormant。
+
+**执行点**（谁来转状态）：
+- 降级：`/optimize-prompts` 月更第 0.5 步逐 pattern 对照最近 5 个 .done 包（runs.csv / cases.csv 的"关联patterns"列）→ 未复现的列 dormant 候选 → **PM 确认后**改 frontmatter 状态（不自动改）
+- 预警：`pipeline-evaluator` 周报"补丁堆积"节附 dormant 候选提示（只提示不动手）
+- 晋升：温 → 热 仍走既有 patch 机制（/optimize-prompts 或 PM 决议紧急合并）
+
+**铁律**：降级 ≠ 删除。pattern 文件与 agent 内 LOCKED 段的撤回都要 PM 拍板，CHANGELOG 留痕。
+
 ---
 
 ## 二、与 evals/ 的区别

@@ -201,6 +201,9 @@ evaluator版本: <你的 version>
 
 ## 六、补丁堆积
 
+**（patch-011）dormant 候选提示（本节末尾固定附带 · 只提示不动手）**：对照最近 5 个 .done 包的"关联patterns"，列出未复现的 active pattern 清单 + 一句"下次 /optimize-prompts 月更时按 knowledge/README § 一.5 与 PM 确认是否转 dormant"。
+
+
 - 当前 patches-pending：<N> 条
 - 按目标 agent 分桶：
   - product-expert: <X> 条

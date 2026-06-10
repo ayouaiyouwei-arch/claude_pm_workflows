@@ -45,6 +45,25 @@ cat optimization/agent-versions.json
 
 ---
 
+## 第 0.5 步：pattern 生命周期检查（patch-011 · 月更必跑）
+
+> 规则见 `knowledge/README.md § 一.5`。降级 ≠ 删除；一切状态变更 PM 拍板。
+
+```bash
+# 取最近 5 个 .done 的关联 patterns 并集
+RECENT_P=$(tail -5 knowledge/cases.csv | awk -F',' '{print $8}' | tr ';' '\n' | sort -u)
+# 逐 active pattern 看是否在并集里
+for f in knowledge/patterns/P*.md; do
+  PID=$(basename "$f" | cut -d- -f1)
+  STATUS=$(awk -F': ' '/^状态:/ {print $2; exit}' "$f")
+  case "$STATUS" in *dormant*|*已规避*) continue;; esac
+  echo "$RECENT_P" | grep -q "$PID" || echo "dormant 候选: $PID（最近 5 包未复现）"
+done
+```
+
+- dormant 候选逐条给 PM 三选一：**转 dormant**（改 frontmatter 状态 + 出现次数保留）/ **保持 active**（PM 认为仍高风险，备注理由）/ **撤热层内联**（pattern 已 dormant 且 agent 内 LOCKED 段也评估撤回——单独走 2.2 LOCKED 锚点检查流程）
+- 每月转 dormant / 复活的清单写入本次 CHANGELOG 条目
+
 ## 第 1 步：聚合 pending 条目
 
 读所有 `optimization/patches-pending/*.md`，按**目标 agent + 改动锚点**聚合，按**独立来源数量**降序排列：
