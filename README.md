@@ -41,11 +41,12 @@ flowchart TD
 - **2 meta-agents**: `pipeline-retrospector` (sediments each delivery) + `pipeline-evaluator` (weekly report)
 - **Output**: a `deliverables/*.draft` package = the blueprint a developer/Codex builds from directly
 - **Self-evolving loop**: every `.done` package writes to `runs.csv` / `cases.csv`; `/pipeline-review` produces a weekly report; `/optimize-prompts` folds recurring lessons back into the agent prompts
+- **Design quality built in**: 30 methodology cards + head-of-pipeline quality loops (A1 self-walkthrough / A2 usability soft-gate / A1.5 4-lens self-critique) + auto style adaptation (extract real style, or pick once from mini-demos)
 
 ## Quick start
 
 ```bash
-git clone https://github.com/ayouaiyouwei-arch/claude-product-pipeline.git my-project-pm
+git clone https://github.com/ayouaiyouwei-arch/claude_pm_workflows.git my-project-pm
 cd my-project-pm
 # Open in Claude Code — CLAUDE.md auto-detects a fresh skeleton and lists what to provide
 /init-project          # pulls your code, drafts rules, confirms with you, fills PROJECT-PROFILE.md
@@ -55,6 +56,25 @@ cd my-project-pm
 ### Built-in: design methodology cards
 
 The skeleton ships with **30 design-methodology cards built in** at `knowledge/methodology/` (snapshot): `heuristic-evaluation` (Nielsen 10 + severity scale), `critique-visual-hierarchy` / `critique-composition` / `critique-typography`, `user-flow-diagram`, `error-handling-ux`, `ux-writing`, `form-design`, `data-visualization`, `ui-ux-pro-max` (99 UX guidelines), and more — see `knowledge/methodology/README.md` for the full list. A1 / A1.5 / A2 read them on demand to ground flow design, edge-state design, demo self-critique and the A2 usability scan in industry best practice. **No extra installation needed.** Resolution order: project `knowledge/methodology/<name>.md` → fallback user-level `~/.claude/skills/<name>/SKILL.md` → skip without blocking. Project facts always win over methodology.
+
+### Built-in quality loops
+
+The head of the pipeline now iterates **before** anything reaches your gate (mirroring the proven `/iterate-A7` tail loop):
+
+- **A1 self-walkthrough** — after drafting a spec, A1 re-walks it as a new user *and* a power user against Nielsen's 10 usability heuristics, fixes what it safely can, and leaves a residual table for A2
+- **A2 usability soft-gate** — an 11th review check scores usability findings 0–4; severity ≥ 3 findings are **surfaced to you verbatim** (three dispositions: rework / intentional / pass down) — never auto-rejected, never silently swallowed
+- **A1.5 4-lens self-critique** — every demo screenshot passes visual-hierarchy / composition / typography / polish review (≤ 2 rounds, majors must be fixed or escalated) before you see it; revision rounds ship with before/after comparison shots
+- **`/iterate-A2`** — review rejections auto-loop on form-level issues (A1 fix → A2 re-review, ≤ 2 rounds) while product decisions always escalate to you
+
+Five loop principles baked in: hard round caps · explicit convergence criteria · external judging standards with audit trails · stop-on-new-issue · **loops never replace human gates**.
+
+### Auto style adaptation
+
+A1.5 designs in **your project's actual visual style**, not generic best-practice taste:
+
+- **Existing UI** → `/init-project` (or the `extract-visual-baseline` skill anytime) scans your frontend code — real color histogram, type scale, spacing rhythm, radius/shadow habits, component usage, UI deps — into a visual baseline that **hard-constrains every demo** (off-palette colors get rejected at review)
+- **No UI yet** → A1.5 proposes 2–3 style candidates as mini-demo screenshots; you pick once (Gate 1.5-style), the choice is frozen as the baseline, and every later feature follows it automatically
+- **Baseline drift** → re-run the scanner anytime; a drift report asks you per finding: *update the baseline* or *log a deviation for dev to converge*
 
 ## Design principle: generic engine, project-specific knowledge
 
@@ -73,12 +93,14 @@ PROJECT-PROFILE.md       # single source of project config
 CLAUDE.md                # session preamble + first-run onboarding trigger
 .claude/
 ├── agents/   (10)       # 8 pipeline agents + 2 meta agents
-├── skills/   (22)       # packaging / promotion / testing / acceptance-regression / knowledge / baseline
-└── commands/ (6)        # /init-project /new-feature /pipeline-review /optimize-prompts /babysit-active /iterate-A7
+├── skills/   (23)       # packaging / promotion / testing / acceptance-regression / extract-visual-baseline / knowledge / baseline
+└── commands/ (8)        # /init-project /new-feature /pipeline-review /optimize-prompts /babysit-active /iterate-A7 /iterate-A2 /dev-verify
 product-docs/baseline/   # version / diff / change ledgers (empty, grow as you go)
 deliverables/_template/  # delivery-package template (12 root docs + snapshot + demo)
 test/tools/e2e-scripts/  # independent acceptance e2e skeleton (L0–L5 + role matrix + config template)
-knowledge/patterns/      # 4 built-in generic methodologies + your project's learned ones
+knowledge/methodology/   # 30 design-methodology cards (built-in snapshot · zero install)
+knowledge/patterns/      # built-in generic methodologies + your project's learned ones
+scripts/                 # visual-baseline-scan.py (real-style extraction) + csv-to-spec
 evals/ · optimization/   # runs.csv + weekly reports · prompt patches + agent versions
 ```
 
@@ -131,6 +153,7 @@ Net effect: the engine ports as-is; the smarts regrow per project — recurring 
 
 - **8 agent**：A1 产品 / A1.5 视觉规范（仅 UI 类）/ A2 需求审 / A3 技术 / A4 范围审 / A5 二次校验（仅 A4 触发）/ A6 用例 / A7 用例审
 - **自进化**：每次交付后 `pipeline-retrospector` 自动沉淀；`/pipeline-review` 周报；`/optimize-prompts` 月度把踩坑提炼进 agent prompt
+- **设计力**：30 张设计方法论卡片内置 + 头部质量循环（A1 自走查 / A2 可用性软闸 / A1.5 四视角自评）+ 风格自动适配（提取真实风格 or 看图选型一次固化）
 - **产物**：`deliverables/*.draft` 包 = 给研发/Codex 拿到就能干活的施工图
 
 ## 设计原则：引擎通用，知识专属
@@ -147,7 +170,7 @@ Net effect: the engine ports as-is; the smarts regrow per project — recurring 
 
 ```bash
 # 1. 克隆
-git clone https://github.com/ayouaiyouwei-arch/claude-product-pipeline.git my-project-pm && cd my-project-pm
+git clone https://github.com/ayouaiyouwei-arch/claude_pm_workflows.git my-project-pm && cd my-project-pm
 # 2. 在 Claude Code 里开第一段对话 —— CLAUDE.md 会自动检测到空白骨架并列出前置准备清单
 # 3. 运行接入向导
 /init-project        # 拉你的代码 → 主动梳理规则 → 逐项问你确认 → 填 PROJECT-PROFILE.md
@@ -159,6 +182,25 @@ git clone https://github.com/ayouaiyouwei-arch/claude-product-pipeline.git my-pr
 ### 内置：设计方法论卡片
 
 骨架**自带 30 张设计方法论卡片**（`knowledge/methodology/` 快照）：`heuristic-evaluation`（Nielsen 10 条 + 严重度量表）、`critique-visual-hierarchy` / `critique-composition` / `critique-typography`、`user-flow-diagram`、`error-handling-ux`、`ux-writing`、`form-design`、`data-visualization`、`ui-ux-pro-max`（99 条 UX 红线）等——完整清单见 `knowledge/methodology/README.md`。A1 / A1.5 / A2 按需读取，为流程设计、边界态设计、demo 自评与 A2 可用性快扫提供行业最佳实践依据。**克隆即用，无需额外安装。**读取顺序：项目内 `knowledge/methodology/<name>.md` → 兜底用户级 `~/.claude/skills/<name>/SKILL.md` → 都缺失跳过不阻塞。方法论与项目事实源冲突时，永远以项目文件为准。
+
+### 内置：质量自迭代循环
+
+流水线头部现在**先自己转一轮再来找你**（复制尾部 `/iterate-A7` 已验证的闭环模式）：
+
+- **A1 自走查** —— 写完需求细化先戴"新用户 / 熟练用户"两顶帽子按 Nielsen 10 条可用性法则走查一遍，能修的自己修，修不了的留残留表给 A2 复扫
+- **A2 可用性软闸** —— 新增第 11 项审核：可用性问题打 0~4 分；3 分以上**原样亮给你**三选一处置（回炉 / 我故意的 / 降为注意事项）——绝不自动打回、绝不悄悄吞掉
+- **A1.5 四视角自评** —— 每张 demo 截图先过"视觉层级 / 构图留白 / 排版 / 打磨细节"四维评审（最多 2 轮 · 重大问题修完才许给你看）；你说"改 X"后下一轮必附改前/改后对比图
+- **`/iterate-A2`** —— 审核打回自动闭环（格式类问题 A1 修 → A2 重审 · 最多 2 轮）；产品决策类问题永远升给你拍板
+
+五条循环原则内置：轮次硬上限 · 收敛判据显式 · 评审用外部标准且留痕可查 · 出新问题立即停 · **循环永远不替代人工 Gate**。
+
+### 内置：风格自动适配
+
+A1.5 按**你项目的真实视觉风格**做设计，而不是凭通用审美发挥：
+
+- **已有界面的项目** → `/init-project`（或随时跑 `extract-visual-baseline` skill）扫描你的前端代码——真实用色直方图 / 字号阶梯 / 间距节奏 / 圆角阴影惯例 / 组件引用 / UI 依赖——生成视觉基线，**硬约束之后每一张 demo**（超出色板的颜色会被审核打回）
+- **还没有界面** → A1.5 按产品类型出 2~3 个候选风格的 mini demo 截图，你**看图拍板一次**（Gate 1.5-style），选中即固化为基线，之后所有需求自动沿用不再重选
+- **基线陈旧** → 随时重扫；漂移报告逐条问你：是"基线该跟上代码"，还是"代码漂了该登记让研发收敛"
 
 ## 自带的通用方法论（不随项目变）
 
