@@ -69,6 +69,8 @@ The head of the pipeline now iterates **before** anything reaches your gate (mir
 
 Five loop principles baked in: hard round caps · explicit convergence criteria · external judging standards with audit trails · stop-on-new-issue · **loops never replace human gates**.
 
+**And the loops are measured** (patch-012): every loop leaves a machine-readable `loop-trace` block that lands in `evals/loops.csv` (rounds, caught/self-fixed/escalated, cap-hits, broke-something stops), every post-ship defect lands in `evals/escapes.csv` (found-at vs should-have-been-caught-at layer), and the weekly report renders an interception funnel + loop convergence dashboard — so "did the loops actually move defect detection earlier" is a number, not a feeling. All three eval CSVs are schema-validated at write time (`scripts/validate-evals-csv.sh`).
+
 ### Auto style adaptation
 
 A1.5 designs in **your project's actual visual style**, not generic best-practice taste:
@@ -156,6 +158,7 @@ Net effect: the engine ports as-is; the smarts regrow per project — recurring 
 - **8 agent**：A1 产品 / A1.5 视觉规范（仅 UI 类）/ A2 需求审 / A3 技术 / A4 范围审 / A5 二次校验（仅 A4 触发）/ A6 用例 / A7 用例审
 - **自进化**：每次交付后 `pipeline-retrospector` 自动沉淀；`/pipeline-review` 周报；`/optimize-prompts` 月度把踩坑提炼进 agent prompt
 - **设计力**：30 张设计方法论卡片内置 + 头部质量循环（A1 自走查 / A2 可用性软闸 / A1.5 四视角自评）+ 风格自动适配（提取真实风格 or 看图选型一次固化）
+- **可度量**（patch-012）：每个质量循环留机器可读 loop-trace → `evals/loops.csv`（轮数/检出/自修/超限/改坏）；交付后逃逸缺陷登 `evals/escapes.csv`（发现层 vs 应拦截层）；周报出拦截漏斗 + Loop 收敛仪表——"循环有没有用"从感觉变成数字；三张评估 CSV 写入时 schema 校验
 - **产物**：`deliverables/*.draft` 包 = 给研发/Codex 拿到就能干活的施工图
 
 ## 设计原则：引擎通用，知识专属

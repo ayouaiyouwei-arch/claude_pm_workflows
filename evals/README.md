@@ -10,6 +10,8 @@
 |---|---|---|---|
 | `runs.csv` | `/new-feature` 第 9 步自动追加 | `pipeline-evaluator` / PM | 每个 `.done` 包 1 行（append-only） |
 | `_runs字段说明.md` | PM 维护 | 任何要解读 runs.csv 的人 | 字段调整时手改 |
+| `loops.csv` + `_loops字段说明.md` | `pipeline-retrospector`（从 loop-trace 块抽取） | `pipeline-evaluator`（周报 四B Loop 收敛仪表） | 每个 `.done` 包 0~N 行（patch-012） |
+| `escapes.csv` + `_escapes字段说明.md` | 主对话当场登记（P025 灰度 / hotfix 立项 / DIFF 登记 / 紧急 patch 四 Hook） | `pipeline-evaluator`（周报 四A 拦截漏斗） | 逃逸事件时 1 行（patch-012） |
 | `rubrics/_rubric模板.md` | PM 维护 | PM 抽样时复制 | 模板调整时手改 |
 | `rubrics/<YYYY-MM-DD>-<CHG>-<short>.md` | PM 手填（10 分钟/包） | `pipeline-evaluator` | 每周 5 包抽样 |
 | `weekly/<YYYY-WW>-周报.md` | `pipeline-evaluator` agent | PM | 每周一次（`/pipeline-review`） |

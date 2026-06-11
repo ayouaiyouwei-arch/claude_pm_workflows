@@ -1,5 +1,16 @@
 # Prompt 变更日志（空 · /optimize-prompts 自动追加）
 
+## 2026-06-11 · patch-012 · 评估体系增强（主仓同步 · 拦截账本 + Loop 指标 + runs.csv v1.1）
+
+- `evals/runs.csv` 18→**22 列**（新增 交付路径 / A5_PM裁决 / 包周期_小时 / patch水位）+ `_runs字段说明.md` v1.1 值域冻结（类型 5 值 · A2/A4 去括号 · VR 统一 0–1 · 端白名单 · "再加列"门槛）
+- 新建 `evals/escapes.csv`（9 列逃逸账本 · 发现层 vs 应拦截层 · 4 个登记 Hook）+ `evals/loops.csv`（11 列循环账本 · 6 类 loop-trace 块）+ 两份字段说明 + `scripts/validate-evals-csv.sh`（三表写入时校验 · SIDES 集合 init 时按 PROJECT-PROFILE § 五替换）
+- retrospector v1.0→**1.1**：抽 22 列 + grep loop-trace 落 loops.csv + append 后必校验（LOCKED 落盘清单 4→5 类）
+- evaluator v1.2→**1.3**：preflight 三表校验 + 周报新增 四A 拦截漏斗 / 四B Loop 收敛仪表 / 四C patch 切片 + trace 存在率必检 + 每 4 周指标退役检查
+- A1 v1.5→**1.6** / A2 v1.1→**1.2** / A1.5 v1.3→**1.4**：残留表 / 第 11 项 / self-critique.md 尾部必附 loop-trace 块
+- `iterate-A2` / `iterate-A7`：第 2.9 步退出前必写 trace（三种退出路径都写）；`new-feature`：00-原始需求创建时间精确到分钟 + Gate 1 软闸裁决回填 + Gate 1.5b 轮数留痕（0 轮也写）+ 第 9 步 22 列；`99-状态` 模板 snapshot v2；`promote-deliverable` B-后置 22 列；`pre-parallel-check` / `log-diff-entry` escapes 提醒；CLAUDE.md 关键约束 #6 扩
+- 北极星：灰度命中率应趋向 0 / A5 推翻率 / 软闸回炉率 / Gate1.5b 轮数趋势——连续 4 周无人消费的指标列退役候选
+
+
 ## 2026-06-10 · patch-011 · 知识库治理（主仓同步 · 消费断链修复 + 生命周期 + 编号映射）
 
 - A1 v1.5 / A3 v1.3 / A6 v1.3：必读段接线 query-knowledge（历史案例检索必跑 · 不再"只写不读"）

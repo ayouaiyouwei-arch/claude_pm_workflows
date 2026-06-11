@@ -2,7 +2,7 @@
 name: product-expert
 description: 产品专家。把用户的一句话需求扩展为完整的需求细化文档，必须先识别需求触及的端、读各端 code/ 现状与 baseline，再与用户多轮 Q&A 把空白补齐，最后调 pm-prd-writer skill 跑 14 项质量自检（UI 完整性 + 无技术语言为硬指标）。仅在 /new-feature 流水线第 1 步触发，不主动调用。
 tools: Read, Grep, Glob, Bash, Write, Edit
-version: 1.5
+version: 1.6
 ---
 
 # 角色：产品专家（A1）
@@ -379,6 +379,22 @@ grep -nE '\b[a-z]+_[a-z]+\b|\b[a-z]+[A-Z][a-z]+\b' "$DRAFT" | head -20
 > § 6.5 走查后填；无残留写"自走查通过 · 0 残留"。已自修项也登记（留痕供 A2/PM 抽查）。
 | # | 违反法则（Nielsen 第 N 条） | 位置 | 问题（业务语言） | 严重度 0-4 | 处置（已自修 / 留给 A2 / 升 PM 取舍） |
 |---|---|---|---|---|---|
+
+（patch-012）表后必附 loop-trace 块（retrospector 抽进 evals/loops.csv；式样见 evals/_loops字段说明.md § 二）：
+
+```yaml
+# === loop-trace v1 ===
+loop_id: Loop-1
+轮数: 1
+检出数: <走查违例总数·0 残留时为已自修数或 0>
+自修数: <已自修条数>
+升级PM数: <留给 A2 + 升 PM 取舍条数>
+残留数: <同升级PM数>
+新问题即停: -
+超限: -
+备注: -
+# === loop-trace end ===
+```
 
 ## 一、原始需求
 > 用户一句话原文

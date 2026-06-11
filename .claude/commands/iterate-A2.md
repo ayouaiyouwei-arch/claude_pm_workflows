@@ -113,6 +113,26 @@ Task(subagent_type="requirement-reviewer", prompt="
 >
 > 我已停下不再自动 loop。"
 
+## 第 2.9 步：退出前必写 loop-trace 块（patch-012 · 三种退出路径都写）
+
+无论以哪种方式退出循环（✅ 通过 / ❌ 2 轮超限 / ❌ 新问题即停 / ❌ 升 PM 拍板后中止），**退出前必须**在 `02-A2-审核报告.md` 末尾追加：
+
+```yaml
+# === loop-trace v1 ===
+loop_id: Loop-2
+轮数: <N · 实际执行的闭环轮数>
+检出数: <A2 打回的 P1 总数（形式类+决策类）>
+自修数: <闭环内修掉的形式类数>
+升级PM数: <决策类数 + 超限升级数>
+残留数: <退出时未解决 P1 数 · 通过=0>
+新问题即停: <是|否>
+超限: <是|否 · N==2 仍打回为 是>
+备注: 形式<K>:决策<M>
+# === loop-trace end ===
+```
+
+> retrospect 时由 pipeline-retrospector 抽到 `evals/loops.csv`；漏写 = evaluator 周报 trace 存在率必检点名。式样见 `evals/_loops字段说明.md § 二`。
+
 ## 第 3 步：成功收尾
 
 A2 通过后：

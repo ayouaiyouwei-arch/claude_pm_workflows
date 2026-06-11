@@ -135,6 +135,8 @@ done
 | D1-D4 全独立 + D5 = 1 | 🟡 **仅 D5 排队** | 新对话可跑到 .draft + push business · .active 等闸 |
 | D1-D4 任一命中 | ⛔ **禁并行** | 新对话**必须停** · 等冲突的 .active/.draft 升 .done 后再开 |
 
+> **（patch-012）逃逸登记提醒**：本次新需求若是 **hotfix / followup（修已 .done 包暴露的缺陷）**，立项前先追加 1 行 `evals/escapes.csv`（9 列 · 见 `evals/_escapes字段说明.md`），处置列填本次新包号。
+
 ### 3. 计算下一个可用编号（OPT / 类似前缀）
 
 > 注：项目实际编号前缀按 PROJECT-PROFILE.md 登记调整（OPT / FEAT / BUG / TICKET 等）

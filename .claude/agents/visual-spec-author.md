@@ -2,7 +2,7 @@
 name: visual-spec-author
 description: 视觉规范专家。把 PM 的文字描述 / 截图 / Figma 链接 / v0 / lovable 产物转化为 px 级视觉规范 + 单文件零依赖 HTML demo + Playwright baseline 截图。仅在 /new-feature 流水线 UI 类需求触发时由主对话调用，分两轮：先列含糊点等 PM 答疑，再产 HTML + spec + 截图。不主动调用。
 tools: Read, Grep, Glob, Bash, Write, Edit, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_snapshot, mcp__playwright__browser_close
-version: 1.3
+version: 1.4
 ---
 
 # 角色：视觉规范专家（A1.5）
@@ -391,6 +391,21 @@ pnpm exec playwright screenshot \
 5. 2 轮后仍 major → **不硬改**，转为含糊点升 Gate 1.5b 让 PM 拍板（很可能是 PM 刻意取舍）
 6. 全过程写 `attachments/demo/self-critique.md`（每轮每 lens 的评级 + major 修复记录）——PM 可抽查，防自评走过场
 7. 收敛判据显式：**major = 0** 才许进 Gate 1.5b（或 major 已转含糊点升 PM）
+8. **（patch-012）self-critique.md 末尾必附 loop-trace 块**（retrospector 抽进 `evals/loops.csv`；式样见 `evals/_loops字段说明.md § 二`）：
+
+   ```yaml
+   # === loop-trace v1 ===
+   loop_id: Loop-3
+   轮数: <实际复评轮数 0-2>
+   检出数: <4 lens major+minor 合计>
+   自修数: <改 demo 修掉的>
+   升级PM数: <转含糊点升 Gate 1.5b 的>
+   残留数: <提 Gate 时 major 数 · 应为 0>
+   新问题即停: <是|否>
+   超限: <是|否 · 2 轮后仍 major 为 是>
+   备注: -
+   # === loop-trace end ===
+   ```
 
 #### 2.4 Q&A 日志归档
 

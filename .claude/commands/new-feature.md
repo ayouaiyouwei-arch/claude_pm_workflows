@@ -55,7 +55,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
    mkdir -p "product-docs/_drafts/${TODAY}-${SLUG}"
    echo "${TODAY}-${SLUG}" > /tmp/new-feature-current.txt
    ```
-4. 在 `product-docs/_drafts/${TODAY}-${SLUG}/00-原始需求.md` 写入用户的一句话原文 + 创建时间
+4. 在 `product-docs/_drafts/${TODAY}-${SLUG}/00-原始需求.md` 写入用户的一句话原文 + 创建时间（**patch-012：精确到分钟** `date '+%F %H:%M'`——retrospector 算 `包周期_小时` 的起点锚，只写日期则该包周期记 `-`）
 
 ---
 
@@ -155,6 +155,8 @@ PM 答疑结果：<完整答疑列表>
 
 可能多轮迭代，直到 PM 选 A。PM 选 B 的后续轮次：A1.5 必须随新截图附 `baseline-<N>-revision-before-after.png` 对比图（PM 一眼复核改没改到位）。
 
+**（patch-012）Gate 1.5b 留痕两件事**：① PM 每轮选 B 后，主对话在 `attachments/demo/qa-log.md` 追加一行 `Gate 1.5b 第 <N> 轮（YYYY-MM-DD HH:mm）：B 改 <要点>`；② PM 选 A 收口时，主对话在 qa-log.md 末尾写 loop-trace 块（`loop_id: Gate1.5b改图`，`轮数` = 选 B 的总次数，0 轮一遍过也要写；式样见 `evals/_loops字段说明.md § 二`）。
+
 ### 1.5.3 A1.5 完成后 → 进第 2 步 A2
 
 A2 此时需多审一项："`01.5-视觉规范.md § 一/二/三` 表是否与 `01-需求细化.md § 五 UI 要求` 一致"——主对话在调 A2 时把这项加进 prompt。
@@ -178,6 +180,7 @@ Task(subagent_type="requirement-reviewer", prompt="
   - **我故意的** → 在 02-A2-审核报告.md 该条"建议"列回填"PM 拍板保留 + 理由"，放行
   - **降为 A3 注意事项** → 移入"给 A3 的注意事项"段随包流转
   全部处置完才进第 3 步。**严禁**主对话自行吞掉警告不亮给用户。
+  **（patch-012）裁决回填 trace**：处置完后，主对话把 02-A2-审核报告.md 里 A2-软闸 loop-trace 块的 `备注:` 行从"待PM裁决"改为 `回炉<N>/接受<M>`（retrospector 抽进 loops.csv，软闸校准指标的数据源）。
 - 结论 = 通过（0 警告）→ 进入第 3 步
 
 ---
@@ -424,18 +427,20 @@ Task(subagent_type="pipeline-retrospector", prompt="
 关联 _drafts 目录：product-docs/_drafts/<日期>-<短名>/
 
 请按 agent 定义流程：
-1. 抽取 18 列指标，写到 .done 包内 99-状态.md § 六（机器可读 yaml 段）
-2. 追加 1 行到 evals/runs.csv
-3. 追加 1 行到 knowledge/cases.csv
-4. 产出 1 份 optimization/patches-pending/<包名>.md（反思 + 候选补丁 + 候选范例）
-5. 第 1 句话格式：[retrospect 完成] 包=<包名>，已写 runs.csv/cases.csv/patches-pending/
+1. 抽取 22 列指标（v1.1 · 含 交付路径/A5_PM裁决/包周期_小时/patch水位），写到 .done 包内 99-状态.md § 六（机器可读 yaml 段）
+2. 追加 1 行到 evals/runs.csv，并跑 bash scripts/validate-evals-csv.sh runs --last
+3. grep _drafts 全部 loop-trace 块 → 逐块追加到 evals/loops.csv（缺失的在反思报告记录），并跑 validate loops --last
+4. 追加 1 行到 knowledge/cases.csv
+5. 产出 1 份 optimization/patches-pending/<包名>.md（反思 + 候选补丁 + 候选范例）
+6. 第 1 句话格式：[retrospect 完成] 包=<包名>，runs.csv=+1（22列校验✅），loops.csv=+N，cases.csv=+1，patches-pending=+1
 ")
 ```
 
 retrospector 完成后告知 PM：
 
 > "本期 retrospect 完成。已沉淀：
->  - 1 行 evals/runs.csv（看 18 列指标）
+>  - 1 行 evals/runs.csv（22 列指标 · 校验通过）
+>  - N 行 evals/loops.csv（Loop 收敛留痕）
 >  - 1 行 knowledge/cases.csv（业务标签 + 决策摘要）
 >  - 1 份 optimization/patches-pending/<包名>.md（待 /optimize-prompts 月更时审）
 >  

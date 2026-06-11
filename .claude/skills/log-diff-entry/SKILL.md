@@ -64,3 +64,4 @@ description: 用 baseline/templates/差异条目模板.md 创建新差异条目�
 - ❌ 跳过编号顺延规则
 - ❌ 状态默认填「已关闭」（必须经过裁决 + 修复 + 验收）
 - ❌ 不更新「说明文档.md」进度记录
+- ❌ （patch-012）DIFF 源于**已交付包的逃逸缺陷**时漏登 `evals/escapes.csv`（应同步追加 1 行 · 处置列填 DIFF-XXX · 见 `evals/_escapes字段说明.md`）
