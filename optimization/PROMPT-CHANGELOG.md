@@ -11,6 +11,7 @@
 - **CLAUDE.md**：关键约束 #16（收口 + 防御栈 · 铁律+指针格式）+ 修复 P015 业务语言条与 P017+P018 条撞号（11→15）
 - **init-project**：第 5.5 步防御栈接线（参数区核对 + hooksPath 挂载 + 干跑验证 + 密钥初始化 + 重启会话提醒）
 - **knowledge/记忆体系.md**：三层记忆架构（L0 工作/L1 情景/L2 语义程序 · 双写铁律：决议进 memory 必同会话回填权威文件）
+- **度量改良（同日追加）**：promote.sh 新增 `log_state_change()`——mv 后自动 append 99-状态 § 二 行（机器时间戳 · 相邻行间隔 = 各阶段耗时 · "禁止手改"落实为机器写）；pipeline-state.json Gate 补 `asked_at`/`at` 配对时间戳（差值 = PM 决策等待时长 · retrospector 从 state 推导不加 runs.csv 列）；**裁决拒绝"agent 自估 token"**——模型不知道自己的消耗，自估 = 假数据进账本，真数据走 harness transcript 工具（ccusage 类）事后统计
 
 ## 2026-06-12 · patch-013 · 存量文档基建流水线（gitlab 端直接演化）
 

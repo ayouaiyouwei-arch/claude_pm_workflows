@@ -68,7 +68,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
     "steps":{},"gates":{"gate1":{"resolved":false},"gate2":{"resolved":false},"gate3":{"resolved":false}}}
    EOF
    ```
-   每步完成后用 Edit 更新对应字段（如 `"steps":{"A1":{"verdict":"pass","rounds":2}}`、Gate 过后 `"gate1":{"resolved":true,"at":"<时间>"}`）。
+   每步完成后用 Edit 更新对应字段（如 `"steps":{"A1":{"verdict":"pass","rounds":2}}`）。**Gate 两笔时间戳（度量改良）**：向 PM 提问的同时写 `"gateN":{"asked_at":"<时间>"}`，PM 答复落定改 `"gateN":{"resolved":true,"asked_at":"<原值>","at":"<时间>"}`——两者之差 = PM 决策等待时长（周报可看瓶颈在 agent 还是在等 PM；retrospector 从 state 文件推导，**不新增 runs.csv 列**）。时间一律 `date '+%F %H:%M'`。
 5. 在 `product-docs/_drafts/${TODAY}-${SLUG}/00-原始需求.md` 写入用户的一句话原文 + 创建时间（**patch-012：精确到分钟** `date '+%F %H:%M'`——retrospector 算 `包周期_小时` 的起点锚，只写日期则该包周期记 `-`）
 
 ---

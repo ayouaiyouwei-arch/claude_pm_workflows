@@ -34,6 +34,26 @@ CUR=$(ls -d deliverables/"${BASE}".* 2>/dev/null | head -1)
 CUR_STATE="${CUR##*.}"
 PKG_ID=$(echo "$BASE" | grep -oE "(OPT|AGENT)-?[0-9]{1,3}" | head -1 | sed 's/-//' )  # 归一成 OPT046 形式做宽松匹配
 
+# § 二 状态变更历史自动留痕（机器时间戳 · 相邻行间隔 = 各阶段耗时 · "禁止手改"由此落实为机器写）
+log_state_change() {  # $1=包新路径 $2=从 $3=到 $4=备注
+  local ST="$1/99-状态.md"
+  [ -f "$ST" ] || { echo "ℹ️ ${1}/99-状态.md 不存在 · 跳过 § 二 留痕"; return 0; }
+  local NOW; NOW=$(date '+%F %H:%M')
+  awk -v now="$NOW" -v from="$2" -v to="$3" -v note="$4" '
+    /^## 二、/ { in2=1 }
+    in2 && /^## / && !/^## 二、/ { in2=0 }
+    { lines[NR]=$0 }
+    in2 && /^\|/ { last=NR; n++ }
+    END {
+      seq = (n>=2 ? n-1 : 1)   # n 含表头+分隔行 → 数据行=n-2 · 新序号=n-1
+      for (i=1; i<=NR; i++) {
+        print lines[i]
+        if (i==last) printf "| %d | %s | %s | %s | promote.sh | %s |\n", seq, now, from, to, note
+      }
+    }' "$ST" > "$ST.tmp" && mv "$ST.tmp" "$ST"
+  echo "📝 § 二 留痕：${2} → ${3} @ ${NOW}"
+}
+
 case "$TARGET" in
   active)
     ACTIVE_COUNT=$(ls deliverables/ 2>/dev/null | grep -c '\.active$')
@@ -45,6 +65,7 @@ case "$TARGET" in
     fi
     mv "$CUR" "deliverables/${BASE}.active"
     echo "✅ ${BASE}: .${CUR_STATE} → .active"
+    log_state_change "deliverables/${BASE}.active" ".${CUR_STATE}" ".active" "${FORCE:+--force 跳闸}"
     ;;
   done)
     # 闸门：runs.csv 先落账（宽松匹配 OPT-046 / OPT046 两种写法）
@@ -57,6 +78,7 @@ case "$TARGET" in
     fi
     mv "$CUR" "deliverables/${BASE}.done"
     echo "✅ ${BASE}: .${CUR_STATE} → .done"
+    log_state_change "deliverables/${BASE}.done" ".${CUR_STATE}" ".done" "${FORCE:+--force 跳闸}"
     if [ -x scripts/validate-evals-csv.sh ] || [ -f scripts/validate-evals-csv.sh ]; then
       bash scripts/validate-evals-csv.sh runs --last || {
         echo "⚠️ runs.csv 末行校验未通过 · 包已 mv 但请立即修正 runs.csv（见上方违例明细）" >&2
@@ -73,6 +95,7 @@ case "$TARGET" in
     mkdir -p deliverables/archive
     mv "$CUR" "deliverables/archive/${BASE}.${CUR_STATE}"
     echo "✅ ${BASE}: .${CUR_STATE} → archive/"
+    log_state_change "deliverables/archive/${BASE}.${CUR_STATE}" ".${CUR_STATE}" "archive/" "${FORCE:+--force 跳闸}"
     ;;
   *)
     echo "❌ 未知目标状态：$TARGET（可选 active|done|archive）" >&2
