@@ -70,13 +70,15 @@ grep -q "未初始化 · 待 /init-project" PROJECT-PROFILE.md && echo "FRESH" |
 | `knowledge/` | patterns / cases / graph（知识图谱沉淀）|
 | `optimization/` | patches-pending/applied + agent-versions.json |
 | `evals/` | runs.csv / regression-set / weekly 周报 |
-| `.claude/` | agents（10）/ skills（19）/ commands（5）|
+| `.claude/` | agents（11）/ skills（19）/ commands（6）|
+| `product-docs/modules/` | **存量现状文档**（每模块 6 件套 · /init-docs 产出 · 长期演进）|
 
 ---
 
 ## 🚦 关键流水线入口
 
 - **初始化新项目**：`/init-project`（首次接入用 · 收集前置信息 + 梳理代码 + 确认后写 PROJECT-PROFILE）
+- **存量文档基建**：`/init-docs`（接入后跑一次，可分批续跑 · 模块拆分 Gate D1 → 每模块 6 件套 + Gate D2 裁决 → test-cases/<模块>.csv · 产物是 /new-feature 的上游事实源 · 收口走 publish-baseline《场景 B · docs-only》）
 - **新需求**：`/new-feature <一句话>` → 8 agent 流水线 + 5~6 Gate
 - **包升级**：`promote-deliverable`（.draft → .active → .done → archive）
 - **周报**：`/pipeline-review`
@@ -126,6 +128,8 @@ grep -q "未初始化 · 待 /init-project" PROJECT-PROFILE.md && echo "FRESH" |
     - **P021 跨端数据流契约** · A1 §2.v 识别写入端↔读取端 · "非同源(重建)"→ **唯一保留的设计动作 = Gate 1 问 PM"两端是否应一致"（产品决策）**· 一致性靠 A6 round-trip 用例兜，**A3 不设方案硬闸**
     - **分工铁律**：设计阶段"想清楚要什么"，测试/验收阶段"确认做对没有"。渲染缺陷属后者
     - **改动**：P020/P021 pattern + A1 v1.3（撤硬闸只留跨端问 PM）+ A3 v1.2（撤硬闸改建议）+ A6 v1.2（加厚 [MAP]+round-trip）+ A1.5 v1.1 + P013 M1~M5 + L2 skill `acceptance-regression` § 九 `@map` 断言
+13. **文档命名空间引用规则（通用方法论 · 2026-06-11 新增 · /init-docs 上线随附）**：`product-docs/modules/`（存量现状 · 长期演进）≠ `product-docs/_drafts/`（单需求过程稿）≠ `deliverables/*/`（交付包冻结快照）——三套编号各自独立，**引用文档必须带路径，禁止裸说"06 文档"**。
+14. **升 .done 三件回流（通用方法论 · 2026-06-11 新增 · 与 P004 retrospect 并列执行 · promote-deliverable 后置）**：任何包升 `.done` 时必须同步 ① 包内用例增删改合并回 `test/test-cases/<模块>.csv`（`baseline_version` 标记来源）② 行为变化回写 `modules/M0X/01-功能说明 § 演进记录` + `04-业务规则` 现状 ③ 新页面/路由/接口补 `modules/M0X/02-对照矩阵`。**缺任一 = 存量基线开始漂移，下个需求 A1 读到旧事实**。
 
 ---
 

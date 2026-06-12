@@ -50,6 +50,7 @@ git clone https://github.com/ayouaiyouwei-arch/claude_pm_workflows.git my-projec
 cd my-project-pm
 # Open in Claude Code — CLAUDE.md auto-detects a fresh skeleton and lists what to provide
 /init-project          # pulls your code, drafts rules, confirms with you, fills PROJECT-PROFILE.md
+/init-docs             # (legacy systems) reverse-engineer as-is docs: 6 files per module + test-case library, batchable
 /new-feature "<your one-line requirement>"
 ```
 
@@ -92,10 +93,11 @@ The key move: **all project-specific knowledge collapses into one file (`PROJECT
 PROJECT-PROFILE.md       # single source of project config
 CLAUDE.md                # session preamble + first-run onboarding trigger
 .claude/
-├── agents/   (10)       # 8 pipeline agents + 2 meta agents
+├── agents/   (11)       # 8 pipeline agents + 2 meta agents + legacy-excavator (reverse-PRD digger)
 ├── skills/   (23)       # packaging / promotion / testing / acceptance-regression / extract-visual-baseline / knowledge / baseline
-└── commands/ (8)        # /init-project /new-feature /pipeline-review /optimize-prompts /babysit-active /iterate-A7 /iterate-A2 /dev-verify
+└── commands/ (9)        # /init-project /init-docs /new-feature /pipeline-review /optimize-prompts /babysit-active /iterate-A7 /iterate-A2 /dev-verify
 product-docs/baseline/   # version / diff / change ledgers (empty, grow as you go)
+product-docs/modules/    # as-is docs, 6 files per module (built by /init-docs · long-lived fact source)
 deliverables/_template/  # delivery-package template (12 root docs + snapshot + demo)
 test/tools/e2e-scripts/  # independent acceptance e2e skeleton (L0–L5 + role matrix + config template)
 knowledge/methodology/   # 30 design-methodology cards (built-in snapshot · zero install)
@@ -174,6 +176,7 @@ git clone https://github.com/ayouaiyouwei-arch/claude_pm_workflows.git my-projec
 # 2. 在 Claude Code 里开第一段对话 —— CLAUDE.md 会自动检测到空白骨架并列出前置准备清单
 # 3. 运行接入向导
 /init-project        # 拉你的代码 → 主动梳理规则 → 逐项问你确认 → 填 PROJECT-PROFILE.md
+/init-docs           # （存量系统）反向沉淀现状文档：每模块 6 件套 + 用例库底座，可分批续跑
 /new-feature "<你的一句话需求>"
 ```
 

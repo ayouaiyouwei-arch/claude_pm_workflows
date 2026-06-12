@@ -11,6 +11,7 @@
     "test-case-reviewer": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
     "visual-spec-author": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
     "pipeline-evaluator": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
-    "pipeline-retrospector": { "version": "1.0", "last_patch": null, "last_updated": "<init>" }
+    "pipeline-retrospector": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
+    "legacy-excavator": { "version": "1.0", "last_patch": null, "last_updated": "<init>" }
   }
 }

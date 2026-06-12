@@ -155,6 +155,7 @@ find code/<仓库名> -name "*.tsx" -o -name "*.vue" | grep -v node_modules | he
 - baseline 3 台账已建（空，随用随登记）
 
 下一步：
+- **存量项目强烈建议先跑 /init-docs**（存量文档基建：模块 6 件套 + 用例库底座，给 /new-feature 当事实源）
 - 跑第一个需求：/new-feature <一句话>
 - 流水线会引用 PROJECT-PROFILE.md 做核心架构/领域术语判定
 - 跑几轮后，pipeline-retrospector 会自动沉淀你项目专属的 patterns（越用越聪明）
