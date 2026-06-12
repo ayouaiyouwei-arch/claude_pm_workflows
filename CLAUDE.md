@@ -70,7 +70,7 @@ grep -q "未初始化 · 待 /init-project" PROJECT-PROFILE.md && echo "FRESH" |
 | `knowledge/` | patterns / cases / graph（知识图谱沉淀）|
 | `optimization/` | patches-pending/applied + agent-versions.json |
 | `evals/` | runs.csv / regression-set / weekly 周报 |
-| `.claude/` | agents（11）/ skills（19）/ commands（6）|
+| `.claude/` | agents（11）/ skills（23）/ commands（9）+ settings.json（deny + hooks 三件套）|
 | `product-docs/modules/` | **存量现状文档**（每模块 6 件套 · /init-docs 产出 · 长期演进）|
 
 ---

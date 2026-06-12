@@ -4,9 +4,10 @@
 > 把一句话需求孵化成研发可直接施工的交付包 —— 8 个 Claude Code agent 的流水线引擎。越用越聪明，项目无关。
 
 ![Built with Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-d97757)
-![Agents](https://img.shields.io/badge/agents-8%20+%202-blue)
+![Agents](https://img.shields.io/badge/agents-8%20+%203-blue)
 ![Project agnostic](https://img.shields.io/badge/project-agnostic-2ea44f)
 ![Self-evolving](https://img.shields.io/badge/self--evolving-eval%E2%86%92optimize%E2%86%92knowledge-purple)
+![Guardrails](https://img.shields.io/badge/guardrails-hooks%20%2B%20gated%20scripts-orange)
 
 **English** · [中文](#中文)
 
@@ -42,6 +43,7 @@ flowchart TD
 - **Output**: a `deliverables/*.draft` package = the blueprint a developer/Codex builds from directly
 - **Self-evolving loop**: every `.done` package writes to `runs.csv` / `cases.csv`; `/pipeline-review` produces a weekly report; `/optimize-prompts` folds recurring lessons back into the agent prompts
 - **Design quality built in**: 30 methodology cards + head-of-pipeline quality loops (A1 self-walkthrough / A2 usability soft-gate / A1.5 4-lens self-critique) + auto style adaptation (extract real style, or pick once from mini-demos)
+- **Deterministic guardrails** (patch-014): gated scripts (ID dispenser / state-machine promote) + git pre-push whitelist gate + Claude Code hooks — rules that used to rely on prompt obedience are now mechanically enforced (see *Built-in: deterministic guardrails*)
 
 ## Quick start
 
@@ -79,6 +81,17 @@ A1.5 designs in **your project's actual visual style**, not generic best-practic
 - **No UI yet** → A1.5 proposes 2–3 style candidates as mini-demo screenshots; you pick once (Gate 1.5-style), the choice is frozen as the baseline, and every later feature follows it automatically
 - **Baseline drift** → re-run the scanner anytime; a drift report asks you per finding: *update the baseline* or *log a deviation for dev to converge*
 
+### Built-in: deterministic guardrails
+
+Prompts are *probably* obeyed; hooks and gated scripts are *always* executed. The skeleton ships a layered defense stack — battle-tested on the origin project, where every prose-only rule eventually failed (11 packages missed retrospect, 5 ID collisions):
+
+- **Gated scripts (L1, structural elimination)** — `next-id.sh` single ID dispenser (5-source scan + `--check`), `promote.sh` state machine with 3 gates (single-active / **ledger-before-done** / archive-only-done), `git-biz-push.sh` with 5 self-checks built in, `load-secrets.sh` (secrets live outside the repo)
+- **Git pre-push hard gate (L2)** — push-branch **whitelist** (blacklist mode that "only blocks release" provably leaks `main`/tag pushes), mirror-path whitelist, delivery-prompt presence check — and it catches **every** push agent on the machine (Claude, Codex, humans), which Claude Code hooks alone cannot
+- **Claude Code hooks (L4)** — `guard-bash` blocks bypassing the gated scripts (exit 2 feeds a fix-it-now message back to the model), `post-csv-validate` schema-checks eval ledgers right after every write, `session-start-brief` injects a ≤15-line state brief (in-flight packages, pipeline progress, name-level ledger reconciliation) at session start — all wired in `.claude/settings.json` via `$CLAUDE_PROJECT_DIR`, zero per-machine config
+- **Resumable pipelines** — each `/new-feature` run keeps a `pipeline-state.json` (current step, gate status) inside its package dir: parallel pipelines stay isolated, and context compaction can't lose your place
+
+Every script has a ⚙️ parameter block; `/init-project` fills it from `PROJECT-PROFILE.md` § 2 (defaults = the common two-way branch-isolation convention, so same-convention projects run unchanged).
+
 ## Design principle: generic engine, project-specific knowledge
 
 | Layer | What | Portability |
@@ -104,7 +117,9 @@ deliverables/_template/  # delivery-package template (12 root docs + snapshot + 
 test/tools/e2e-scripts/  # independent acceptance e2e skeleton (L0–L5 + role matrix + config template)
 knowledge/methodology/   # 30 design-methodology cards (built-in snapshot · zero install)
 knowledge/patterns/      # built-in generic methodologies + your project's learned ones
-scripts/                 # visual-baseline-scan.py (real-style extraction) + csv-to-spec
+scripts/                 # gated scripts (next-id / promote / git-sync / git-biz-push / load-secrets)
+├── hooks/               # Claude Code hooks ×3 (guard-bash / post-csv-validate / session-start-brief)
+└── git-hooks/           # pre-push hard gate (branch whitelist + mirror whitelist + prompt presence)
 evals/ · optimization/   # runs.csv + weekly reports · prompt patches + agent versions
 ```
 
@@ -159,6 +174,7 @@ Net effect: the engine ports as-is; the smarts regrow per project — recurring 
 - **自进化**：每次交付后 `pipeline-retrospector` 自动沉淀；`/pipeline-review` 周报；`/optimize-prompts` 月度把踩坑提炼进 agent prompt
 - **设计力**：30 张设计方法论卡片内置 + 头部质量循环（A1 自走查 / A2 可用性软闸 / A1.5 四视角自评）+ 风格自动适配（提取真实风格 or 看图选型一次固化）
 - **可度量**（patch-012）：每个质量循环留机器可读 loop-trace → `evals/loops.csv`（轮数/检出/自修/超限/改坏）；交付后逃逸缺陷登 `evals/escapes.csv`（发现层 vs 应拦截层）；周报出拦截漏斗 + Loop 收敛仪表——"循环有没有用"从感觉变成数字；三张评估 CSV 写入时 schema 校验
+- **确定性防护**（patch-014）：收口脚本（发号器 / 状态机 promote）+ git pre-push 白名单硬闸 + CC hooks 三件套——曾经靠提示词自觉的规则现在机器强制执行（详见下方"内置：确定性防护"）
 - **产物**：`deliverables/*.draft` 包 = 给研发/Codex 拿到就能干活的施工图
 
 ## 设计原则：引擎通用，知识专属
@@ -207,6 +223,17 @@ A1.5 按**你项目的真实视觉风格**做设计，而不是凭通用审美�
 - **已有界面的项目** → `/init-project`（或随时跑 `extract-visual-baseline` skill）扫描你的前端代码——真实用色直方图 / 字号阶梯 / 间距节奏 / 圆角阴影惯例 / 组件引用 / UI 依赖——生成视觉基线，**硬约束之后每一张 demo**（超出色板的颜色会被审核打回）
 - **还没有界面** → A1.5 按产品类型出 2~3 个候选风格的 mini demo 截图，你**看图拍板一次**（Gate 1.5-style），选中即固化为基线，之后所有需求自动沿用不再重选
 - **基线陈旧** → 随时重扫；漂移报告逐条问你：是"基线该跟上代码"，还是"代码漂了该登记让研发收敛"
+
+### 内置：确定性防护（防御栈）
+
+提示词是"大概率听话"，hooks 和收口脚本是"必然执行"。骨架自带分层防御栈——源项目实战检验过：纯提示词约束全部失效过（漏 11 包 retrospect、撞号 5 次）：
+
+- **收口脚本（L1 · 结构性消除）** —— `next-id.sh` 唯一发号器（5 源扫描 + `--check` 占用复核）· `promote.sh` 状态机三闸（单 active / **先落账后升 done** / 仅 done 可归档）· `git-biz-push.sh` 五项自检内置 · `load-secrets.sh` 密钥仓外存放
+- **git pre-push 硬闸（L2）** —— 推送分支**白名单制**（"只拦 release"的黑名单制实证会漏 main/tags）+ 镜像路径白名单 + 派活提示词存在性——对本机**所有** push 主体生效（Claude / Codex / 人手敲），这是 CC hooks 单独做不到的
+- **Claude Code hooks（L4）** —— `guard-bash` 拦绕过收口脚本的操作（exit 2 把"怎么修"当场喂回模型）；`post-csv-validate` 评估账本写后即校验；`session-start-brief` 每次开场自动注入 ≤15 行简报（在飞包 / 流水线进度 / 账本名字级对账）——全部经 `.claude/settings.json` 用 `$CLAUDE_PROJECT_DIR` 接线，换机器零配置
+- **流水线可恢复** —— 每条 `/new-feature` 流水线在包目录内维护 `pipeline-state.json`（当前步 / Gate 状态）：多流水线并行天然隔离，上下文压缩后不丢进度
+
+所有脚本头部 ⚙️ 参数区由 `/init-project` 按 `PROJECT-PROFILE.md § 二` 填充（默认值 = 常见双向分支隔离惯例，同款约定的项目零改动直接用）。
 
 ## 自带的通用方法论（不随项目变）
 
