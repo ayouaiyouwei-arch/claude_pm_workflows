@@ -1,5 +1,10 @@
 # Prompt 变更日志（空 · /optimize-prompts 自动追加）
 
+## 2026-06-12 · patch-013 · 存量文档基建流水线（gitlab 端直接演化）
+
+- `/init-docs` command（存量文档基建流水线）+ `legacy-excavator` agent（存量文档挖掘）+ 模块 6 件套模板；`publish-baseline` 增 docs-only 场景 B 特例；`/init-project` 接线；agent-versions 登记 legacy-excavator v1.0
+- ⚠️ **编号注记**：实施 commit `3bc33c4` 的 message 误标 "patch-012"——撞号根因 = 本地"patch-012 评估体系"commit 未及时 push，gitlab 端不知 012 已被占用（发号器哲学的又一实证）。**裁决以本 changelog 为准：评估体系 = patch-012（与主仓同号 · 长期对照零成本），本条 = patch-013**
+
 ## 2026-06-11 · patch-012 · 评估体系增强（主仓同步 · 拦截账本 + Loop 指标 + runs.csv v1.1）
 
 - `evals/runs.csv` 18→**22 列**（新增 交付路径 / A5_PM裁决 / 包周期_小时 / patch水位）+ `_runs字段说明.md` v1.1 值域冻结（类型 5 值 · A2/A4 去括号 · VR 统一 0–1 · 端白名单 · "再加列"门槛）
