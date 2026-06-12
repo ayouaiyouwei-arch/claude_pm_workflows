@@ -1,7 +1,7 @@
 ---
 description: A2 需求审核打回后自动闭环（A1 修 → 自检 → A2 重审），最多 2 轮，仅形式类问题可进闭环，决策类直接升 PM。patch-009 新增（Loop-2 · 对齐 iterate-A7 模式）。
 argument-hint: <_drafts 短名，如 2026-06-10-xxx-yyy>；留空则用 /tmp/new-feature-current.txt 内的最近一次
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
 ---
 
 # /iterate-A2 · A2 闭环自动迭代（Loop-2）
@@ -65,7 +65,7 @@ grep -A 50 "## 打回时必填\|必须修改的问题" "$A2_REPORT" | head -80
 ### 2.1 调 A1 按 A2 报告修
 
 ```
-Task(subagent_type="product-expert", prompt="
+Agent(subagent_type="product-expert", prompt="
 工作目录：product-docs/_drafts/<短名>/
 当前是【A2 闭环第 N 轮】（最多 2 轮）。
 
@@ -80,7 +80,7 @@ A2 已打回，必改 P1 项见 02-A2-审核报告.md § 必须修改的问题�
 ### 2.2 主对话拿到 A1 返回 → 调 A2 重审
 
 ```
-Task(subagent_type="requirement-reviewer", prompt="
+Agent(subagent_type="requirement-reviewer", prompt="
 审核对象：product-docs/_drafts/<短名>/01-需求细化.md
 当前是【A2 闭环第 N 轮重审】。
 

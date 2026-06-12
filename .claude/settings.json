@@ -1,0 +1,52 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(git push origin release*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Edit(code/**)",
+      "Write(code/**)",
+      "Bash(mv deliverables/*.active deliverables/*.done*)",
+      "Bash(mv deliverables/*.draft deliverables/*.active*)",
+      "Edit(deliverables/archive/**)",
+      "Write(deliverables/archive/**)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/hooks/guard-bash.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/hooks/post-csv-validate.sh\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/hooks/session-start-brief.sh\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,7 +1,7 @@
 ---
 description: 流水线周更入口。每周跑一次，调 pipeline-evaluator 出周报，并提醒 PM 完成本周 rubric 抽样。
 argument-hint: 留空（自动算本周）或 <YYYY-WW>（指定周次）
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
 ---
 
 # /pipeline-review · 流水线周更
@@ -98,7 +98,7 @@ NR>1 && (
 ## 第 3 步：调 pipeline-evaluator
 
 ```
-Task(subagent_type="pipeline-evaluator", prompt="
+Agent(subagent_type="pipeline-evaluator", prompt="
 本周窗口：<WEEK_START> ~ <WEEK_END>
 周次：<WEEK>
 请按 agent 定义流程产出 evals/weekly/<WEEK>-周报.md。

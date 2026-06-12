@@ -118,7 +118,7 @@ grep -q "未初始化 · 待 /init-project" PROJECT-PROFILE.md && echo "FRESH" |
     - **P014**（A1+A6+A7）· UI 文案 "近 N 天" / "Last N days" / "本周" / "Top N" 等含数字 / 范围的预设按钮 · A1 § 4.3.x 必产 LOCKED 表（4 列 · 含 semantic 类型 rolling/calendar/point-in-time/event-based · 行业事实标准）· A6 必产 `[BV-LABEL]` 用例 ≥ 3（与 [BV] 区别：UI 文案语义边界 vs 经典边界值）· A7 Pass2 触发判定 + property-based test (`@fast-check/vitest`) INFO 推荐
     - **触发包**：实战中"8 agent 全过 + 25 用例全过 + dev-verify 通过 + 9 硬检查通过 + 全量回归 100% PASS → 仍漏 30+ 天"反思 · PM 灰度 5 分钟主观体验首次点 preset 按钮才触发
     - **长期工程方案**（推荐 · 不在 prompt LOCKED 内）：L1 工程层 TypeScript discriminated union + readonly const PRESETS[] · L2 测试层 @fast-check/vitest property-based test 覆盖 4000+ 边界日 · 工程层落地后 A7 P014 LOCKED 可降级为 INFO 提醒
-11. **P015 LOCKED · 问 PM 必用业务语言（通用方法论 · 2026-05-28 新增 · 骨架默认开启）**：
+15. **P015 LOCKED · 问 PM 必用业务语言（通用方法论 · 2026-05-28 新增 · 骨架默认开启 · 原误标 11 与 P017+P018 条撞号 · patch-014 修正）**：
     - **P015**（A1 + A1.5 + A2 + A3 + A4 + A5 + A7 + 主对话）· agent 向 PM 提任何问题清单 / 打回原因 / Gate 决策必满足 4 条：① 业务影响必先说（"用户/客户/演示场景会看到/经历什么"）② 技术词必括号翻译（30 词黑名单翻译表）③ A/B/C 选项必各带业务后果 ④ 返回前 30 词技术黑名单 grep 自检 ≤ 0
     - **触发包**：实战中"agent 给 PM 的问题清单大量塞 `import.meta.env.PROD` / `interceptor` / `hostname` 等技术黑话 · PM 看不懂 · 决策卡住或拍错"反思 · 7 agent prompt + new-feature command 全部加 LOCKED 段
     - **覆盖范围**：骨架默认开启 · 所有新项目无需 init 即生效
@@ -130,6 +130,7 @@ grep -q "未初始化 · 待 /init-project" PROJECT-PROFILE.md && echo "FRESH" |
     - **改动**：P020/P021 pattern + A1 v1.3（撤硬闸只留跨端问 PM）+ A3 v1.2（撤硬闸改建议）+ A6 v1.2（加厚 [MAP]+round-trip）+ A1.5 v1.1 + P013 M1~M5 + L2 skill `acceptance-regression` § 九 `@map` 断言
 13. **文档命名空间引用规则（通用方法论 · 2026-06-11 新增 · /init-docs 上线随附）**：`product-docs/modules/`（存量现状 · 长期演进）≠ `product-docs/_drafts/`（单需求过程稿）≠ `deliverables/*/`（交付包冻结快照）——三套编号各自独立，**引用文档必须带路径，禁止裸说"06 文档"**。
 14. **升 .done 三件回流（通用方法论 · 2026-06-11 新增 · 与 P004 retrospect 并列执行 · promote-deliverable 后置）**：任何包升 `.done` 时必须同步 ① 包内用例增删改合并回 `test/test-cases/<模块>.csv`（`baseline_version` 标记来源）② 行为变化回写 `modules/M0X/01-功能说明 § 演进记录` + `04-业务规则` 现状 ③ 新页面/路由/接口补 `modules/M0X/02-对照矩阵`。**缺任一 = 存量基线开始漂移，下个需求 A1 读到旧事实**。
+16. **结构性收口 + 防御栈（patch-014 · 主仓 harness 加固同步 · 2026-06-12）**：编号一律 `bash scripts/next-id.sh`（禁自算 · 主仓撞号 5 案例后机器化）；包状态变更一律 `bash scripts/promote.sh`（禁直接 mv · GATE-D5/GATE-RETRO/GATE-ARCHIVE 三闸 · **runs.csv 先落账后升 .done**）；业务侧推送一律 `bash scripts/git-biz-push.sh`（五项自检内置）；密钥一律 `source scripts/load-secrets.sh`（仓内禁写密码本体）。三层防御：① 收口脚本（L1 结构性消除）② `scripts/git-hooks/pre-push` 硬闸（L2 · `/init-project` 时 `git -C code/<仓> config core.hooksPath <工作空间>/scripts/git-hooks` 挂入**双向隔离仓**（可直推 main 的仓不挂）· G1 推送分支白名单制 / G2 镜像路径白名单 / G3 派活提示词存在性 · 对本机所有 push 主体生效）③ `.claude/settings.json` deny 9 条 + CC hooks 三件套（L4 · guard-bash 拦绕过收口的 mv/mkdir / post-csv-validate 写后 schema 校验 / session-start-brief 开场简报 + .done↔runs.csv 名字级对账）。**hooks 是必然执行，CLAUDE.md 是大概率听话——机械约束一律下沉到脚本层，prose 只留判断型约束**；脚本头部 ⚙️ 参数区由 `/init-project` 按 PROJECT-PROFILE § 二 填充
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 description: A7 用例审核打回后自动闭环（A6 修 → 自检 → A7 重审），最多 3 轮，超时强制停下让 PM 介入。
 argument-hint: <_drafts 短名，如 2026-05-09-dashboard-vehicle-card-collapse>；留空则用 /tmp/new-feature-current.txt 内的最近一次
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
 ---
 
 # /iterate-A7 · A7 闭环自动迭代
@@ -59,7 +59,7 @@ grep -A 50 "## 必须修改的问题\|## 四、必须修改的问题" "$A7_REPOR
 ### 2.1 调 A6 按 A7 报告修
 
 ```
-Task(subagent_type="test-case-author", prompt="
+Agent(subagent_type="test-case-author", prompt="
 工作目录：product-docs/_drafts/<短名>/
 当前是【A7 闭环第 N 轮】（最多 3 轮）。
 
@@ -74,7 +74,7 @@ A7 已打回，必改 P1 项见 07-A7-用例审核报告.md § 必须修改的�
 ### 2.2 主对话拿到 A6 返回 → 调 A7 重审
 
 ```
-Task(subagent_type="test-case-reviewer", prompt="
+Agent(subagent_type="test-case-reviewer", prompt="
 审核对象：product-docs/_drafts/<短名>/06-用例.csv + 06-用例说明.md
 当前是【A7 闭环第 N 轮重审】。
 

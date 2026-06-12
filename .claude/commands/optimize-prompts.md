@@ -1,7 +1,7 @@
 ---
 description: prompt 月更入口。读 optimization/patches-pending 全部条目，按"被独立提出次数"排序，逐条与 PM 决策合并/拒绝/改写后合并，每次合并跑 regression-set 兜底，最终 bump agent 版本号 + 追加 PROMPT-CHANGELOG.md。
 argument-hint: 留空（自动扫所有 pending）或 <agent-name>（仅审针对该 agent 的补丁）
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
 ---
 
 # /optimize-prompts · prompt 月更
@@ -158,7 +158,7 @@ NEW_VER="<OLD_VER + 0.1>"   # 1.0 → 1.1, 1.1 → 1.2
 ### 2.5 跑回归（regression-set）
 
 ```
-Task(subagent_type="<目标agent>", prompt="
+Agent(subagent_type="<目标agent>", prompt="
 回归测试模式。
 对 evals/regression-set/expected/<case_id_1>/ 下的输入跑你的标准流程，
 把结论与 expected/<case_id>/<agent>/<报告>-期望.md 对比，给出：

@@ -142,6 +142,11 @@ find code/<仓库名> -name "*.tsx" -o -name "*.vue" | grep -v node_modules | he
 4. **`product-docs/baseline/`**：确认 3 个空台账（01 版本/02 差异/03 变更）就位，写入首条"基线建立"记录
 4.5.（有前端时）**`product-docs/visual-baseline/`**：按 `extract-visual-baseline` skill 第 4 步模板落 01~06 草稿（确认后去"待 PM 确认"标），`00-调查方法.md` 登记本次扫描（日期/范围/文件数/commit SHA）；`08-交互最佳实践参考.md` 从通用模板起步（行业沉淀 · 非提取物）；PROJECT-PROFILE § 七回填"视觉基线目录 = product-docs/visual-baseline/"
 5.（可选）如用户给了验收环境 → 生成本项目的"验收环境必读"草稿到 `knowledge/patterns/`（参 robobus P006）
+5.5 **防御栈接线（patch-014 · 必做）**：
+   - **脚本参数区**：按 PROJECT-PROFILE § 二 核对/调整 `scripts/git-hooks/pre-push`、`scripts/git-sync.sh`、`scripts/git-biz-push.sh` 头部 ⚙️ 参数区（推送分支模式 / 镜像路径 / 派活提示词文件名 / 拉取分支模式 / commit 身份；默认值 = 双向隔离惯例，同款工作流零改动）
+   - **git 硬闸挂载**（仅双向隔离仓 · 可直推 main 的仓**不挂**）：`git -C code/<仓> config core.hooksPath "$(pwd)/scripts/git-hooks"`，挂后干跑验证：`echo "refs/heads/main <任意SHA> refs/heads/main <任意SHA>" | bash scripts/git-hooks/pre-push`（应输出 [GUARD-G1] 拦截）
+   - **CC hooks**：`.claude/settings.json` 随骨架自带（guard-bash / post-csv-validate / session-start-brief 三件套 + deny 9 条），无需额外配置——**hooks 配置在会话启动时加载，init 完成后提醒用户重启会话生效**
+   - **密钥**：`mkdir -p ~/.config/$(basename "$(pwd)") && cp scripts/secrets.env.example ~/.config/$(basename "$(pwd)")/secrets.env && chmod 600 ~/.config/$(basename "$(pwd)")/secrets.env`，让用户填真实值（仓内禁写密码本体）
 
 ---
 

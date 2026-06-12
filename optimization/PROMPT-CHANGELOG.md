@@ -1,5 +1,17 @@
 # Prompt 变更日志（空 · /optimize-prompts 自动追加）
 
+## 2026-06-12 · patch-014 · harness 加固（主仓同步 · L1-L4 防御栈 + 状态落盘 + Task→Agent）
+
+- **核心立场**：hooks 是必然执行，CLAUDE.md 是大概率听话——机械约束下沉脚本层，prose 只留判断型约束（主仓实证：漏 11 包 retrospect / 撞号 5 次 / patch 编号又撞 1 次全是 prose 失效）
+- **L1 收口脚本**：`next-id.sh`（发号器 · 5 源扫描 + --check）/ `promote.sh`（状态机三闸：GATE-D5 单 active / GATE-RETRO runs.csv 先落账 / GATE-ARCHIVE）/ `git-sync.sh` + `git-biz-push.sh`（拉推脚本化 · 五项自检内置）/ `load-secrets.sh` + `secrets.env.example`（密钥出仓）
+- **L2 git 硬闸**：`scripts/git-hooks/pre-push`（G1 推送分支**白名单制**——黑名单制只拦 release 时 push main/tags 全放行是主仓实证漏洞 / G2 镜像路径白名单 / G3 派活提示词存在性 · 对本机所有 push 主体生效）· ⚙️ 参数区 init 时按 PROJECT-PROFILE § 二 填充 · 仅挂双向隔离仓
+- **L4 CC hooks**：`.claude/settings.json` 新建（deny 9 条 + 三 hook 接线 `$CLAUDE_PROJECT_DIR` 相对路径）· `guard-bash.sh`（拦绕过 promote.sh 的 mv + 绕过发号器的已占用号 mkdir）/ `post-csv-validate.sh`（evals 三表写后 schema 校验 · exit 2 喂回当场修）/ `session-start-brief.sh`（开场简报：在飞包 + pipeline-state 进度 + memory 待回填 + .done↔runs.csv **名字级**对账）
+- **new-feature**：顶部"适用范围"段（bug 修复不走流水线 · 主仓 2026-06-06 决议）+ 第 0 步 pipeline-state.json 状态落盘（替代 /tmp 单例 · 多流水线隔离 + 压缩后恢复）+ A5 调用模板补工作目录（多包并行禁 glob 撞最新报告）+ 中断恢复段改读 state
+- **Task→Agent 命名统一**：7 个 command 调用语法/frontmatter/散文全替换（harness 工具已改名 · allowed-tools 按名匹配版本敏感）
+- **CLAUDE.md**：关键约束 #16（收口 + 防御栈 · 铁律+指针格式）+ 修复 P015 业务语言条与 P017+P018 条撞号（11→15）
+- **init-project**：第 5.5 步防御栈接线（参数区核对 + hooksPath 挂载 + 干跑验证 + 密钥初始化 + 重启会话提醒）
+- **knowledge/记忆体系.md**：三层记忆架构（L0 工作/L1 情景/L2 语义程序 · 双写铁律：决议进 memory 必同会话回填权威文件）
+
 ## 2026-06-12 · patch-013 · 存量文档基建流水线（gitlab 端直接演化）
 
 - `/init-docs` command（存量文档基建流水线）+ `legacy-excavator` agent（存量文档挖掘）+ 模块 6 件套模板；`publish-baseline` 增 docs-only 场景 B 特例；`/init-project` 接线；agent-versions 登记 legacy-excavator v1.0

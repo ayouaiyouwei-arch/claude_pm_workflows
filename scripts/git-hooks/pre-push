@@ -1,0 +1,75 @@
+#!/bin/bash
+# ═══════════════════════════════════════════════════════════════
+# pre-push · code/<仓> 本地推送硬闸（双向分支隔离 + 派活提示词机器化）
+# ───────────────────────────────────────────────────────────────
+# 安装：git -C code/<仓> config core.hooksPath <工作空间>/scripts/git-hooks
+# 生效面：本机所有 push 主体（Claude / Codex / PM 手敲）——这是
+#         Claude Code hooks 做不到的（CC hooks 只看得到自己会话）。
+# 逃生口：git push --no-verify（git 原生 · 用了请在包内 08-修复历史留痕理由）
+# 拦截项：
+#   [G1] 白名单制：仅允许 push 到 $BIZ_BRANCH_GLOB（黑名单制只拦 release 时
+#        push main/develop/tags 全放行是真实漏洞 · 主仓 2026-06-12 实证）
+#   [G2] 业务分支只允许交付包镜像（$MIRROR_PREFIX 下）+ 禁工作空间私有目录
+#   [G3] 新增交付包目录必须含派活提示词 $PROMPT_FILE（提示词先于 push）
+# 注意：仅挂"双向隔离"的仓；可直推 main 的仓（如 PM 自主开发仓）不要挂
+# ═══════════════════════════════════════════════════════════════
+
+# ⚙️ 项目参数区（/init-project 按 PROJECT-PROFILE § 二 调整；默认值 = 常见双向隔离惯例）
+BIZ_BRANCH_GLOB="${BIZ_BRANCH_GLOB:-feature/business-submit-*}"   # G1 唯一合法推送分支模式
+MIRROR_PREFIX="${MIRROR_PREFIX:-docs/acceptance/}"                # G2 允许路径前缀
+PKG_DIR_GLOB="${PKG_DIR_GLOB:-docs/acceptance/问题说明/[^/]+}"     # G3 包目录 grep 模式
+PROMPT_FILE="${PROMPT_FILE:-00-Codex派活提示词.md}"                # G3 提示词文件名（置空=禁用 G3）
+
+BLOCK=0
+while read -r LOCAL_REF LOCAL_SHA REMOTE_REF REMOTE_SHA; do
+  [ -z "$LOCAL_REF" ] && continue
+
+  # ── [G1] 白名单制：唯一合法推送目标 ──
+  case "$REMOTE_REF" in
+    refs/heads/$BIZ_BRANCH_GLOB)
+      ;;  # 合法目标 → 继续走 G2/G3 内容检查
+    *)
+      echo "[GUARD-G1] ❌ push 已拦截" >&2
+      echo "原因：本仓唯一合法推送目标是 ${BIZ_BRANCH_GLOB}，当前目标 ${REMOTE_REF#refs/heads/}（白名单制 · release/main/tags 一律拒）" >&2
+      echo "下一步：bash scripts/git-biz-push.sh \"<包目录名>\" \"biz(req): <一句话>\"" >&2
+      BLOCK=1; continue
+      ;;
+  esac
+
+  # 删除远端分支（local_sha 全 0）不做内容检查
+  if [ "$LOCAL_SHA" = "0000000000000000000000000000000000000000" ]; then continue; fi
+
+  # 计算本次要推出去的 commit 范围（quotepath=false：中文路径不转义 · 否则白名单匹配失败误拦）
+  if [ "$REMOTE_SHA" = "0000000000000000000000000000000000000000" ]; then
+    RANGE=$(git rev-list "$LOCAL_SHA" --not --remotes=origin | tail -1)
+    [ -z "$RANGE" ] && continue
+    DIFF_FILES=$(git -c core.quotepath=false diff --name-only "${RANGE}^" "$LOCAL_SHA" 2>/dev/null || git -c core.quotepath=false show --name-only --format="" "$LOCAL_SHA")
+  else
+    DIFF_FILES=$(git -c core.quotepath=false diff --name-only "$REMOTE_SHA" "$LOCAL_SHA" 2>/dev/null)
+  fi
+  [ -z "$DIFF_FILES" ] && continue
+
+  # ── [G2] 业务分支：只允许交付包镜像 ──
+  VIOLATION=$(echo "$DIFF_FILES" | grep -vE "^${MIRROR_PREFIX}")
+  if [ -n "$VIOLATION" ]; then
+    echo "[GUARD-G2] ❌ push 已拦截" >&2
+    echo "原因：业务分支只允许交付包镜像（${MIRROR_PREFIX}**），以下文件越界：" >&2
+    echo "$VIOLATION" | head -10 >&2
+    echo "下一步：git reset HEAD~1 后只 git add ${MIRROR_PREFIX}<本次包>/ 重新提交" >&2
+    BLOCK=1; continue
+  fi
+
+  # ── [G3] 新增包目录必须带派活提示词 ──
+  [ -z "$PROMPT_FILE" ] && continue
+  NEW_PKG_DIRS=$(echo "$DIFF_FILES" | grep -oE "^${PKG_DIR_GLOB}" | sort -u)
+  for PKG_DIR in $NEW_PKG_DIRS; do
+    if ! git cat-file -e "${LOCAL_SHA}:${PKG_DIR}/${PROMPT_FILE}" 2>/dev/null; then
+      echo "[GUARD-G3] ❌ push 已拦截" >&2
+      echo "原因：${PKG_DIR}/ 缺 ${PROMPT_FILE}（提示词必须先于 push 落包内，研发拉分支直接读）" >&2
+      echo "下一步：调 write-fix-prompt skill 生成提示词 → 落包根 → 镜像 → 重新提交 push" >&2
+      BLOCK=1
+    fi
+  done
+done
+
+exit $BLOCK

@@ -1,7 +1,7 @@
 ---
 description: 存量文档基建流水线（项目接入后跑一次，可分批续跑）。把无文档的存量系统反向沉淀为：产品全景 + 角色权限矩阵 + 每模块 6 件套 + test-cases/<模块>.csv 用例库，供 /new-feature 流水线引用与回流。
 argument-hint: 留空 = 从头开始（模块拆分提案）；或 <模块编号列表，如 M06,M07> = 续跑指定模块
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task, AskUserQuestion
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent, AskUserQuestion
 ---
 
 # /init-docs · 存量文档基建流水线（反向沉淀）
@@ -65,7 +65,7 @@ ls product-docs/modules/_template/ >/dev/null 2>&1 && echo "✅ 模块模板在"
 ## 第 3 步：模块拆解（每模块一轮 · 调 legacy-excavator agent）
 
 ```
-Task(subagent_type="legacy-excavator", prompt="
+Agent(subagent_type="legacy-excavator", prompt="
 阶段：DOCS
 模块：M0X <模块名>（缩写 <ABBR>）
 代码快照：code/<仓库>/ @ <SHA>
@@ -78,7 +78,7 @@ Task(subagent_type="legacy-excavator", prompt="
 
 agent 返回 `[excavate-docs 完成] M0X=<名> · 6件套已落 · FE=<n>条 · 待裁决=<m>条`。
 
-> **兼容写法（实战验证 2026-06-12）**：若运行环境的 Task 注册表未加载自定义 agent（按 `legacy-excavator` 调用报错/找不到），改派 **general-purpose 子代理**，prompt 首行写明「先读 agent 定义 `.claude/agents/legacy-excavator.md`，严格按其流程与红线执行」，效果等同。
+> **兼容写法（实战验证 2026-06-12）**：若运行环境的 Agent 注册表未加载自定义 agent（按 `legacy-excavator` 调用报错/找不到），改派 **general-purpose 子代理**，prompt 首行写明「先读 agent 定义 `.claude/agents/legacy-excavator.md`，严格按其流程与红线执行」，效果等同。
 > **中断防御**：批次并行建议 ≤3 个**前台**子代理 + prompt 内要求「尽早落盘——每完成一件立即 Write，不攒到最后」（后台代理遇会话额度/限流中断会整批丢产出）。
 
 ### 🚦 Gate D2 · PM 裁决（每模块一次 · 强制）
@@ -98,7 +98,7 @@ agent 返回 `[excavate-docs 完成] M0X=<名> · 6件套已落 · FE=<n>条 · 
 ## 第 4 步：用例生成（每模块一轮 · Gate D2 后调）
 
 ```
-Task(subagent_type="legacy-excavator", prompt="
+Agent(subagent_type="legacy-excavator", prompt="
 阶段：CASES
 模块：M0X <模块名>（缩写 <ABBR>）
 模块文档：product-docs/modules/M0X-<模块名>/（Gate D2 已裁决，07 残留挂起项见文件）
@@ -142,4 +142,4 @@ grep -c "five_states" 略——抽 5 条人工看场景化（Given/When/Then 可
 - ❌ 跳过 Gate D1/D2 冻结或转正
 - ❌ 用例无方法标签 / 表头偏离冻结 18 列 / 配比超 ±20pt 不返工
 - ❌ 修改 code/ 任何文件
-- ❌ 一次 Task 让 agent 同时干 DOCS + CASES（裁决前后是两个世界）
+- ❌ 一次 Agent 让 agent 同时干 DOCS + CASES（裁决前后是两个世界）

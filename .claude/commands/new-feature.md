@@ -1,7 +1,7 @@
 ---
 description: 功能孵化流水线（新增 / 现有优化 / UI 重构通用）。从一句话需求到 .draft 研发交付包，依次跑 7-8 个 agent（UI 类需求多跑 A1.5 视觉规范专家），关键节点停下来等 PM 决策。
 argument-hint: <一句话需求> 或留空（留空则进入交互问询）
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
 ---
 
 # /new-feature · 功能孵化流水线（新增 + 优化 + UI 重构通用）
@@ -9,6 +9,12 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
 > 用户已输入：$ARGUMENTS
 
 > 🔧 项目无关骨架版 · 项目专属配置见 PROJECT-PROFILE.md
+
+## ⚠️ 适用范围（先判断再启动 · 主仓 2026-06-06 决议同步）
+
+- **bug 修复 / 小优化类**（单文件、0 接口、0 schema 的修复）→ **不走本流水线**：grep 实证（标 SHA/文件/行号）后直接写派活提示词交 PM（write-fix-prompt 骨架），不强建 .draft、不强登编号；PM 显式要求留痕才补全流程
+- **全新功能 / 现有功能优化 / UI 重构** → 走本流水线
+- 拿不准 → 问 PM 一句"这个走流水线还是直接派活？"
 
 ## ⚠️ 立场（每次启动重申一次）
 
@@ -20,7 +26,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
 
 ## 你（主对话）的职责
 
-你是流水线编排者，**不要自己扮演 8 个 agent 中的任何一个**——必须用 `Task` 工具按顺序调用对应的 subagent。你的工作是：
+你是流水线编排者，**不要自己扮演 8 个 agent 中的任何一个**——必须用 `Agent` 工具按顺序调用对应的 subagent。你的工作是：
 
 1. 在每个阶段开始前，告诉用户即将进入哪个阶段
 2. 调对应 agent
@@ -53,9 +59,17 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
    TODAY=$(date +%Y-%m-%d)
    SLUG="<用户确认的短名>"
    mkdir -p "product-docs/_drafts/${TODAY}-${SLUG}"
-   echo "${TODAY}-${SLUG}" > /tmp/new-feature-current.txt
    ```
-4. 在 `product-docs/_drafts/${TODAY}-${SLUG}/00-原始需求.md` 写入用户的一句话原文 + 创建时间（**patch-012：精确到分钟** `date '+%F %H:%M'`——retrospector 算 `包周期_小时` 的起点锚，只写日期则该包周期记 `-`）
+   **编号**（如本需求要编号）一律调发号器，禁止自算：`bash scripts/next-id.sh`（打包前 Gate 3 再跑 `--check <号>` 复核占用）。
+4. **状态落盘（patch-014 · 替代 /tmp 单例）**：在包目录内建 `pipeline-state.json`，**每完成一步/每过一个 Gate 立即更新**——多流水线并行天然隔离、上下文压缩后重读此文件即可恢复进度：
+   ```bash
+   cat > "product-docs/_drafts/${TODAY}-${SLUG}/pipeline-state.json" <<EOF
+   {"slug":"${TODAY}-${SLUG}","ui_class":null,"current_step":"A1",
+    "steps":{},"gates":{"gate1":{"resolved":false},"gate2":{"resolved":false},"gate3":{"resolved":false}}}
+   EOF
+   ```
+   每步完成后用 Edit 更新对应字段（如 `"steps":{"A1":{"verdict":"pass","rounds":2}}`、Gate 过后 `"gate1":{"resolved":true,"at":"<时间>"}`）。
+5. 在 `product-docs/_drafts/${TODAY}-${SLUG}/00-原始需求.md` 写入用户的一句话原文 + 创建时间（**patch-012：精确到分钟** `date '+%F %H:%M'`——retrospector 算 `包周期_小时` 的起点锚，只写日期则该包周期记 `-`）
 
 ---
 
@@ -63,7 +77,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
 
 调用：
 ```
-Task(subagent_type="product-expert", prompt="
+Agent(subagent_type="product-expert", prompt="
 新功能需求：<用户一句话>
 工作目录：product-docs/_drafts/<日期>-<短名>/
 请按 agent 定义流程：先必读、再现状梳理、再列缺口问题。把缺口问题先返回给我（不要写 v1）。
@@ -112,7 +126,7 @@ A1 § 〇 没显式声明则主对话**主动追问 A1**："本期是否含视�
 PM 提供材料后：
 
 ```
-Task(subagent_type="visual-spec-author", prompt="
+Agent(subagent_type="visual-spec-author", prompt="
 工作目录：product-docs/_drafts/<日期>-<短名>/
 需求方提供的原始材料：<PM 给的文字 / 截图路径 / Figma URL / v0 URL>
 
@@ -131,7 +145,7 @@ A1.5 返回含糊点 + 自行发挥点清单。
 主对话把 A1.5 的清单**完整、原样**呈现给 PM。等 PM 答完后，调 A1.5 第 2 轮：
 
 ```
-Task(subagent_type="visual-spec-author", prompt="
+Agent(subagent_type="visual-spec-author", prompt="
 工作目录：product-docs/_drafts/<日期>-<短名>/
 PM 答疑结果：<完整答疑列表>
 
@@ -166,7 +180,7 @@ A2 此时需多审一项："`01.5-视觉规范.md § 一/二/三` 表是否与 `
 ## 第 2 步：A2 需求逻辑审核
 
 ```
-Task(subagent_type="requirement-reviewer", prompt="
+Agent(subagent_type="requirement-reviewer", prompt="
 审核对象：product-docs/_drafts/<日期>-<短名>/01-需求细化.md
 请按 10 项硬性清单 + 第 11 项可用性启发式快扫（软闸）审，输出 02-A2-审核报告.md。
 ")
@@ -188,7 +202,7 @@ Task(subagent_type="requirement-reviewer", prompt="
 ## 第 3 步：A3 技术方案专家
 
 ```
-Task(subagent_type="tech-architect", prompt="
+Agent(subagent_type="tech-architect", prompt="
 工作目录：product-docs/_drafts/<日期>-<短名>/
 请先完成 5 项复用扫描，再产出 03-技术方案.md，必须填齐 § 五定量指标。
 ")
@@ -201,7 +215,7 @@ A3 返回 `[A3 完成] ... 定量指标：改动 N 文件 / 新增 M 接口 / sc
 ## 第 4 步：A4 范围审核
 
 ```
-Task(subagent_type="scope-reviewer", prompt="
+Agent(subagent_type="scope-reviewer", prompt="
 审核对象：product-docs/_drafts/<日期>-<短名>/03-技术方案.md
 请按阈值规则机械判定，输出 04-A4-范围审核报告.md。
 ")
@@ -218,9 +232,11 @@ A4 返回三种结论之一：
 ## 第 5 步：A5 二次校验（条件性）
 
 ```
-Task(subagent_type="secondary-reviewer", prompt="
-触发原因见 04-A4-范围审核报告.md。
-请跑 3 条质询路径，输出 05-A5-二次校验报告.md。
+Agent(subagent_type="secondary-reviewer", prompt="
+工作目录：product-docs/_drafts/${TODAY}-${SLUG}/（子代理不继承主对话上下文 · 必传 · 多包并行时禁止 glob 撞最新报告）
+触发原因见该目录下 04-A4-范围审核报告.md。
+请读同目录 01-需求细化.md + 03-技术方案.md + 04-A4-范围审核报告.md，
+跑 3 条质询路径，输出 05-A5-二次校验报告.md 到同目录。
 ")
 ```
 
@@ -242,7 +258,7 @@ A5 返回三种建议：通过原方案 / 拆分 / 延后。
 ## 第 6 步：A6 测试用例专家
 
 ```
-Task(subagent_type="test-case-author", prompt="
+Agent(subagent_type="test-case-author", prompt="
 工作目录：product-docs/_drafts/<日期>-<短名>/
 请基于 01 + 03（或 A5 调整后版本）产出 06-用例.csv 与 06-用例说明.md。
 
@@ -261,7 +277,7 @@ Task(subagent_type="test-case-author", prompt="
 ## 第 7 步：A7 用例审核
 
 ```
-Task(subagent_type="test-case-reviewer", prompt="
+Agent(subagent_type="test-case-reviewer", prompt="
 审核对象：06-用例.csv + 06-用例说明.md
 工作目录：product-docs/_drafts/<日期>-<短名>/
 
@@ -419,10 +435,10 @@ grep -q "TODO\|TBD\|<.*>" "$PKG/02-基线快照.md" && echo "❌ 02 还有占位
 >
 > 流水线只有跑到 `.done` 才能拿到 `Codex_轮次` / `Codex_QUESTION数` / `实际改动文件数` 等下游指标，所以 retrospect 必须延后到 `.done`。
 
-执行内容（由 `pipeline-retrospector` agent 完成，主对话只调一次 Task）：
+执行内容（由 `pipeline-retrospector` agent 完成，主对话只调一次 Agent）：
 
 ```
-Task(subagent_type="pipeline-retrospector", prompt="
+Agent(subagent_type="pipeline-retrospector", prompt="
 本次刚 promote 到 .done 的包：deliverables/<日期>-<CHG>-<短名>.done/
 关联 _drafts 目录：product-docs/_drafts/<日期>-<短名>/
 
@@ -452,12 +468,12 @@ retrospector 完成后告知 PM：
 
 ## 中断与恢复
 
-- 任何阶段用户说"停" → 立即停下，告知当前 `/tmp/new-feature-current.txt` 里记录的工作目录，下次可以从该目录继续
+- 任何阶段用户说"停" → 立即停下，告知当前工作目录；下次恢复时读该目录下 `pipeline-state.json` 即知走到第几步、哪些 Gate 已过（多流水线并行各自独立 · 重启不丢）
 - 任何 agent 报错 → 把错误原文告知用户，问是重试还是回退一步
 
 ## 不允许的事
 
 - ❌ 跳过任何 gate 自动继续
-- ❌ 把多个 agent 合并到一次 Task 调用
+- ❌ 把多个 agent 合并到一次 Agent 调用
 - ❌ 自己写 agent 该写的产物
 - ❌ A4 触发 A5 时自己尝试做 A5 的活
