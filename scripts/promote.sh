@@ -68,9 +68,9 @@ case "$TARGET" in
     log_state_change "deliverables/${BASE}.active" ".${CUR_STATE}" ".active" "${FORCE:+--force 跳闸}"
     ;;
   done)
-    # 闸门：runs.csv 先落账（宽松匹配 OPT-046 / OPT046 两种写法）
-    LOOSE=$(echo "$PKG_ID" | sed 's/\(OPT\|AGENT\)/\1-\\?/')
-    if ! grep -qiE "$LOOSE" evals/runs.csv 2>/dev/null && [ "$FORCE" != "--force" ]; then
+    # 闸门：runs.csv 先落账（宽松匹配 OPT-046 / OPT046 两种写法 · 只认首列 run_id）
+    LOOSE=$(printf '%s' "$PKG_ID" | sed -E 's/^(OPT|AGENT)/&-?/')   # BSD sed 的 BRE 不支持 \| 交替 · 必须 -E
+    if ! grep -qiE "^[^,]*${LOOSE}" evals/runs.csv 2>/dev/null && [ "$FORCE" != "--force" ]; then
       echo "❌ [GATE-RETRO] evals/runs.csv 中没有本包（${PKG_ID:-$BASE}）的行" >&2
       echo "原因：retrospect（P004） 必须先落账再升 .done（2026-05-25 曾漏 11 包致周报瘫痪）" >&2
       echo "下一步：先跑 retrospect（runs.csv +1 行 · 22 列）+ cases.csv +1 行，再重新 promote" >&2
