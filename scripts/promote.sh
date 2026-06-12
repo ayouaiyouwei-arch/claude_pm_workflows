@@ -28,7 +28,7 @@ TARGET="${2:?用法: promote.sh <包目录名> <active|done|archive> [--force]}"
 FORCE="${3:-}"
 
 # 容错：允许传带或不带状态后缀的包名
-BASE=$(echo "$PKG" | sed 's/\.\(draft\|active\|done\|superseded\|hotfix\)$//')
+BASE=$(echo "$PKG" | sed -E 's/\.(draft|active|done|superseded|hotfix)$//')   # BSD sed 兼容 · 禁用 BRE \| 交替
 CUR=$(ls -d deliverables/"${BASE}".* 2>/dev/null | head -1)
 [ -z "$CUR" ] && { echo "❌ 找不到包：deliverables/${BASE}.*" >&2; exit 1; }
 CUR_STATE="${CUR##*.}"
