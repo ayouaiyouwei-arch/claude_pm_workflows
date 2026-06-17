@@ -11,12 +11,13 @@ A1 product-expert / A2 requirement-reviewer / A1.5 visual-spec-author 三个 age
 2. 兜底：用户级 `~/.claude/skills/<name>/SKILL.md`（本目录缺失时）
 3. 都缺失：跳过该步不阻塞流水线
 
-## 清单（30 个）
+## 清单（34 个）
 
 | 用途 | 卡片 |
 |---|---|
 | A1 流程/边界态/文案（7） | user-flow-diagram · error-handling-ux · loading-states · feedback-patterns · ux-writing · hicks-law · millers-law |
 | A1 结构/动机/检索（5） | information-architecture · navigation-patterns · jobs-to-be-done · search-ux · design-brief |
+| **A1 受众门控·体验路径（4 · UPGRADE Wave 1 ③ · 2026-06-16 cp）** | **journey-map · experience-map · onboarding-design · metrics-definition** —— 受众驱动的"体验路径 + 劝退点"推理方法论；此前作为用户级 skill 存在但未进快照、未接 A1（体验路径推理缺位的根因）。门控：`audience_profile.primary∈{toC, both}` 时读 |
 | A1 Loop-1 + A2 第 11 项（1） | heuristic-evaluation（Nielsen 10 条 + 严重度 0-4） |
 | A1.5 视觉基础（5） | visual-hierarchy · layout-grid · color-system · typography-scale · spacing-system |
 | A1.5 类型触发（7） | form-design · data-visualization · dark-mode-design · responsive-design · animation-principles · micro-interaction-spec · component-spec |
@@ -27,7 +28,7 @@ A1 product-expert / A2 requirement-reviewer / A1.5 visual-spec-author 三个 age
 
 1. **项目事实源永远赢**：卡片与项目视觉基线文件（见 `PROJECT-PROFILE.md` 登记）冲突时，以项目文件为准；卡片只供"设计思路与判断框架"，严禁据此引入项目外色板/字号/新组件库
 2. **按需读不全读**：触发条件见各 agent 的"设计方法论库"映射表
-3. **P027 兼容**：方法论产出转述给 PM 时仍走业务语言
+3. **P015 兼容**：方法论产出转述给 PM 时仍走业务语言
 
 ## 更新方式
 

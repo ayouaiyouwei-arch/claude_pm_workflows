@@ -90,7 +90,7 @@ ls deliverables/ | grep '\.active$'            # 输出应该是：<active 包�
 9. `07-时间与里程碑.md` ← 截止 + 依赖
 10. `08-修复历史.md` ← 看历史 ROUND/QUESTION/ANSWER/BUG/FIX
 
-### § 五条铁律（完整引用 `.cursor/rules/07-研发交付包规范.mdc § 一`）
+### § 五条铁律（研发交付包施工铁律 · 下方完整列出）
 
 1. 单 active 强制（已在 § 启动前自检覆盖）
 2. 物理隔离：禁止主动 read / grep `product-docs/` / `test/` 其他 / `archive/` / 其他包
@@ -104,7 +104,7 @@ ls deliverables/ | grep '\.active$'            # 输出应该是：<active 包�
 
 1. 修改文件清单（相对 code/ 完整路径）
 2. 关键改动说明
-3. 自动化用例运行结果（Bruno + Playwright，路径见 `05-用例清单.md`）
+3. 自动化用例运行结果（acceptance-regression Playwright 套件；如做了契约核查附 api-contract-diff.md，路径见 `05-用例清单.md`）
 4. 5-state 覆盖：empty / loading / data / error / partial
 5. 风险与未尽事宜
 

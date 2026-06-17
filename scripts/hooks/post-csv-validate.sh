@@ -7,7 +7,10 @@
 # 兜的场景：有人绕过 retrospector/promote.sh 直接 Edit evals/*.csv
 # ═══════════════════════════════════════════════════════════════
 INPUT=$(cat)
-FP=$(printf '%s' "$INPUT" | python3 -c "import json,sys; print(json.load(sys.stdin).get('tool_input',{}).get('file_path',''))" 2>/dev/null)
+# file_path 提取：优先 python3，缺失则 grep 兜底（路径无特殊字符，grep 足够可靠）——
+# 不再因 python3 缺失而静默 exit 0 漏过 evals csv；真正的 python3 缺失由下方 validate 脚本 fail-closed 报出
+FP=$(printf '%s' "$INPUT" | python3 -c "import json,sys; print(json.load(sys.stdin).get('tool_input',{}).get('file_path',''))" 2>/dev/null || true)
+[ -z "$FP" ] && FP=$(printf '%s' "$INPUT" | grep -o '"file_path"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"file_path"[[:space:]]*:[[:space:]]*"//; s/"$//')
 case "$FP" in
   *evals/runs.csv)    KEY=runs ;;
   *evals/loops.csv)   KEY=loops ;;

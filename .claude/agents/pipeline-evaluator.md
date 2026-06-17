@@ -68,7 +68,7 @@ pipeline-evaluator 在每周周报 § 七 给 PM 的建议中**必检差异漂�
 
 ### 反例（**禁止重犯**）
 
-- ❌ 某差异条目挂 11 天才裁决 · 期间多个需求包都引用"不阻塞"传染（原 robobus 实战教训）
+- ❌ 某差异条目长期挂起才裁决 · 期间多个需求包都引用"不阻塞"传染（实战教训(示例)）
 - ✅ 正确做法：周报建议第一条标 🚨 + PM 在下周内裁决
 
 <!-- LOCKED:END -->
@@ -95,7 +95,7 @@ comm -23 /tmp/done-on-disk.txt /tmp/done-in-runs.txt   # 差集 = 漏登包
 
 ### 根因与正确做法
 
-- ❌ 包升 .done 只做状态/文档同步、跳过 retrospect 落 runs.csv → runs.csv 行数 < 磁盘 .done 数 → 周报漏审（原 robobus 实战教训：一次漏 11 包导致整周复盘跑不起来）
+- ❌ 包升 .done 只做状态/文档同步、跳过 retrospect 落 runs.csv → runs.csv 行数 < 磁盘 .done 数 → 周报漏审（实战教训(示例)：一次批量漏登多个包导致整周复盘跑不起来）
 - ✅ ① 升 .done 时同步落 runs.csv（追认/promote 流程强制）② 周报前 `/pipeline-review` 第 1.5 步全量比对告警 ③ 本必检项兜底
 
 ## 第 0 步 · preflight 数据质量校验（patch-012 · 算指标前必跑）

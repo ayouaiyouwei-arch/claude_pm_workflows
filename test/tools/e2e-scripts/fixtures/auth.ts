@@ -7,7 +7,7 @@ import { test as base, expect, type Page } from '@playwright/test';
  *   - 角色 id 与账号：在 .env（`PM_<ROLE>_USER` / `PM_<ROLE>_PASSWORD`）或下方 DEFAULT_CREDENTIALS 填
  *   - 登录流程：导航登录页 → 填账号密码 → （如有验证码自行处理）→ 提交 → 等离开登录页
  *   - 验证码：若为图形/短信码，需从可见渠道获取（如 DOM 内 SVG 明文、测试短信网关），
- *     仍属「纯 UI 操作」——不调业务造数接口。参考 robobus 实现（从登录页 <img> 的 SVG 反解）。
+ *     仍属「纯 UI 操作」——不调业务造数接口。如有图形验证码，可从 DOM 内 <img>/SVG 明文反解（<项目登录实现占位>）。
  *
  * 独立验收原则：登录走真实 UI，不 mock、不直接注入 token 绕过登录页。
  */

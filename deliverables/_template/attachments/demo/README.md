@@ -41,7 +41,7 @@ attachments/demo/
 
 ## 二.5、交互覆盖清单（**A1.5 必须演示**）
 
-> 本节是 demo 的"交互完整度"硬指标。详细 18 条 + 项目内例子 + 反例见 [`product-docs/ai-page-interaction-audit/visual-baseline/08-交互最佳实践参考.md`](../../../../product-docs/ai-page-interaction-audit/visual-baseline/08-交互最佳实践参考.md)。
+> 本节是 demo 的"交互完整度"硬指标。详细 18 条 + 项目内例子 + 反例见 [`product-docs/visual-baseline/08-交互最佳实践参考.md`](../../../../product-docs/visual-baseline/08-交互最佳实践参考.md)。
 
 ### 触发分级
 

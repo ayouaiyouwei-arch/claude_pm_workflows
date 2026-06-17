@@ -7,8 +7,8 @@
 ## 一、为什么要做
 
 到一定规模后，单纯靠 grep `cases.csv` 不够：
-- 无法回答"上次改 admin/dashboard 的 CHG 都碰过哪些字段"
-- 无法回答"接口 `POST /vehicle/state` 在哪几个包被改过、改前改后的契约"
+- 无法回答"上次改 admin/order-list 的 CHG 都碰过哪些字段"
+- 无法回答"接口 `POST /order/cancel` 在哪几个包被改过、改前改后的契约"
 - 无法回答"模式 P003 影响的所有 agent 与所有触及端的交叉表"
 
 `graph.jsonl` 是**单文件三元组**，diff-friendly，**不上 Neo4j / 不上向量库**。
@@ -19,11 +19,11 @@
 
 | 类型前缀 | 示例 | 来源 |
 |---|---|---|
-| `case:` | `case:2026-05-09-OPT-001-...` | `cases.csv` 第 1 列 |
+| `case:` | `case:2026-01-15-OPT-001-...` | `cases.csv` 第 1 列 |
 | `chg:` | `chg:CHG-039` | 包名解析 |
-| `module:` | `module:admin/dashboard` | `03-技术方案.md` 改动文件聚合 |
-| `endpoint:` | `endpoint:POST_/vehicle/state` | `04-接口契约.md` |
-| `field:` | `field:Vehicle.batteryLevel` | `04-接口契约.md` |
+| `module:` | `module:admin/order-list` | `03-技术方案.md` 改动文件聚合 |
+| `endpoint:` | `endpoint:POST_/order/cancel` | `04-接口契约.md` |
+| `field:` | `field:Order.status` | `04-接口契约.md` |
 | `pattern:` | `pattern:P001` | `knowledge/patterns/` |
 | `agent:` | `agent:product-expert` | `.claude/agents/` |
 | `patch:` | `patch:patch-007` | `optimization/patches-applied/` |
@@ -50,8 +50,8 @@
 每行一个 JSON 对象：
 
 ```json
-{"s": "case:2026-05-09-OPT-001-dashboard-vehicle-card-collapse", "p": "修改", "o": "module:admin/dashboard", "src": "03-技术方案.md § 一", "ts": "2026-05-15"}
-{"s": "case:2026-05-09-OPT-001-dashboard-vehicle-card-collapse", "p": "命中", "o": "pattern:P001", "src": "patches-pending/2026-05-09-...md", "ts": "2026-05-15"}
+{"s": "case:2026-01-15-OPT-001-card-collapse", "p": "修改", "o": "module:admin/order-list", "src": "03-技术方案.md § 一", "ts": "2026-05-15"}
+{"s": "case:2026-01-15-OPT-001-card-collapse", "p": "命中", "o": "pattern:P001", "src": "patches-pending/2026-05-09-...md", "ts": "2026-05-15"}
 {"s": "patch:patch-007", "p": "规避", "o": "pattern:P001", "src": "PROMPT-CHANGELOG.md", "ts": "2026-06-12"}
 ```
 
@@ -67,8 +67,8 @@
 ## 五、未来检索范例（启用后）
 
 ```bash
-# 上次改 admin/dashboard 的所有 case
-grep '"o": "module:admin/dashboard"' knowledge/graph.jsonl | jq -r '.s'
+# 上次改 admin/order-list 的所有 case
+grep '"o": "module:admin/order-list"' knowledge/graph.jsonl | jq -r '.s'
 
 # pattern P001 在哪些 case 出现过
 grep '"o": "pattern:P001"' knowledge/graph.jsonl | jq -r '.s'

@@ -8,6 +8,8 @@
       "Write(code/**)",
       "Bash(mv deliverables/*.active deliverables/*.done*)",
       "Bash(mv deliverables/*.draft deliverables/*.active*)",
+      "Bash(mv deliverables/*.done deliverables/archive*)",
+      "Bash(mv deliverables/*.done* deliverables/archive*)",
       "Edit(deliverables/archive/**)",
       "Write(deliverables/archive/**)"
     ]

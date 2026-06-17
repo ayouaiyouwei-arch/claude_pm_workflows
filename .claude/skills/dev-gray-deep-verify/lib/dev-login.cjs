@@ -1,4 +1,5 @@
-// dev 灰度 UI 登录 helper · 自动解 captcha SVG · 支持 admin / big-screen
+// dev 灰度 UI 登录 helper · 自动解 captcha SVG（项目无关骨架 · captcha/登录流程按项目适配）
+// 支持多端：主端（默认 hash 路由 /#/login）+ 可配置副端（loginPath 传项目副端登录路由）
 // 用法：const { loginAdmin, loginScreen } = require('./dev-login.cjs')
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -12,7 +13,7 @@ function decodeCaptchaFromDataUrl(src) {
 }
 
 /**
- * 通用 UI 登录（admin 或 big-screen 同款流程）
+ * 通用 UI 登录（各端同款流程）
  * @param {import('playwright').Page} page
  * @param {object} opts
  * @param {string} opts.loginUrl - 完整登录页 URL
@@ -60,14 +61,14 @@ async function uiLogin(page, { loginUrl, user, pass, maxRetries = 3 }) {
   return { ok: false, finalUrl: lastUrl, attempts: maxRetries, error: 'login still on /login after retries' };
 }
 
-/** Admin 登录便捷 */
-async function loginAdmin(page, { baseUrl, user, pass }) {
-  return uiLogin(page, { loginUrl: `${baseUrl}/#/login`, user, pass });
+/** 主端登录便捷（默认 hash 路由 /#/login；不同则传 loginPath） */
+async function loginAdmin(page, { baseUrl, user, pass, loginPath = '/#/login' }) {
+  return uiLogin(page, { loginUrl: `${baseUrl}${loginPath}`, user, pass });
 }
 
-/** Big-screen 登录便捷 */
-async function loginScreen(page, { baseUrl, user, pass }) {
-  return uiLogin(page, { loginUrl: `${baseUrl}/big-screen/#/login`, user, pass });
+/** 副端登录便捷（loginPath 传项目副端登录路由，如 '/<副端>/#/login'） */
+async function loginScreen(page, { baseUrl, user, pass, loginPath = '/#/login' }) {
+  return uiLogin(page, { loginUrl: `${baseUrl}${loginPath}`, user, pass });
 }
 
 module.exports = { uiLogin, loginAdmin, loginScreen, decodeCaptchaFromDataUrl };

@@ -15,6 +15,11 @@ cd "$(dirname "$0")/.."
 FILE_KEY="${1:?用法: validate-evals-csv.sh <runs|loops|escapes> [--last|--all]}"
 MODE="${2:---all}"
 
+command -v python3 >/dev/null 2>&1 || {
+  echo "❌ 缺 python3：evals CSV schema 校验依赖 python3，无法校验（fail-closed）。请先安装（macOS: brew install python3）后重试" >&2
+  exit 1
+}
+
 python3 - "$FILE_KEY" "$MODE" <<'PYEOF'
 # -*- coding: utf-8 -*-
 import csv, re, sys
@@ -25,9 +30,11 @@ INT = r'^\d+$|^-$'
 FLOAT01 = r'^(0(\.\d{1,2})?|1(\.0{1,2})?)$|^-$'
 DATE = r'^\d{4}-\d{2}-\d{2}$'
 
-# 🔧 骨架版：/init-project 时按 PROJECT-PROFILE.md § 五 替换为本项目端白名单（与 evals/_runs字段说明.md 列 4 同步）
-SIDES = {'admin', 'cockpit', 'big-screen', 'driver', 'h5', 'shared',
-         'backend', 'agent-backend', 'deploy', 'scripts'}
+# 🔧 骨架版占位：/init-project 时按 PROJECT-PROFILE.md § 五 替换为本项目真实端白名单
+#   （与 evals/_runs字段说明.md 列 4 同步）。未替换前（仍含 '<端>' 占位）跳过端白名单严格校验、仅提示，
+#   避免新项目真实端（如 checkout/catalog）被骨架遗留白名单硬拒报费解错误。
+SIDES = {'<端1>', '<端2>', '<端3>'}
+SIDES_CONFIGURED = not any(s.startswith('<') for s in SIDES)
 
 SCHEMAS = {
     'runs': {
@@ -79,7 +86,7 @@ SCHEMAS = {
             1: ('登记日期', DATE),
             4: ('严重度', {'P0', 'P1', 'P2'}),
             5: ('发现层', {'Codex施工', '全量回归', 'dev-verify', 'PM灰度', '线上', '其他'}),
-            6: ('应拦截层', {'A1', 'A1.5', 'A2', 'A3', 'A5', 'A6', 'A7',
+            6: ('应拦截层', {'A1', 'A1.5', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7',
                             'Loop-1', 'Loop-2', 'Loop-3', '不可拦截'}),
             8: ('状态', {'开放', '已闭环'}),
         },
@@ -103,7 +110,7 @@ for lineno, r in data:
         ok = (v in rule) if isinstance(rule, set) else bool(re.match(rule, v))
         if not ok:
             errors.append(f'L{lineno} {r[0]}: {name}={v!r} 违例')
-    if schema.get('special') == 'sides' and r[3].strip() != '-':
+    if schema.get('special') == 'sides' and SIDES_CONFIGURED and r[3].strip() != '-':
         bad = [t for t in r[3].split(';') if t.strip() not in SIDES]
         if bad:
             errors.append(f'L{lineno} {r[0]}: 触及端含非白名单 token {bad}')
@@ -112,5 +119,7 @@ if errors:
     print(f'❌ {schema["path"]} 校验失败（{len(errors)} 处）:')
     print('\n'.join(errors))
     sys.exit(1)
+if schema.get('special') == 'sides' and not SIDES_CONFIGURED:
+    print('ℹ️  端白名单仍为骨架占位（SIDES 含 \'<端>\'）→ 已跳过端校验；/init-project 按 PROJECT-PROFILE § 五 替换后生效')
 print(f'✅ {schema["path"]} 校验通过（{mode} · {len(data)} 行）')
 PYEOF

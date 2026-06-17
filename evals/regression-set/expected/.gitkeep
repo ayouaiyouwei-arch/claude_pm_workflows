@@ -1,0 +1,3 @@
+# 回归基准期望输出目录（占位）
+# /optimize-prompts 选入回归 case 后，在此放 <case_id>/<agent>/<报告>-期望.md
+# 见 evals/regression-set/README.md § 四

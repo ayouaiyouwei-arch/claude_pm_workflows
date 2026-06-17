@@ -22,6 +22,7 @@ COMMIT_PREFIX="${COMMIT_PREFIX:-biz(req):}"                          # commit me
 GIT_IDENT_NAME="${GIT_IDENT_NAME:-pm-workspace}"
 GIT_IDENT_EMAIL="${GIT_IDENT_EMAIL:-pm-workspace@local}"
 
+[ -z "$REPO_DIR" ] && { echo "❌ code/ 下没有仓库（先 /init-project clone）；REPO_DIR 为空时禁止 cd（否则会误推骨架自身仓）" >&2; exit 1; }
 cd "$REPO_DIR"
 BIZ_BRANCH="${BIZ_BRANCH_PREFIX}$(date +%Y%m%d)"
 PKG_DIR="${MIRROR_PREFIX}${PKG}"

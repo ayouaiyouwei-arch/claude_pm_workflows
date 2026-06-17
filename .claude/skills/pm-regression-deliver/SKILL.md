@@ -40,7 +40,7 @@ description: PM 自跑回归补全 + 闭环交付（专用于 "0 代码改动 ·
 ```bash
 # 1. 确认 DIFF 状态（必须 = "已裁决" 或 "0 代码"）
 DIFF="DIFF-005"
-grep -A 20 "### ${DIFF}" product-docs/ai-page-interaction-audit/baseline/02-PRD-实现差异台账.md | head -25
+grep -A 20 "### ${DIFF}" product-docs/baseline/02-PRD-实现差异台账.md | head -25
 
 # 2. 定位 CSV 来源
 CSV="product-docs/_drafts/<日期>-<短名>/06-用例.csv"
@@ -166,7 +166,7 @@ S5 具体步骤：
 grep -q '"failed":\s*0' test/reports/<版本>/playwright-results/results.json && echo "✅ 全 PASS"
 
 # 2. baseline DIFF 状态切"已发布"
-#    打开 product-docs/ai-page-interaction-audit/baseline/02-PRD-实现差异台账.md
+#    打开 product-docs/baseline/02-PRD-实现差异台账.md
 #    把 DIFF-<N> 的 "状态" 字段改 "已发布 · PM 自交付（YYYY-MM-DD）"
 #    "裁决结论" 字段补一句 "<YYYY-MM-DD> PM 自跑回归补全完成 · <N>/<N> PASS · 见 test/reports/<版本>/"
 

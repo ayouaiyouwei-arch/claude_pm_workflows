@@ -57,9 +57,9 @@ const code = [...svg.matchAll(/<text[^>]*>([^<]+)<\/text>/g)].map(m => m[1]).joi
 
 ### 多平台支持
 
-`lib/dev-login.cjs` 默认提供 `loginAdmin` + `loginScreen` 两个 helper（基于 robobus 实战）。你项目可能有：
+`lib/dev-login.cjs` 默认提供 1~2 个示例 helper（如 `login<入口1>` / `login<入口2>` · 实战教训(示例)）。你项目可能有：
 - 1 个平台（如 SaaS 后台只一个 admin）→ 只用 `uiLogin` 通用入口
-- N 个平台（如 admin + cockpit + h5）→ 仿照 `loginAdmin/loginScreen` 加 helper
+- N 个平台（如 后台 + 大屏 + h5）→ 仿照示例 helper 加 `login<入口N>`
 
 ## 出现过的包（按时间倒序）
 
@@ -70,7 +70,7 @@ const code = [...svg.matchAll(/<text[^>]*>([^<]+)<\/text>/g)].map(m => m[1]).joi
 ## 残余风险 / 仍未解决的子情况
 
 - **selector 关键字不匹配**误判 fail：每包 check 文件的 elements 字典由 PM 实写（贴近实际命名）+ 必带 fullPage 截图给人复核兜底
-- **dev 灰度数据空**导致功能链路触发不了（如"双击 vehicle marker 进 closeup" 需先有 marker）：⚠️ 标注但不阻断
+- **dev 灰度数据空**导致功能链路触发不了（如"某交互需先有列表/地图数据才能触发下一步"）：⚠️ 标注但不阻断
 - **captcha 偶尔识别错**：skill 自带 3 次重试（`maxRetries=3`）
 - **token / 账号密码泄露**：截图 + 日志归档到 `evidence/` · 加 `.gitignore`
 

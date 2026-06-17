@@ -20,7 +20,7 @@ description: PM 端独立深度交互验证 dev 灰度环境功能落地。任�
 
 `lib/dev-login.cjs`：
 - 抓 DOM 上的 captcha `<img>` → 解码 → 提取验证码 → 填表 → 提交
-- 多平台支持（按项目实际平台数 · admin / big-screen / 其他端）
+- 多平台支持（按项目实际平台数 · 主端 / 副端 / 其他端）
 - 默认假设 captcha 是 **SVG 明文渲染**（`<text>` 标签内含明文）—— **如你项目 captcha 不是 SVG，改 `decodeCaptchaFromDataUrl` 为图片 OCR 或 API 登录+cookie 持久化**
 
 ### 2. 标准化 helper
@@ -57,7 +57,7 @@ const PKG_CHECKS = [
 - 平台清单（你项目有哪些端 · 各自 base URL）
 - captcha 类型（SVG 明文 / 图片 OCR / API 登录绕过 / 无验证码）—— 决定 `dev-login.cjs` 的实现
 
-模板默认值是 robobus 项目的样板。**你项目实施时要替换** `lib/dev-login.cjs` 中的 captcha 解码逻辑 + 登录 URL 模式。
+模板默认值是某历史项目的样板（示例占位）。**你项目实施时要替换** `lib/dev-login.cjs` 中的 captcha 解码逻辑 + 登录 URL 模式。
 
 ## 用法
 
@@ -86,7 +86,7 @@ node test/tools/e2e-scripts/pm-dev-tests/check-<包>.cjs
 
 ## 接入升 .done 默认执行
 
-- **手动追认 .done**（项目实际类似 P008 时）：插入"4.5 步：dev 灰度 smoke 验证（best-effort）"
+- **手动追认 .done**（项目实际类似 `<手动追认包>` 时）：插入"4.5 步：dev 灰度 smoke 验证（best-effort）"
 - **promote-deliverable B-后置**：retrospect 落库后跑 `/dev-verify <PKG>`
 - **CLAUDE.md 关键约束**：升 .done 后默认执行 · 失败不阻断仅写痕迹
 

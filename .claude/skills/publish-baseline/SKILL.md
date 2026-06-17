@@ -35,6 +35,12 @@ description: 走完基线刷新检查清单后，向 baseline/01-基线版本登
    - 过程中 4 项 ✅
    - 收尾 9 项 ✅（含 4 项测试相关）
    - 任意一项不通过 → 立即停止发布
+2.5. **用例覆盖审计发布门（`coverage-audit` 工作流）**
+   - 先跑 `node test/tools/lint-cases.js`（G1 静态门禁）——退出码≠0 不放行。
+   - 主对话列**受本次基线影响的模块**：`ls product-docs/modules/` → 构造 `[{code,name}]`（代码验收基线可只取触及模块；周期体检取全量）。
+   - 调 `Workflow({name:"coverage-audit", args:{root:"<工作空间绝对路径>", sha:"<当前快照 SHA>", modules:[...]}})`。
+   - 读返回的 `results[].verify.verifiedGaps`：**确认为「真缺口」且 severity=高**的，须先补（走 `gen-cases` 工作流）或由 PM 在发布通告备注栏**显式豁免留痕**，否则中止。
+   - **docs-only 场景**：本步与测试轨同口径**按 N/A 豁免**（验收环境未就绪时）；但**建议仍跑一次**作存量覆盖体检（结果存档、不阻塞发布）。
 3. **确认所有「待裁决」差异条目均已闭合**：未闭合的必须先走 `log-diff-entry` 或 `log-change-request`
 4. **【M1.7 新增】关联交付包闭环校验**
    - 扫 `baseline/03-产品变更登记.md`，找出本次纳入的 CHG-XXX 列表

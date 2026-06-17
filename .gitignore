@@ -7,6 +7,11 @@ code/*
 # deliverables/*.draft/
 # deliverables/*.active/
 
+# 密钥（设计上在仓外 ~/.config/<工作空间>/，此为 defense-in-depth：万一误落仓内也不提交）
+# 注意：secrets.env.example（模板）不匹配下方规则，照常提交
+secrets.env
+**/secrets.env
+
 # 系统文件
 .DS_Store
 *.log

@@ -1,6 +1,6 @@
 ---
 description: A7 用例审核打回后自动闭环（A6 修 → 自检 → A7 重审），最多 3 轮，超时强制停下让 PM 介入。
-argument-hint: <_drafts 短名，如 2026-05-09-dashboard-vehicle-card-collapse>；留空则用 /tmp/new-feature-current.txt 内的最近一次
+argument-hint: <_drafts 短名，如 2026-01-15-card-collapse-opt>；留空则自动取 product-docs/_drafts/ 下最近修改的目录
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
 ---
 
@@ -25,8 +25,8 @@ A7 用例审核打回（结论 = 打回，含 P1 必改项），主对话不想�
 ## 第 0 步：定位工作目录
 
 ```bash
-DRAFT="${ARGUMENTS:-$(cat /tmp/new-feature-current.txt 2>/dev/null)}"
-[ -z "$DRAFT" ] && echo "❌ 未指定短名，且 /tmp/new-feature-current.txt 为空" && exit 1
+DRAFT="${ARGUMENTS:-$(ls -dt product-docs/_drafts/*/ 2>/dev/null | head -1 | xargs -r basename)}"
+[ -z "$DRAFT" ] && echo "❌ 未指定 _drafts 短名，且 product-docs/_drafts/ 下无目录可自动选取" && exit 1
 DRAFT_DIR="product-docs/_drafts/$DRAFT"
 [ -d "$DRAFT_DIR" ] || { echo "❌ 工作目录不存在: $DRAFT_DIR"; exit 1; }
 ```

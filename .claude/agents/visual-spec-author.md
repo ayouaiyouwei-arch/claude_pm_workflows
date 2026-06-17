@@ -57,7 +57,7 @@ ls product-docs/visual-baseline/01-颜色清单.md 2>/dev/null && echo "基线�
 > 不替 PM 拍风格——给候选 + 看图选 + 固化；之后所有 UI 需求自动沿用，不再重选。
 
 1. **判定产品类型**：管理后台 / 数据大屏 / 营销站 / 移动 H5 / 工具型（从 01-需求细化.md § 〇 触及端 + 用途推断）
-2. **出 2~3 个候选风格**：读 `knowledge/methodology/ui-ux-pro-max.md` 的 Style Selection 域（可参考 `minimalist-ui` 等卡片；缺失则按业界常识候选），每候选给：风格名 / 为什么适合该产品类型 / 色板方向 / 字体方向 / 信息密度——全部业务语言（P027）
+2. **出 2~3 个候选风格**：读 `knowledge/methodology/ui-ux-pro-max.md` 的 Style Selection 域（可参考 `minimalist-ui` 等卡片；缺失则按业界常识候选），每候选给：风格名 / 为什么适合该产品类型 / 色板方向 / 字体方向 / 信息密度——全部业务语言（P015）
 3. **每候选产 1 个 mini demo**：同一样例页面（1 卡片 + 1 个 3 行表格 + 1 主按钮 + 1 表单项）做成单文件 HTML 的 2~3 个风格版本 + Playwright 各截 1 张图（命名 `style-candidate-<A/B/C>.png`）
 4. **🚦 Gate 1.5-style**：停下，截图给 PM 看图选（允许混搭：如"A 的色板 + B 的密度"）
 5. **固化**：选中风格落成视觉基线初稿（01 色板 / 02 字号 / 03 间距 = 该风格 token 集 + 05 组件引用约定），每份头部标 `> 风格选型产物 · 非代码提取 · <日期> PM 拍板（Gate 1.5-style）`——之后所有 UI 需求自动沿用，不再重选风格

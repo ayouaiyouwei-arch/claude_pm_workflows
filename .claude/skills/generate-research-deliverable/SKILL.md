@@ -33,7 +33,7 @@ description: 从基线 + PRD + CHG + 用例自动生成一份 .draft 状态的�
 
 ## 前置校验（执行前自检）
 
-1. **CHG 已登记**：`grep "<CHG-XXX>" product-docs/ai-page-interaction-audit/baseline/03-产品变更登记.md` 命中
+1. **CHG 已登记**：`grep "<CHG-XXX>" product-docs/baseline/03-产品变更登记.md` 命中
 2. **包名不冲突**：`ls deliverables/` 不存在同名目录（含其他状态后缀）
 3. **当前 `.active` 包数 ≤ 1**：本 skill 只产 `.draft`，不影响 active 计数；但如已经 ≥ 1 active，提醒 PM「起完 draft 后不能立刻 active」
 

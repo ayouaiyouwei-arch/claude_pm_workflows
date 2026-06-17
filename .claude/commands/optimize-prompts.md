@@ -189,6 +189,8 @@ PATCH_ID="patch-$(printf %03d $NEXT_NUM)"
 # Append 到 PROMPT-CHANGELOG.md
 ```
 
+**同步追加 `agent-versions.json` 顶层 `patch_log`**（runs.csv 第 22 列 `patch水位` 的事实源——retrospector 取"合并日期严格早于起包日的最大 patch-NNN"）：用 Edit 在 `patch_log` 数组追加 `{ "patch": "<PATCH_ID>", "merged_at": "<合并日期 YYYY-MM-DD>" }`。**缺这步 → patch水位 算不出（记 `-`）。**
+
 ### 2.7 处理 patches-pending
 
 合并/拒绝完成后，**移走** `patches-pending/` 中所有提及该补丁的文件中的对应段落。

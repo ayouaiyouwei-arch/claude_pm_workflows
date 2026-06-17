@@ -1,13 +1,18 @@
 /**
- * 集中管理 data-testid。
+ * 集中管理 data-testid · 通用模板（项目无关骨架）
+ *
+ * ⚠️ 接入项目必做：按本项目模块/页面填充下方 modules 段（删除 __example 占位）。
+ *   - 模块缩写与拆分以 /init-docs Gate D1 确认稿为准（对齐 acceptance.config.json § modules）
  *
  * 约定：
  *  - 所有 spec 必须通过本表引用 data-testid，禁止硬编码 CSS 选择器（如 `.el-button:nth-child(3)`）
  *  - 如发现某节点缺 data-testid，先在前端补上 `data-testid="..."`，再在本表登记，禁止用脆性选择器替代
- *  - 选择器命名约定：`<模块>.<页面>.<元素>`，例 `dashboard.summary.totalOrdersCard`
+ *  - 选择器命名约定：`<模块>.<页面>.<元素>`，例 `<模块>.list.statusFilter`
+ *  - 渲染类元素（地图/canvas overlay）必须挂真实 data-* 钩子（对齐 P020「可渲染必可验证」），不可用截图替代断言
  */
 
 export const Selectors = {
+  // ── 以下两段（global / login）项目无关，通用保留 ──
   global: {
     siderMenu: 'global.sider.menu',
     headerUser: 'global.header.user',
@@ -28,88 +33,17 @@ export const Selectors = {
     errorMsg: 'login-error',
   },
 
-  dashboard: {
-    summary: {
-      totalOrdersCard: 'dashboard.summary.totalOrders',
-      activeDriversCard: 'dashboard.summary.activeDrivers',
-      onlineVehiclesCard: 'dashboard.summary.onlineVehicles',
-      activeAlertsCard: 'dashboard.summary.activeAlerts',
-      trendChart: 'dashboard.summary.trendChart',
-    },
-  },
-
-  schedule: {
-    calendar: {
-      root: 'schedule.calendar.root',
-      viewSwitcher: 'schedule.calendar.viewSwitcher',
-      dimSwitcher: 'schedule.calendar.dimSwitcher',
-    },
-    adjust: {
-      slot: 'schedule.adjust.slot',
-      replaceDriverBtn: 'schedule.adjust.replaceDriverBtn',
-      replaceVehicleBtn: 'schedule.adjust.replaceVehicleBtn',
-      pickerSubmit: 'schedule.adjust.pickerSubmit',
-    },
-  },
-
-  order: {
+  // ── 以下为占位示例，演示 `<模块>.<页面>.<元素>` 命名约定 ──
+  // 接入项目后删除 __example，按本项目模块逐个补充（结构同 global/login）。
+  __example: {
     list: {
-      table: 'order.list.table',
-      statusFilter: 'order.list.statusFilter',
-      pagination: 'order.list.pagination',
+      table: '__example.list.table',
+      statusFilter: '__example.list.statusFilter',
+      pagination: '__example.list.pagination',
     },
     detail: {
-      timeline: 'order.detail.timeline',
-      refundBtn: 'order.detail.refundBtn',
-      refundReason: 'order.detail.refundReason',
-      refundSubmit: 'order.detail.refundSubmit',
-    },
-  },
-
-  security: {
-    monitor: {
-      list: 'security.monitor.list',
-      map: 'security.monitor.map',
-      handleBtn: 'security.monitor.handleBtn',
-      closeBtn: 'security.monitor.closeBtn',
-      closeReason: 'security.monitor.closeReason',
-      closeSubmit: 'security.monitor.closeSubmit',
-      wsStatus: 'security.monitor.wsStatus',
-    },
-  },
-
-  rule: {
-    alert: {
-      newBtn: 'rule.alert.newBtn',
-      enableSwitch: 'rule.alert.enableSwitch',
-      saveBtn: 'rule.alert.saveBtn',
-    },
-  },
-
-  analysis: {
-    operation: {
-      odMatrix: 'analysis.operation.odMatrix',
-      aggSwitcher: 'analysis.operation.aggSwitcher',
-      exportBtn: 'analysis.operation.exportBtn',
-    },
-  },
-
-  resource: {
-    route: {
-      editorEnter: 'resource.route.editorEnter',
-      draftSaveBtn: 'resource.route.draftSaveBtn',
-      publishBtn: 'resource.route.publishBtn',
-    },
-    vehicle: {
-      newBtn: 'resource.vehicle.newBtn',
-      statusSwitcher: 'resource.vehicle.statusSwitcher',
-    },
-  },
-
-  setting: {
-    user: {
-      newRoleBtn: 'setting.user.newRoleBtn',
-      bindUserBtn: 'setting.user.bindUserBtn',
+      root: '__example.detail.root',
+      primaryAction: '__example.detail.primaryAction',
     },
   },
 } as const;

@@ -1,12 +1,12 @@
 ---
-description: 用 6 大测试设计方法（EC/BV/DT/SC/EG/ST）从 02 矩阵 + 03 问题清单 + 06 验收清单 + 02 差异台账反向追加场景化用例到 test-cases/<模块>.csv，强制场景化 + 优先级 30:50:20 + 5 态 100%
+description: 用 6+1 测试设计方法（EC/BV/DT/SC/EG/ST + VR 视觉回归）从 02 矩阵 + 03 问题清单 + 06 验收清单 + 02 差异台账反向追加场景化用例到 test-cases/<模块>.csv，强制场景化 + 优先级 30:50:20 + 5 态 100%
 ---
 
 > 🔧 项目无关骨架版 · 项目专属配置见 PROJECT-PROFILE.md
 
 # Skill · generate-test-case
 
-> 一句话定位：以 `product-docs/` 中的**矩阵 / 问题清单 / 验收清单 / 差异台账**为输入，按 `_测试设计方法.md` 6 大方法体系反向生成**场景化**用例追加到 `test-cases/<模块>.csv`，并产出覆盖率追溯矩阵。
+> 一句话定位：以 `product-docs/` 中的**矩阵 / 问题清单 / 验收清单 / 差异台账**为输入，按 `_测试设计方法.md` 6+1 方法体系（7 法含 VR + 特殊标签，详见其 §二）反向生成**场景化**用例追加到 `test-cases/<模块>.csv`，并产出覆盖率追溯矩阵。
 >
 > **场景化是硬性要求**：每条用例必须以方法标签 `[...]` 开头，且能写成 `Given/When/Then`。
 
@@ -37,7 +37,7 @@ description: 用 6 大测试设计方法（EC/BV/DT/SC/EG/ST）从 02 矩阵 + 0
 ## 工具
 
 - 仅文档解析（无外部工具）
-- 读：`product-docs/.../02-页面-产品-代码对照矩阵.md`、`03-页面交互问题清单.md`、`06-验收测试清单.md`、`baseline/02-PRD-实现差异台账.md`、`08-PRD歧义与待澄清问题.md`、`test/test-data/{演示数据集,边界数据,测试账号}.md`
+- 读：**`01-功能说明.md`（功能点 FP 清单 = 覆盖率分母 · 必读，2026-06-13 起强制）**、`02-页面-产品-代码对照矩阵.md`、`03-页面交互问题清单.md`、`04-业务规则与状态机.md`、`06-验收测试清单.md`、`baseline/02-PRD-实现差异台账.md`、`baseline/03-产品变更登记.md`、`08-PRD歧义与待澄清问题.md`、**`product-docs/00-产品全景.md § 三`（端到端主流程 = 跨模块链路来源）**、`test/test-data/{演示数据集,边界数据,测试账号}.md`
 - 必读：`test/test-cases/_测试设计方法.md`、`test/test-cases/_用例字段说明.md`
 - 写：`test/test-cases/<模块>.csv`、`test/reports/<版本>/coverage-matrix.md`
 
@@ -56,15 +56,16 @@ description: 用 6 大测试设计方法（EC/BV/DT/SC/EG/ST）从 02 矩阵 + 0
 
 对每个目标模块：
 
+0. **覆盖义务清单（分母 · 先做 · 闭环驱动铁律见 `_测试设计方法.md § 〇`）**：先**枚举**本模块全部覆盖义务——`01` 每个 FP-xx / `04` 每条规则 R、状态机合法+关键非法迁移、判定表每规则、权限矩阵每「角色×操作」格 / `03` 每个高 severity FE / 关联每个 DIFF·CHG / `06` 每个验收点。这张清单是生成的**分母**，Step 5.2 据它判闭环。**不读 01 直接生成 = 没分母 = 必漏 FP**。
 1. **业务范围**：从 02 矩阵抄出页面 / 路由 / 后端依赖
 2. **业务规则**：从 PRD（`code/<仓库名>/<PRD目录>/`）+ 03 问题清单 + 02 差异台账提取
 3. **数据模型**：从 OpenAPI（`reports/<版本>/openapi.json`）+ 接口代码生成产物（路径见 PROJECT-PROFILE.md § 三/五）提取实体字段 / 枚举 / 分页
 4. **依赖链**：项目运行时依赖服务（如 docker-compose 的 DB / 缓存 / MQ / 对象存储等）+ 外部引擎（如有，按项目实际拓扑）
 5. **角色矩阵**：从 `test/test-data/测试账号.md` 拿全部角色（角色数见 PROJECT-PROFILE.md § 六）
 
-### Step 3 · Design（设计 · 应用 6 大方法）
+### Step 3 · Design（设计 · 应用 6+1 方法）
 
-> 应用顺序：**SC → EC → BV → DT → ST → EG**（详见 `_测试设计方法.md` § 三）
+> 应用顺序：**SC → EC → BV → DT → ST → EG →（UI 类）VR**（详见 `_测试设计方法.md` § 三）
 
 #### 3.1 SC · 场景法（最低要求）
 
@@ -90,7 +91,7 @@ description: 用 6 大测试设计方法（EC/BV/DT/SC/EG/ST）从 02 矩阵 + 0
 
 #### 3.5 ST · 状态迁移
 
-对状态实体（订单 / 告警 / 班次 / 车辆 / 线路 / 任务）：
+对状态实体（订单 / 告警 / 审批单 / 工单 / 任务）：
 - 每条**合法迁移** ≥ 1 用例
 - 关键**非法迁移** ≥ 1 用例（占合法迁移数 ≥ 60%）
 
@@ -134,15 +135,22 @@ description: 用 6 大测试设计方法（EC/BV/DT/SC/EG/ST）从 02 矩阵 + 0
 
 > 任一档差异 > 20% → **告警 + 拒绝写入**，要求重新分配。
 
-#### 5.2 覆盖率检查
+#### 5.2 覆盖率检查（**闭环优先**）
+
+> **先判义务闭环，再判方法配比**。义务闭环 = 对 Step 2.0 清单逐条核「有无 ≥1 用例」，列出未覆盖项。
 
 | 维度 | 目标 | 检查方法 |
 |---|---|---|
+| **功能点 FP 闭环** | **100%（每个 FP ≥1 用例或显式标"有意不测+理由"）** | 对 Step 2.0 的 FP 清单逐条核 case_id；**有未覆盖 = 没生成完，回 Step 3 补** |
+| **义务闭环（R/迁移/DT格/FE/DIFF·CHG/验收点）** | **100% 覆盖或显式豁免** | 同上，逐条对 Step 2.0 清单 |
+| **跨模块链路（SCN）** | `00 § 三`主流程逐条 ≥1 链路用例 | 见 `_测试设计方法.md § 4.4b`；落 `SCN-跨模块场景.csv` |
 | 5 态 | 100% | 每条用例 `five_states` 字段非空 |
 | 状态迁移 | 合法 100% + 非法 ≥ 60% | 每个状态实体 ST 用例数 ≥ 合法迁移数 |
 | 判定表 | 每规则 ≥ 1 用例 | 权限矩阵 / 票价规则 DT 用例数 |
 | 6 方法 | 每模块每方法 ≥ 1（SC 强制，其他按业务适用性） | 追溯矩阵统计 |
 | 接口契约 | 核心接口 ≥ 80% / 其他 ≥ 70% | OpenAPI tag 下 endpoint 覆盖比 |
+
+> **写入门禁**：义务闭环有「未覆盖」项 → 不写入、回去补。写盘后跑 `node test/tools/lint-cases.js`（G1 静态门禁）退出码必 0。
 
 ### Step 6 · 去重 / 校验
 
@@ -168,15 +176,24 @@ description: 用 6 大测试设计方法（EC/BV/DT/SC/EG/ST）从 02 矩阵 + 0
 | <模块B> | 2 | 2 | 2 | 4 | 3 | 3 | 16 | 5/8/3 | 100% | ✅ |
 ```
 
+**同时产「义务闭环矩阵」（当门禁 · 比方法配比更重要 · 见 `_测试设计方法.md § 九`）**：每条 Step 2.0 义务 → case_id / `未覆盖` / `有意不测（理由）`。任一「未覆盖」= 不通过。
+
+```md
+| 义务（FP/R/迁移/DT格/权限/FE/DIFF·CHG/链路） | 覆盖 case_id | 状态 |
+|---|---|---|
+| FP-NN <某功能点> | <TC-XXX-0NN> | ✅ |
+| FP-MM <某功能点> | — | ❌ 未覆盖 → 返工 |
+```
+
 ### Step 9 · 更新 `_待自动化资产清单.md`
 
 把新增用例的 `automation_path` 全部追加到 `test/test-cases/_待自动化资产清单.md`，标 `状态=待生成`。
 
-### Step 10 · 更新 `测试说明文档.md` § 三
+### Step 10 · 更新 `test/测试说明文档.md` § 三
 
 - 「批量生成 N 条用例（按方法分布 EC:BV:DT:SC:EG:ST = a:b:c:d:e:f）」
 - 「优先级配比 P0:P1:P2 = x:y:z（达标 / 偏离）」
-- 标注下一步：调 `api-contract-test` 生成对应 `.bru`、调 `run-acceptance-suite` 生成对应 `.spec.ts`
+- 标注下一步：调 `run-acceptance-suite` 把新用例补成 acceptance-regression Playwright `.spec.ts`；（可选·研发自测层）调 `api-contract-test` 做 OpenAPI 契约核查
 
 ---
 
@@ -198,8 +215,8 @@ description: 用 6 大测试设计方法（EC/BV/DT/SC/EG/ST）从 02 矩阵 + 0
 - 追溯矩阵：reports/B1.0.x/coverage-matrix.md
 - _待自动化资产清单：追加 28 条
 - 下一步：
-  - 调 api-contract-test 生成 Bruno .bru（待 OpenAPI 拉取）
-  - 调 run-acceptance-suite（regression）生成 Playwright .spec.ts
+  - 调 run-acceptance-suite（regression）把新用例补成 acceptance-regression Playwright .spec.ts（L1）
+  -（可选·研发自测层）调 api-contract-test 做后端 OpenAPI 契约核查
 ```
 
 ---
@@ -216,7 +233,7 @@ description: 用 6 大测试设计方法（EC/BV/DT/SC/EG/ST）从 02 矩阵 + 0
 - ❌ 模块用例配比偏离 30:50:20 ± 20% 仍写入
 - ❌ `five_states` 留空（不适用必须显式 `na`）
 - ❌ 不更新 `_待自动化资产清单.md` 与 `coverage-matrix.md`
-- ❌ 不更新 `测试说明文档.md` § 三
+- ❌ 不更新 `test/测试说明文档.md` § 三
 
 ---
 
@@ -228,6 +245,6 @@ description: 用 6 大测试设计方法（EC/BV/DT/SC/EG/ST）从 02 矩阵 + 0
 | 字段冻结说明 | `test/test-cases/_用例字段说明.md` |
 | 待自动化资产清单 | `test/test-cases/_待自动化资产清单.md` |
 | 后端测试支持需求 | `test/test-data/后端测试支持需求.md` |
-| 测试规则 | `.cursor/rules/06-测试执行与证据规范.mdc` |
-| 后续生成 .bru | `.claude/skills/api-contract-test/SKILL.md` |
+| 测试执行与证据规范 | `.claude/skills/capture-test-evidence/SKILL.md` |
 | 后续生成 .spec.ts | `.claude/skills/run-acceptance-suite/SKILL.md` |
+|（可选）OpenAPI 契约核查 | `.claude/skills/api-contract-test/SKILL.md` |

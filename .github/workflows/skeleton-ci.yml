@@ -1,0 +1,34 @@
+name: skeleton-ci
+
+# 骨架自检 CI（UPGRADE Track A）。把"引用完整性 + 确定性层自测"变成每次 push/PR 的硬闸，
+# 解决"这套骨架从未端到端跑过、一次重命名就静默断链"的隐性风险。零项目依赖。
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint-and-selftest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 确定性脚本依赖 python3（hook/validator fail-closed 于缺失）；ubuntu-latest 自带，显式确认
+      - name: Confirm python3 present (validators fail-closed without it)
+        run: command -v python3
+
+      - name: Reference-integrity lint (scripts/lint-skeleton.sh)
+        run: bash scripts/lint-skeleton.sh
+
+      - name: Deterministic-layer selftest (scripts/selftest.sh)
+        run: bash scripts/selftest.sh
+
+      # selftest 自带 trap 清理；再兜底断言工作树无残留（开源洁净度）
+      - name: Assert no selftest residue
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "❌ CI 跑后工作树有改动（selftest 未清干净）："; git status --porcelain; exit 1
+          fi
+          echo "✓ 工作树干净，无自检残留"

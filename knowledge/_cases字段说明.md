@@ -2,7 +2,7 @@
 
 > 🔧 项目无关骨架版 · 示例均为占位 · 项目专属配置见 PROJECT-PROFILE.md
 
-> `knowledge/cases.csv` 的字段冻结说明。当前版本：**v1.0（2026-05-10）**。
+> `knowledge/cases.csv` 的字段冻结说明。当前版本：**v1.1（2026-06-16）**。
 
 ---
 
@@ -21,7 +21,7 @@
 |---|---|---|---|---|
 | 1 | `case_id` | string | `.done` 包名 | 与 `evals/runs.csv` 的 `run_id` 一一对应 |
 | 2 | `done_date` | date | `99-状态.md` | YYYY-MM-DD |
-| 3 | `类型` | enum | `01-需求细化.md` | `新增` / `优化` / `UI重构` |
+| 3 | `类型` | enum | `01-需求细化.md` | **5 值**（与 runs.csv 对齐）：`新增` / `优化` / `UI重构` / `bug修复` / `混合`。复合一律 `混合` |
 | 4 | `触及端` | string | `01-需求细化.md` | 端名按 PROJECT-PROFILE.md § 五，多值用 `;`（例 `<端A>;<端B>`） |
 | 5 | `修改级别` | enum | `03-技术方案.md` | `L1` / `L2` / `L3` |
 | 6 | `核心模块` | string | `03-技术方案.md` 改动文件清单聚合 | 如 `<端>/<模块>;<shared>/<子模块>` |
@@ -59,3 +59,4 @@ grep "UI重构" knowledge/cases.csv | tail -3 | awk -F',' '{print $9}'
 | 版本 | 日期 | 变更 | 操作人 |
 |---|---|---|---|
 | v1.0 | 2026-05-10 | 首版 9 列 | PM |
+| v1.1 | 2026-06-16 | col 3 `类型` enum 由 3 值补齐为 5 值（`+bug修复 +混合`），与 runs.csv 对齐——二表共享主键 `case_id`==`run_id` 且 retrospector 一次写两边，枚举不一致会让同一包在两账本分类冲突（UPGRADE Track B） | PM |

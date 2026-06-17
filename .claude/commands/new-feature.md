@@ -65,10 +65,12 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
    ```bash
    cat > "product-docs/_drafts/${TODAY}-${SLUG}/pipeline-state.json" <<EOF
    {"slug":"${TODAY}-${SLUG}","ui_class":null,"current_step":"A1",
-    "steps":{},"gates":{"gate1":{"resolved":false},"gate2":{"resolved":false},"gate3":{"resolved":false}}}
+    "steps":{},"gates":{"gate1":{"resolved":false},"gate1_5a":{"resolved":false},"gate1_5b":{"resolved":false},"gate2":{"resolved":false},"gate3":{"resolved":false}}}
    EOF
    ```
-   每步完成后用 Edit 更新对应字段（如 `"steps":{"A1":{"verdict":"pass","rounds":2}}`）。**Gate 两笔时间戳（度量改良）**：向 PM 提问的同时写 `"gateN":{"asked_at":"<时间>"}`，PM 答复落定改 `"gateN":{"resolved":true,"asked_at":"<原值>","at":"<时间>"}`——两者之差 = PM 决策等待时长（周报可看瓶颈在 agent 还是在等 PM；retrospector 从 state 文件推导，**不新增 runs.csv 列**）。时间一律 `date '+%F %H:%M'`。
+   每步完成后用 Edit 更新对应字段。**步耗时（度量改良 · UPGRADE W3⑥）**：每步**开始**写 `started_at`、**完成**写 `ended_at`（如 `"steps":{"A1":{"started_at":"<时间>","ended_at":"<时间>","verdict":"pass","rounds":2}}`）——两者之差 = 该 agent 自身耗时，配合下面的 Gate 双时间戳，控制塔即可拆分"卡在 agent vs 卡在等 PM"。**Gate 两笔时间戳**：向 PM 提问的同时写 `"gateN":{"asked_at":"<时间>"}`，PM 答复落定改 `"gateN":{"resolved":true,"asked_at":"<原值>","at":"<时间>"}`——两者之差 = PM 决策等待时长（retrospector 从 state 文件推导，**不新增 runs.csv 列**）。时间一律 `date '+%F %H:%M'`。
+   > **视觉环 Gate 键（M3 · 必种）**：`gates{}` 已预种 `gate1_5a`/`gate1_5b`（A1.5 视觉环的两个 PM 闸），与 gate1/2/3 并列——**禁止删除**，否则控制塔遍历 `gates{}` 会漏渲染视觉环（PM 来回最久的环节）。**非 UI 类需求**（A1 判定 `ui_class` 后确认不含视觉重构）把这两个键标 `{"resolved":true,"skipped":"non-UI"}`，看板显示"跳过(非 UI)"而非"等待"。
+   > **契约自检（best-effort · 非阻断）**：状态文件在升 `.done`/retrospect 前可跑 `bash scripts/validate-pipeline-state.sh "<state路径>"` 兜底（5 个 gate 键齐全 + JSON 合法 + ended 步必有 started）。
 5. 在 `product-docs/_drafts/${TODAY}-${SLUG}/00-原始需求.md` 写入用户的一句话原文 + 创建时间（**patch-012：精确到分钟** `date '+%F %H:%M'`——retrospector 算 `包周期_小时` 的起点锚，只写日期则该包周期记 `-`）
 
 ---
@@ -397,7 +399,21 @@ ls "$PKG/test-cases-snapshot"/*.csv
 grep -q "TODO\|TBD\|<.*>" "$PKG/02-基线快照.md" && echo "❌ 02 还有占位" || echo "✅ 02 已填"
 ```
 
-### 8.7 状态机初始化
+### 8.6b 交付包终审（跨产物勾稽 · best-effort）
+
+> ⚠️ 8.6 只查"文件齐不齐"（机械）；本步查"11 个文件拼在一起对不对得上"（跨产物接缝）——
+> 补流水线唯一的结构性盲区，拦 `evals/escapes.csv` 里"全过仍漏"那一档（接口↔用例、视觉门槛、编号漂移）。
+> 与 A2/A4/A7 不重叠（它们各审一份产物）；与 pipeline-evaluator 不重叠（那是事后周报）。
+
+```bash
+bash scripts/deliverable-final-check.sh "$PKG"
+```
+
+- `exit 0`（0 BLOCKER）→ 继续 8.7。WARN 不阻断，但**逐条用业务语言念给 PM**（P015），PM 说"故意的"才放行
+- `exit 1`（有 BLOCKER）→ **停下**，按报告里的"文件:行号"修材料（回 `_drafts` 改或直接改 `.draft` 包，见 8.8 指引），改完**重跑本步**直到 0 BLOCKER
+- 检查项与读法详见 `deliverables/_交付包终审清单.md`
+
+
 打开 `$PKG/99-状态.md` 写入：
 ```md
 - 当前状态：draft
@@ -411,6 +427,7 @@ grep -q "TODO\|TBD\|<.*>" "$PKG/02-基线快照.md" && echo "❌ 02 还有占位
 
 ```
 ✅ .draft 研发交付包已生成：deliverables/<TODAY>-<CHG>-<短名>.draft/
+✅ 交付包终审（跨产物勾稽）：0 BLOCKER（8.6b · deliverable-final-check.sh）
 
 包内容映射（5 类输出物全部就位）：
 1. 产品方案 / 需求细化     → 03-PRD片段.md + 01-需求范围与边界.md

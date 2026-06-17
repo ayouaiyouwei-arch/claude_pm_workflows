@@ -216,7 +216,7 @@ cat deliverables/*.active/08-修复历史.md
 | **起包技能** | `.claude/skills/generate-research-deliverable/SKILL.md`（已升级，含 snapshot 复制 + 元数据） |
 | **状态机技能** | `.claude/skills/promote-deliverable/SKILL.md` |
 | **派活技能** | `.claude/skills/write-fix-prompt/SKILL.md`（已升级） |
-| **变更登记联动** | `product-docs/ai-page-interaction-audit/baseline/03-产品变更登记.md`（含「关联交付包」列） |
+| **变更登记联动** | `product-docs/baseline/03-产品变更登记.md`（含「关联交付包」列） |
 | **用例 snapshot 说明** | 任意包内 `test-cases-snapshot/README.md`（M1.8 D2 新增） |
 
 ---

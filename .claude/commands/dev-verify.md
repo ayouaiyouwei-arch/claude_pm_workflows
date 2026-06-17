@@ -37,8 +37,8 @@ esac
 ```bash
 # 必备
 [ -d code/<你项目仓库>/node_modules/playwright ] || { echo "❌ playwright 不在 · 先 pnpm i"; exit 1; }
-[ -n "$ROBOBUS_DEV_USER" ] || { echo "⚠️ ROBOBUS_DEV_USER 未设 · 见 PROJECT-PROFILE.md § 六"; exit 1; }
-[ -n "$ROBOBUS_DEV_PASS" ] || { echo "⚠️ ROBOBUS_DEV_PASS 未设 · 见 PROJECT-PROFILE.md § 六"; exit 1; }
+[ -n "$DEV_GRAY_USER" ] || { echo "⚠️ DEV_GRAY_USER 未设 · 见 PROJECT-PROFILE.md § 六"; exit 1; }
+[ -n "$DEV_GRAY_PASS" ] || { echo "⚠️ DEV_GRAY_PASS 未设 · 见 PROJECT-PROFILE.md § 六"; exit 1; }
 # Chromium 必装
 ls ~/Library/Caches/ms-playwright/chromium-* 2>/dev/null | head -1 || npx playwright install chromium
 ```
@@ -81,7 +81,7 @@ cp "$LATEST_OUT"/*.png "$PKG_DIR/evidence/" 2>/dev/null
 
 读 results.json 的 `packages.<pkg>.checks` ：
 - 全 ✅ → 99-状态 § 五 加 `dev 灰度验证: ✅ 通过 · <日期>`
-- 有 ❌ 但 dev 数据相关（vehicleMarker 0 等）→ `dev 灰度验证: ⚠️ 部分通过 · 数据问题 · 详 evidence/dev-verify-*.json`
+- 有 ❌ 但 dev 数据相关（如地图标记/列表计数为 0 等数据缺失）→ `dev 灰度验证: ⚠️ 部分通过 · 数据问题 · 详 evidence/dev-verify-*.json`
 - 真功能 fail → `dev 灰度验证: ❌ 失败 · 需查 · 详 evidence/`
 
 **不阻断 .done**（dev gray 数据问题不应回退追认状态），但严重 fail 时给 PM 标 🚨。

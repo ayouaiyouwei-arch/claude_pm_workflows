@@ -17,7 +17,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent, AskUserQuestion
 - **现状即事实**：反向 PRD 只写系统实际行为（P007 实证 · 出处带 `文件@SHA`）。"觉得不该这样"的，进 07-待裁决 / 升 DIFF，**严禁写进 01-功能说明**
 - 从不修改 `code/`（只读快照）
 - 三个编号命名空间并存靠路径隔离：`product-docs/modules/`（存量现状·长期演进）≠ `product-docs/_drafts/`（单需求过程稿）≠ `deliverables/*/`（交付包快照）。**引用文档必须带路径，禁止裸说"06 文档"**
-- 用例落 `test/test-cases/<模块>.csv`（与 /new-feature 包 snapshot 同一个库）：18 列冻结表头 · 方法标签 · P0:P1:P2≈30:50:20 · 5 态 100%（见 `test/test-cases/_用例字段说明.md`）
+- 用例落 `test/test-cases/<模块>.csv`（与 /new-feature 包 snapshot 同一个库）：19 列冻结表头（schema v2 · 含 chg_ref）· 方法标签 · P0:P1:P2≈30:50:20 · 5 态 100%（见 `test/test-cases/_用例字段说明.md`）
 
 ---
 
@@ -102,7 +102,7 @@ Agent(subagent_type="legacy-excavator", prompt="
 阶段：CASES
 模块：M0X <模块名>（缩写 <ABBR>）
 模块文档：product-docs/modules/M0X-<模块名>/（Gate D2 已裁决，07 残留挂起项见文件）
-用例规范：test/test-cases/_测试设计方法.md + _用例字段说明.md（18 列冻结表头）
+用例规范：test/test-cases/_测试设计方法.md + _用例字段说明.md（19 列冻结表头 · schema v2 含 chg_ref）
 baseline_version 填当前生效基线（见 product-docs/baseline/01-基线版本登记表.md）
 输出：test/test-cases/M0X-<模块名>.csv
 ")
@@ -117,7 +117,18 @@ agent 返回 `[excavate-cases 完成] M0X=<名> · N 条（P0/P1/P2=a/b/c）· [
 head -1 test/test-cases/M0X-*.csv          # 表头与冻结表头逐字一致
 awk -F',' 'NR>1{print $8}' test/test-cases/M0X-*.csv | sort | uniq -c   # 配比 30:50:20 ±20pt
 grep -c "five_states" 略——抽 5 条人工看场景化（Given/When/Then 可还原、方法标签在）
+node test/tools/lint-cases.js   # 🚦 G1 静态门禁：表头/19列/case_id 唯一/标签/配比/fe_ref·diff_ref·chg_ref 可追溯（退出码≠0 不放行）
 ```
+
+### 可选 B · 批量并行（`gen-cases` 工作流 · 推荐用于多模块批次）
+
+一批要生成/补多个模块用例时，Gate D2 逐模块裁决后，可用命名工作流一次性扇出（**闭环驱动**：先枚举覆盖义务分母再逐条覆盖；内建 **G2 读码对抗复核**，治"自动生成用例约 11% 断言不贴代码现状"；**S1 结构化 obligations + S2 AutoFix** 见 patch-022）：
+
+1. 主对话先列模块：`ls product-docs/modules/` → 构造 `[{code,name,start:"TC-<ABBR>-0NN",mode:"full"}]`（`start`=该模块下一可用号；`mode=full` 全量 / `gap` 补缺带 `gaps` / `scn` 跨模块链路）。
+2. 调 `Workflow({name:"gen-cases", args:{root:"<工作空间绝对路径>", sha:"<当前快照 SHA>", modules:[...]}})`。
+3. 工作流返回 `{groups:[{code, gen.cases, gen.obligations, review.mustFix, fixedCount}]}`：S2 已自动修 `mustFix`；主对话用 `obligations` 渲染 `coverage-matrix.md`（render-coverage-matrix.mjs），**再过 G1（lint-cases.js `--dir`/`--obligations`）后写盘**。
+
+> 何时**不**用工作流：单模块 / 几条用例（如 /new-feature A6 增量）→ 直接 agent/主对话写盘更省。工作流只在「≥多模块批量扇出 + 要可复现/可 resume」时起。目标态/方案文档用例用 `gen-cases-spec`。脚本与入参见 `.claude/workflows/gen-cases.js` 头注。
 
 ---
 
@@ -140,6 +151,6 @@ grep -c "five_states" 略——抽 5 条人工看场景化（Given/When/Then 可
 - ❌ 把"理想态/应该如何"写进 01-功能说明（那是 CHG 的事；现状即事实）
 - ❌ 凭印象写规则不标出处（P007；拿不准 = 🔍 进 07，不脑补）
 - ❌ 跳过 Gate D1/D2 冻结或转正
-- ❌ 用例无方法标签 / 表头偏离冻结 18 列 / 配比超 ±20pt 不返工
+- ❌ 用例无方法标签 / 表头偏离冻结 19 列 / 配比超 ±20pt 不返工 / 未过 G1 lint 就写盘
 - ❌ 修改 code/ 任何文件
 - ❌ 一次 Agent 让 agent 同时干 DOCS + CASES（裁决前后是两个世界）

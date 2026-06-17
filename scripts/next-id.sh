@@ -2,7 +2,7 @@
 # ═══════════════════════════════════════════════════════════════
 # next-id.sh · OPT / AGENT 编号统一发号器（L1 结构性消除撞号）
 # ───────────────────────────────────────────────────────────────
-# 背景：历史撞号 4 次（OPT-035 / OPT-045 / OPT-046 / OPT-049），
+# 背景：实战教训（示例）——某历史项目多次撞号，
 #       根因 = 各入口自算编号 + 正则漏 CHG-OPTxxx 无连字符写法 +
 #       扫描源不全（漏 _drafts 在飞包 / 研发自编号 / business git log）。
 # 原则：所有需要新编号的入口（pre-parallel-check / /new-feature 主对话 /
@@ -12,9 +12,9 @@
 # 扫描源（5 处 · 取全空间最大值 + 1）：
 #   ① deliverables/ 目录名（兼容 OPT-049 与 CHG-OPT049 两种写法）
 #   ② product-docs/*/baseline/03-产品变更登记.md（CHG-OPTxxx-X）
-#   ③ product-docs/_drafts/ 在飞包（OPT-049 撞号教训：曾漏扫）
-#   ④ code/robobus/scripts/ 研发自编号（小写无连字符 opt043 / agent003 风格）
-#   ⑤ code/robobus 全分支 git log subject（未登台账的直接派活包兜底）
+#   ③ product-docs/_drafts/ 在飞包（撞号教训：曾漏扫在飞包）
+#   ④ code/<主仓>/scripts/ 研发自编号（小写无连字符 opt043 / agent003 风格）
+#   ⑤ code/<主仓> 全分支 git log subject（未登台账的直接派活包兜底）
 # 匹配规则（防误匹配 · 实证校准）：
 #   - 大写带连字符：OPT-049 / AGENT-009 / CHG-OPT049（PM 编号体系）
 #   - 小写无连字符：opt043 / agent003（研发 regression 脚本风格）

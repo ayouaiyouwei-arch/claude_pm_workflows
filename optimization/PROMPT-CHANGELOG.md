@@ -1,81 +1,32 @@
 # Prompt 变更日志（空 · /optimize-prompts 自动追加）
 
-## 2026-06-12 · patch-014 · harness 加固（主仓同步 · L1-L4 防御栈 + 状态落盘 + Task→Agent）
+> 本文件是**追加式账本**：每次 `/optimize-prompts` 合并 patches-pending → agent .md 后，自动在此追加一条变更记录。
+> 骨架初始为空——下方为**格式示例占位**，由本项目运行 `/optimize-prompts` 后逐条追加真实记录。
 
-- **核心立场**：hooks 是必然执行，CLAUDE.md 是大概率听话——机械约束下沉脚本层，prose 只留判断型约束（主仓实证：漏 11 包 retrospect / 撞号 5 次 / patch 编号又撞 1 次全是 prose 失效）
-- **L1 收口脚本**：`next-id.sh`（发号器 · 5 源扫描 + --check）/ `promote.sh`（状态机三闸：GATE-D5 单 active / GATE-RETRO runs.csv 先落账 / GATE-ARCHIVE）/ `git-sync.sh` + `git-biz-push.sh`（拉推脚本化 · 五项自检内置）/ `load-secrets.sh` + `secrets.env.example`（密钥出仓）
-- **L2 git 硬闸**：`scripts/git-hooks/pre-push`（G1 推送分支**白名单制**——黑名单制只拦 release 时 push main/tags 全放行是主仓实证漏洞 / G2 镜像路径白名单 / G3 派活提示词存在性 · 对本机所有 push 主体生效）· ⚙️ 参数区 init 时按 PROJECT-PROFILE § 二 填充 · 仅挂双向隔离仓
-- **L4 CC hooks**：`.claude/settings.json` 新建（deny 9 条 + 三 hook 接线 `$CLAUDE_PROJECT_DIR` 相对路径）· `guard-bash.sh`（拦绕过 promote.sh 的 mv + 绕过发号器的已占用号 mkdir）/ `post-csv-validate.sh`（evals 三表写后 schema 校验 · exit 2 喂回当场修）/ `session-start-brief.sh`（开场简报：在飞包 + pipeline-state 进度 + memory 待回填 + .done↔runs.csv **名字级**对账）
-- **new-feature**：顶部"适用范围"段（bug 修复不走流水线 · 主仓 2026-06-06 决议）+ 第 0 步 pipeline-state.json 状态落盘（替代 /tmp 单例 · 多流水线隔离 + 压缩后恢复）+ A5 调用模板补工作目录（多包并行禁 glob 撞最新报告）+ 中断恢复段改读 state
-- **Task→Agent 命名统一**：7 个 command 调用语法/frontmatter/散文全替换（harness 工具已改名 · allowed-tools 按名匹配版本敏感）
-- **CLAUDE.md**：关键约束 #16（收口 + 防御栈 · 铁律+指针格式）+ 修复 P015 业务语言条与 P017+P018 条撞号（11→15）
-- **init-project**：第 5.5 步防御栈接线（参数区核对 + hooksPath 挂载 + 干跑验证 + 密钥初始化 + 重启会话提醒）
-- **knowledge/记忆体系.md**：三层记忆架构（L0 工作/L1 情景/L2 语义程序 · 双写铁律：决议进 memory 必同会话回填权威文件）
-- **度量改良（同日追加）**：promote.sh 新增 `log_state_change()`——mv 后自动 append 99-状态 § 二 行（机器时间戳 · 相邻行间隔 = 各阶段耗时 · "禁止手改"落实为机器写）；pipeline-state.json Gate 补 `asked_at`/`at` 配对时间戳（差值 = PM 决策等待时长 · retrospector 从 state 推导不加 runs.csv 列）；**裁决拒绝"agent 自估 token"**——模型不知道自己的消耗，自估 = 假数据进账本，真数据走 harness transcript 工具（ccusage 类）事后统计
+<!-- 格式示例（占位 · 实际记录由 /optimize-prompts 自动追加）
 
-## 2026-06-12 · patch-013 · 存量文档基建流水线（gitlab 端直接演化）
+## <YYYY-MM-DD> · <patch 编号> · <一句话标题>
 
-- `/init-docs` command（存量文档基建流水线）+ `legacy-excavator` agent（存量文档挖掘）+ 模块 6 件套模板；`publish-baseline` 增 docs-only 场景 B 特例；`/init-project` 接线；agent-versions 登记 legacy-excavator v1.0
-- ⚠️ **编号注记**：实施 commit `3bc33c4` 的 message 误标 "patch-012"——撞号根因 = 本地"patch-012 评估体系"commit 未及时 push，gitlab 端不知 012 已被占用（发号器哲学的又一实证）。**裁决以本 changelog 为准：评估体系 = patch-012（与主仓同号 · 长期对照零成本），本条 = patch-013**
+- **触发源**：<什么实战/复盘触发了本次 prompt 改良>
+- **决议**：<核心立场 / 方法论结论>
+- **改动文件 + 版本**：<agent/command 名 vX.Y → vX.Z · 简述改动点>
+- **效果 / 验证**：<改良后预期收益或验证口径>
 
-## 2026-06-11 · patch-012 · 评估体系增强（主仓同步 · 拦截账本 + Loop 指标 + runs.csv v1.1）
+-->
 
-- `evals/runs.csv` 18→**22 列**（新增 交付路径 / A5_PM裁决 / 包周期_小时 / patch水位）+ `_runs字段说明.md` v1.1 值域冻结（类型 5 值 · A2/A4 去括号 · VR 统一 0–1 · 端白名单 · "再加列"门槛）
-- 新建 `evals/escapes.csv`（9 列逃逸账本 · 发现层 vs 应拦截层 · 4 个登记 Hook）+ `evals/loops.csv`（11 列循环账本 · 6 类 loop-trace 块）+ 两份字段说明 + `scripts/validate-evals-csv.sh`（三表写入时校验 · SIDES 集合 init 时按 PROJECT-PROFILE § 五替换）
-- retrospector v1.0→**1.1**：抽 22 列 + grep loop-trace 落 loops.csv + append 后必校验（LOCKED 落盘清单 4→5 类）
-- evaluator v1.2→**1.3**：preflight 三表校验 + 周报新增 四A 拦截漏斗 / 四B Loop 收敛仪表 / 四C patch 切片 + trace 存在率必检 + 每 4 周指标退役检查
-- A1 v1.5→**1.6** / A2 v1.1→**1.2** / A1.5 v1.3→**1.4**：残留表 / 第 11 项 / self-critique.md 尾部必附 loop-trace 块
-- `iterate-A2` / `iterate-A7`：第 2.9 步退出前必写 trace（三种退出路径都写）；`new-feature`：00-原始需求创建时间精确到分钟 + Gate 1 软闸裁决回填 + Gate 1.5b 轮数留痕（0 轮也写）+ 第 9 步 22 列；`99-状态` 模板 snapshot v2；`promote-deliverable` B-后置 22 列；`pre-parallel-check` / `log-diff-entry` escapes 提醒；CLAUDE.md 关键约束 #6 扩
-- 北极星：灰度命中率应趋向 0 / A5 推翻率 / 软闸回炉率 / Gate1.5b 轮数趋势——连续 4 周无人消费的指标列退役候选
+## 2026-06-16 · patch-001 · 受众轴接入:A1 体验路径/劝退产物 + A2 劝退 lens
 
+- **触发源**：`optimization/UPGRADE-PLAN-v1.1.md` Wave 1③b + Wave 2④⑤（roadmap 评审驱动 · 非 .done 包反思）。实测 A1 有 JTBD/IA/Nielsen 但无任何环节显式产"体验路径 + 劝退点",根因 = journey-map/experience-map 等卡片未进快照、未接 A1。
+- **决议**：受众(toB/toC)是独立于平台(web/native)的第二条轴;"劝退/体验路径"挂受众轴。A1 按 `audience_profile.primary` 门控产出体验路径 + 劝退点;A2 第 11 项软闸(主观取舍升 PM 的现成位置)加劝退风险 lens。零新增 Gate。
+- **改动文件 + 版本**：`product-expert.md` v1.6→v1.7（映射表加 3 受众门控行 + 新增 §4.8 产物）· `requirement-reviewer.md` v1.2→v1.3（第 11 项软闸加 1b 受众门控 lens）。LOCKED 锚点段校验 byte-identical 未触碰。
+- **效果 / 验证**：⚠️ 回归集空,PM 授权跳过回归→后续人工抽查;LOCKED 校验已过。行为验收(待首个需求):toC→A1 出激活漏斗+劝退断崖、A2 升高 drop-off;toB→任务流程+效率摩擦;web/无 audience→不触发受众卡。回滚点 = `regression-baseline/product-expert-v1.6` + `requirement-reviewer-v1.2`。
 
-## 2026-06-10 · patch-011 · 知识库治理（主仓同步 · 消费断链修复 + 生命周期 + 编号映射）
+## 2026-06-16 · 簿记同步（非 prompt 改动）· agent-versions.json 对齐 frontmatter
 
-- A1 v1.5 / A3 v1.3 / A6 v1.3：必读段接线 query-knowledge（历史案例检索必跑 · 不再"只写不读"）
-- query-knowledge SKILL：状态匹配 bug 修复（case 模糊：active/LOCKED=活跃 · dormant=休眠不返回）+ 产出尾部图谱需求积累引导
-- `knowledge/README § 一.5`：热温冷知识生命周期（晋升/降级标准 + active⇄dormant 状态机 · 降级 PM 拍板）；`/optimize-prompts` 第 0.5 步月更降级检查；`pipeline-evaluator` 周报 dormant 候选提示
-- 新建 `knowledge/patterns/_编号映射.md`：主仓↔骨架编号唯一互译权威（同步 patch 照表机械替换）；CLAUDE.md P007 撞号段加注澄清（与 patterns/P007 是两条规则）
-- `_模式模板.md` 状态规范值改 active/dormant
+- **类型**：纯簿记对账,**未改任何 agent `.md`**。骨架 init 时把 `agent-versions.json` 重置为 1.0,但 6 个 agent 的 frontmatter 仍带骨架内置 patch-009~014 的版本号,json 与实际漂移。本次仅把 json 追平 frontmatter,`last_patch` 保留 `null`(这些版本来自骨架内置 patch,非本项目 patch-NNN 合并,不应臆造 last_patch id)。
+- **同步项**：pipeline-evaluator 1.0→1.3 · pipeline-retrospector 1.0→1.1 · tech-architect 1.0→1.3 · test-case-author 1.0→1.3 · test-case-reviewer 1.0→1.1 · visual-spec-author 1.0→1.4。各项 `last_updated` 及顶层 `last_updated` 置 2026-06-16。
 
-## 2026-06-10 · patch-010 · 视觉基线自动提取 + 风格选型（主仓同步 · "自动适配项目风格"补全）
+## 2026-06-16 · typo 修正（非行为改动 · 走 §六 typo 例外）· product-expert §-引用
 
-- 新建 `scripts/visual-baseline-scan.py`：扫前端代码统计真实用色/字号/间距/圆角阴影/组件引用/UI 依赖（主仓 dogfood 验证口径）
-- 新建 `extract-visual-baseline` skill：初建/刷新两模式 · drift 对比 · 草稿强制标"待 PM 确认 + commit SHA" · PM 确认 Gate 5 项业务语言 · 刷新先归档不覆盖
-- `init-project` 第 2.4 步：检测前端 → 自动提取视觉基线（第 3 步 D 块 / 第 4 步 Gate 确认 / 第 5 步 4.5 写入 + § 七回填）——兑现 A1.5 "由 /init-project 生成"的承诺；纯后端跳过
-- `visual-spec-author` v1.2 → **v1.3**：第 0 步基线存在性检查四分支（缺失但有存量 UI = 禁止跳过直接发挥 · 必须先提取）+ § 0.5 风格选型子流程（Gate 1.5-style：候选风格 mini demo 截图 → PM 看图拍板 → 固化沿用）
-- 效果：① 基线可刷新 ② 新项目 init 即贴真实风格 ③ 全新项目看图选一次风格后自动沿用
-
-## 2026-06-10 · patch-009b · 方法论卡片内置快照（主仓同步 · 流水线自包含）
-
-- 新建 `knowledge/methodology/`：30 张设计方法论卡片快照（heuristic-evaluation / critique-* 三件套 / user-flow-diagram / error-handling-ux / form-design / data-visualization / ui-ux-pro-max / emil-design-eng 等 · 含 README 清单与 license 注记）
-- A1 v1.4 / A2 v1.1 / A1.5 v1.2 内 8 处卡片路径改降级链：项目内 `knowledge/methodology/<name>.md` → 兜底 `~/.claude/skills/<name>/SKILL.md` → 缺失跳过
-- README 双语小节改"内置：设计方法论卡片（克隆即用 · 零安装）"
-- 卡片为快照不自动跟源；公开分发前确认原始 skill 集 license（README 已注记）
-
-## 2026-06-10 · patch-009 · 设计方法论 skill 融入 A1/A1.5/A2 + Loop 工程（主仓 patch-009 同步）
-
-- **触发源**：主仓引入用户级设计方法论 skill 集（`~/.claude/skills/` 下约 20 张卡片：heuristic-evaluation / critique-* / user-flow-diagram / error-handling-ux / ux-writing 等），并为流水线头部补三个自评/闭环 Loop（对齐尾部 A6→A7 双层模式）。
-- **决议**：方法论 = 按需 Read 的"行业最佳实践层"——降级条款（缺卡跳过不阻塞）+ 项目事实源永远赢 + 转述 PM 走 P015 业务语言；A2 第 11 项可用性快扫 = **软闸**（可用性取舍是产品决策 · AI 亮问题、PM 拍板，不参与打回）。
-- **Loop 工程五原则**（一句话）：事件驱动非定时 / 硬上限（Loop-1 1 轮 · Loop-3 ≤ 2 轮 · /iterate-A2 ≤ 2 轮）/ 新问题即停 / 决策类升 PM 不自转 / 全程留痕可抽查（§ 〇.7 残留表 + self-critique.md）。
-- **改动文件 + 版本**：
-  - product-expert v1.3 → **v1.4**（设计方法论库 9 行触发表 + § 3.5 定律依据补充 + § 4.1 JTBD 注 + § 4.2 流程三段式 + § 4.3 ux-writing 注 + § 4.4 五态 checklist + § 6.5 Loop-1 自走查 + § 〇.7 残留表）
-  - requirement-reviewer v1.0 → **v1.1**（第 11 项可用性启发式快扫·软闸 + 结论三态 + P1 分诊标注【形式类/决策类】）
-  - visual-spec-author v1.1 → **v1.2**（设计方法论库：基础 5 卡 + 层级三问 + 类型触发卡 + 丙档 2 卡；§ 2.35 Loop-3 demo 自评循环；§ 2.6 Loop-4 before/after 对比图）
-  - new-feature.md（Gate 1.5b 附 Loop-3 自评摘要 + 第 2 步 A2 三分支：打回按分诊推荐 /iterate-A2 · 通过带警告强制亮 PM 三选一处置）
-  - **新增** `.claude/commands/iterate-A2.md`（Loop-2 · A2 打回自动闭环 · 最多 2 轮 · 决策类先升 PM）
-- **编号泛化**：主仓 P026/P027/P029/P030/P023 → 骨架 P014/P015/P018/P017/P011；skill 路径统一 `~/.claude/skills/`（缺失自动跳过，不阻塞流水线）。
-
-## 2026-06-05 · P020 + P021 LOCKED · 可渲染必可验证 + 跨端数据流契约（通用方法论 · 实战命中后合并 · v2 终版）
-
-- **核心立场**：渲染缺陷是**验收盲区，不是需求没写清** → 防御火力在**测试用例 + 验收流水线**，不在 A1/A3 拦截需求/方案设计。（初稿曾在 A1/A3 加设计阶段硬闸，当日纠偏撤掉。）
-- **触发源**：地图渲染缺陷复盘（选中不聚焦 / 缩放拖拽不顺 / 只画点不画线 + 编辑端保存几何零用例）。根因 = 渲染输出在 canvas/验收 Mock/截图三条路都无可断言抓手（**渲染验收盲区**）+ 编辑端存几何进 `payload:unknown` 黑盒、展示端不读而用别的字段重建（**跨端写读两套**）。
-- **新增 LOCKED pattern**：`P020-可渲染必可验证.md` + `P021-跨端数据流契约.md`（测试/验收中心版）
-- **改动 agent + 版本**：
-  - product-expert v1.2 → **v1.3**（§ 2.u 渲染元素清单**轻量输入·非硬闸** + § 2.v 跨端识别·只留"非同源→问 PM"产品决策）
-  - tech-architect v1.1 → **v1.2**（**撤** #8/#9 设计硬闸 → §6.4 一句"建议带测试钩子"，非否决项）
-  - test-case-author v1.1 → **v1.2**（`[MAP]` 加厚=火力重心 + P021 round-trip 用例 + 钩子缺失=test-blocker）
-  - visual-spec-author v1.0 → **v1.1**（视觉规范模板 § 七点五 地图/canvas 渲染态契约）
-  - `knowledge/patterns/P013-*.md`（用户灰度 5 分钟补地图固定动作 M1~M5）
-- **验收流水线（核心落点）**：L2 skill `~/.claude/skills/acceptance-regression/SKILL.md` 新增 § 九 `@map` overlay 断言方法论（真实 DOM `data-*`·禁截图·钩子缺失=test-blocker）+ `@map` tag
-- **三层收口**（撤设计闸后）：L2 测试(A6 `[MAP]`+round-trip DOM 断言 / A1.5 demo 落 data 钩子) + 验收流水线(acceptance-regression `@map`) + L4 灰度(P013 M1~M5)；设计阶段只留 A1 跨端"两端是否一致"问 PM 这一产品决策
-- **同步来源**：robobus 主仓 patch-008 v2（主仓 pattern 编号 P031/P032 · 骨架泛化为 P020/P021）
+- **类型**：纯 typo/引用修正，**不 bump 版本**（无行为变化，frontmatter 仍 v1.7，与 json 一致）。
+- **改动**：`product-expert.md` 方法论映射表 design-brief 行的 "§ 三缺口识别" → "§ 3 缺口识别"。该 agent 用两套章节号（Arabic=工作流步骤 / CJK=输出文档结构），"缺口识别"是 Arabic `### 3`，而 `§ 三` 实为输出结构的"用户答复整理"——原引用指向错误章节（UPGRADE Track B 审计 · 红队 reference-integrity）。

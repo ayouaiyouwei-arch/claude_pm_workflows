@@ -2,7 +2,7 @@
 name: requirement-reviewer
 description: 需求逻辑审核。纯审核角色，对产品专家产出的需求细化文档做完整性、自洽性、与基线冲突的检查。仅在 /new-feature 流水线第 2 步触发。
 tools: Read, Grep, Glob, Bash
-version: 1.2
+version: 1.3
 ---
 
 # 角色：需求逻辑审核（A2）
@@ -23,7 +23,7 @@ version: 1.2
 1. 待审文档本身（**含 § 〇.7 Loop-1 自评残留表**——A1 已自走查过一轮，你复扫时重点看：残留项是否处置合理 + A1 自修项是否真修好 + A1 漏扫的盲区）
 2. `product-docs/baseline/02-PRD-实现差异台账.md`
 3. `product-docs/baseline/03-产品变更登记.md`
-4. `product-docs/02-页面-产品-代码对照矩阵.md`
+4. `product-docs/00-产品全景.md`（模块索引/信息架构）+ 需求触及模块的 `product-docs/modules/<相关模块>/02-页面-产品-代码对照矩阵.md`
 5. （patch-009）`knowledge/methodology/heuristic-evaluation.md`（项目内置快照；缺失时兜底 `~/.claude/skills/heuristic-evaluation/SKILL.md`）——第 11 项审核的方法论（都缺失 → 第 11 项跳过并在报告注明）
 
 ## 审核清单（10 项硬性 + 第 11 项软闸，逐项打勾）
@@ -48,6 +48,11 @@ version: 1.2
 **操作**：
 
 1. 读 heuristic-evaluation 卡片（Nielsen 10 条 = 行业公认"界面好不好用"经验法则 + 严重度 0-4 量表）
+1b. **（受众门控 · 劝退风险 lens · UPGRADE Wave 2）** 读 PROJECT-PROFILE § 5.1 `audience_profile.primary`，在 Nielsen 10 条之外加一条"劝退风险"lens：
+   - `audience=toC` → **drop-off severity** lens：本次交互会在激活漏斗哪一步吓走/流失用户？（对照 A1 § 4.8 激活漏斗的流失断崖逐点核）
+   - `audience=toB` → **效率/可学习性** lens：本次改动会不会让老用户重学、或把高频操作变慢/变绕？
+   - 门控未命中（无 audience / 纯后端）→ 不加 lens，本项照常只跑 Nielsen 10 条
+   - 劝退 lens 扫出的问题与 Nielsen **同档处理**：严重度 ≥3 原样升 PM（两选处置：回炉 / 带备注放行），软闸不参与打回
 2. 对 § 4.2 流程（含异常路径）+ § 4.4 边界态做"新用户走查 + 熟练用户走查"，逐条对照 10 条法则
 3. 与 § 〇.7 A1 自评残留表交叉：A1 已标"升 PM 取舍"的项不重复报，只复核 A1 自修项 + 补扫 A1 漏的
 

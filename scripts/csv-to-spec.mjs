@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// ⚠️ 骨架提示：ROLE_HINT / MODULE_ABBR / ROUTE_ALIASES 当前为 robobus 示例值，接入项目务必改成自己的（对齐 fixtures/auth 角色、acceptance.config modules、真实路由）。
+// ⚪ 骨架占位：ROLE_HINT/MODULE_ABBR/ROUTE_ALIASES 三表为示例占位值，由本项目 /init-project 或 /init-docs 按 _用例字段说明 §四 填充（roles 示例 <角色1>/<角色2>/<角色3> · 路由模式 BrowserRouter / hash 由项目定）。fixtures/auth 角色账号 + 真实 baseURL 待验收环境提供后由 PM 补。
 /**
  * CSV → Playwright spec.ts 骨架生成器
  *
@@ -7,20 +7,20 @@
  *   node scripts/csv-to-spec.mjs <csv-path> [--out <dir>] [--filter <case-id-pattern>] [--force]
  *
  * 示例：
- *   # 把 OPT-013 16 条 CSV 生成到 tests/regression/综合工作台/
+ *   # 把某需求的 CSV 用例生成到指定回归目录（路径按本项目填充）
  *   node scripts/csv-to-spec.mjs \
- *     "product-docs/_drafts/2026-05-20-dashboard-stats-acceptance-coverage/06-用例.csv" \
- *     --out test/tools/e2e-scripts/tests/regression/综合工作台
+ *     "product-docs/_drafts/<日期-需求名>/06-用例.csv" \
+ *     --out test/tools/e2e-scripts/tests/regression/<模块>
  *
  *   # 只生成 P0 用例
- *   node scripts/csv-to-spec.mjs <csv> --filter "TC-DSH-00[2-7]"
+ *   node scripts/csv-to-spec.mjs <csv> --p0-only          # 只把 P0 用例铺成骨架（bootstrap 红线自动化）
  *
  *   # 强制覆盖已存在 spec
  *   node scripts/csv-to-spec.mjs <csv> --force
  *
  * 规则：
- *   - 18 列 CSV 严格按 test/test-cases/_用例字段说明.md
- *   - 仅生成 automation_type=e2e 或 hybrid 的用例
+ *   - 19 列 CSV（schema v2）严格按 test/test-cases/_用例字段说明.md
+ *   - 默认仅生成 automation_type=e2e/hybrid 的用例；加 --p0-only 则把 P0 用例也铺成骨架（bootstrap P0 红线自动化 · T1①）
  *   - 文件名 = <case_id>.spec.ts
  *   - 默认不覆盖已存在 spec（防误删 PM 手填的实现）· 需 --force
  *   - 骨架内容：Given/When/Then 三段 + 5 态注释 + 设计方法注释 + UI setup/teardown 占位
@@ -42,6 +42,8 @@ const outDir = outDirIdx >= 0 ? args[outDirIdx + 1] : null;
 const filterIdx = args.indexOf('--filter');
 const filterPattern = filterIdx >= 0 ? new RegExp(args[filterIdx + 1]) : null;
 const force = args.includes('--force');
+// --p0-only：把 priority=P0 的用例也铺成 e2e 骨架（绕过 CSV 当前 automation_type=manual 标记），bootstrap P0 红线自动化（T1①）
+const p0Only = args.includes('--p0-only');
 
 if (!fs.existsSync(csvPath)) {
   console.error(`❌ CSV 文件不存在：${csvPath}`);
@@ -101,31 +103,26 @@ function parseCsv(content) {
 }
 
 // ---------- 模块 → 角色推断 ----------
+// 示例占位：模块名 → 默认登录角色映射。按本项目 /init-project 或 /init-docs 填充
+// （角色名示例 <角色1>/<角色2>/<角色3> · 种子账号 + 真实 baseURL 待验收环境提供后由 PM 补）。
+// 默认 <角色1>（最高权限可访问全部）；环境就绪后可细化为受限角色走权限收敛用例。
 const ROLE_HINT = {
-  综合工作台: 'gray_admin',
-  智能排班中心: 'dispatcher01',
-  安全运营中心: 'supervisor01',
-  订单中心: 'officer01',
-  基础资源库: 'gray_admin',
-  系统设置: 'gray_admin',
-  效能分析: 'leader01',
-  规则配置中心: 'gray_admin',
+  '<示例模块>': '<角色1>',
+  // 按本项目 /init-project 或 /init-docs 填充：每个模块一行 模块名: '<默认角色>'
 };
 
 // ---------- 模块 → 缩写（与 _用例字段说明.md § 四 / acceptance-report.mjs MODULE_BY_ABBR 对齐） ----------
-// 用于在 spec 标题注入 @模块缩写 tag · 供 acceptance-report.mjs 与 `pnpm test --grep @SEC` 过滤/归因
+// 用于在 spec 标题注入 @模块缩写 tag · 供 acceptance-report.mjs 与 `pnpm test --grep @<缩写>` 过滤/归因
 const MODULE_ABBR = {
-  综合工作台: 'DSH', 智能排班中心: 'SCH', 订单中心: 'ORD', 安全运营中心: 'SEC',
-  规则配置中心: 'RUL', 效能分析: 'ANA', 基础资源库: 'RES', 系统设置: 'SYS', 跨模块场景: 'SCN',
+  '<示例模块>': '<缩写>',
+  // 按本项目 /init-project 或 /init-docs 填充：每个模块一行 模块名: '<3 字母缩写>'
 };
 
-// ---------- CSV PRD 路由 → 灰度真实路由 ----------
-// 在 TC-DSH-002 reference impl 跑通过程中发现 · CSV 写的是 PRD 规划路由名 ·
-// 灰度实际渲染路由可能不同（如 /admin/dashboard → /workbench · main.tsx:676）
-// 此表持续积累 · 生成器自动转译 · 让骨架默认能跑通登录 + 导航
+// ---------- CSV PRD 路由 → 真实渲染路由（本项目 · 持续积累） ----------
+// 前端部署前缀 / 路由模式（BrowserRouter 或 hash）按本项目 /init-project 填充 ·
+// CSV route 即应用内路由；如发现 PRD 规划路由与实际渲染路由不同，在此登记别名（验收环境就绪后回填）。
 const ROUTE_ALIASES = {
-  '/admin/dashboard': '/workbench',
-  '/workbench/overview': '/workbench', // DIFF-005 老路由兼容
+  // 例：'/old-route': '/new-route',
 };
 function resolveRoute(prdRoute) {
   return ROUTE_ALIASES[prdRoute] ?? prdRoute;
@@ -159,8 +156,10 @@ function renderSpec(row) {
     evidence_required,
   } = row;
 
-  const role = ROLE_HINT[module] ?? 'gray_admin';
-  const moduleAbbr = MODULE_ABBR[module] ?? '';
+  const role = ROLE_HINT[module] ?? '<角色1>';
+  // 模块缩写优先从 case_id 前缀推（TC-<ABBR>-NNN · 权威且不受 module 中文名变体影响），回退 MODULE_ABBR 表
+  const idAbbr = (String(case_id).match(/^TC-([A-Z]+)-/) || [])[1];
+  const moduleAbbr = idAbbr || MODULE_ABBR[module] || '';
   const tagStr = `@${priority}${moduleAbbr ? ` @${moduleAbbr}` : ''} @role:${role} @L1`;
   const resolvedRoute = resolveRoute(route);
   const routeRemapped = resolvedRoute !== route;
@@ -181,13 +180,13 @@ ${routeRemapped ? `// 灰度真实路由：${resolvedRoute}（生成器自动转
 // 5 态覆盖：${fiveStates.length ? fiveStates.join(' / ') : '无'}
 // 证据：${evidence.join(' / ')}
 //
-// ⚠️ PM 自跑路径核心约束（用户 LOCKED · 2026-05-20）：
+// ⚠️ PM 自跑路径核心约束（用户 LOCKED）：
 //   1. 所有增删改 = 必须走页面 UI 点击（getByRole / getByText / getByLabel）
 //   2. 不准用 API 直接造数据 / 直接清数据
 //   3. setup（造前置）+ teardown（清残留）也必须 UI 化
 //   4. evidence 截图必须按 5 态采集
 //
-// 📚 Reference Impl：tests/regression/综合工作台/TC-DSH-002.spec.ts（PM 自跑首条 PASS 样板）
+// 📚 Reference Impl：本项目首条 PASS 样板待 PM 自跑后回填（验收环境就绪后）
 
 import { test, expect } from '../../../fixtures/auth';
 import { captureEvidence } from '../../../utils/evidence';
@@ -208,13 +207,13 @@ test.describe(\`\${CASE_ID} · [${methods}] ${escTs((scenario || '').slice(0, 70
     testInfo.annotations.push({ type: 'design_methods', description: '${methods}' });
 
     // ============================================================
-    // Given · 已登录 + 导航到目标路由（hash 路由 · reload 确保接口重新请求）
+    // Given · 已登录 + 导航到目标路由（路由模式 BrowserRouter / hash 按本项目 PROJECT-PROFILE 配置）
     // ============================================================
     // 原 CSV preconditions:
     //   ${escTs((preconditions || '').slice(0, 200))}
     await test.step(\`Given · ${role} 已登录 · 进入 \${ROUTE}\`, async () => {
-      await page.goto(\`/#\${ROUTE}\`);
-      await page.reload(); // 重要：hash 内导航不重发请求 · reload 强制重新挂载组件
+      // baseURL（含部署前缀，如 https://<host>/<前缀>）在 playwright.config 配置（验收环境待提供）
+      await page.goto(ROUTE);
       await page.waitForLoadState('networkidle');
       await expect(page).toHaveURL(new RegExp(ROUTE.replace(/\\//g, '\\\\/')));
     });
@@ -224,8 +223,8 @@ test.describe(\`\${CASE_ID} · [${methods}] ${escTs((scenario || '').slice(0, 70
     // ============================================================
 ${stepsArr.map((s, i) => `    await test.step(\`When ${i + 1} · ${escTs(s.slice(0, 80))}\`, async () => {
       // TODO PM: 真实 UI 点击 · 禁止 API 直调
-      // 范例见 TC-DSH-002.spec.ts · 用 getByRole / getByText / getByPlaceholder
-      throw new Error('未实现 · 请按 CSV steps 填实 · 参考 TC-DSH-002 reference impl');
+      // 用 getByRole / getByText / getByPlaceholder · 禁 API 直调
+      throw new Error('未实现 · 请按 CSV steps 填实 UI 点击（getByRole/getByText/getByLabel）');
     });`).join('\n\n')}
 
     // ============================================================
@@ -277,11 +276,13 @@ const { rows } = parseCsv(csvContent);
 const e2eRows = rows.filter((r) => {
   if (!r.case_id) return false;
   if (filterPattern && !filterPattern.test(r.case_id)) return false;
+  if (p0Only) return r.priority === 'P0';               // T1①：P0 一律铺骨架（不看 manual 标记）
   return ['e2e', 'hybrid'].includes(r.automation_type);
 });
 
 if (e2eRows.length === 0) {
-  console.error('⚠️ 0 条 e2e/hybrid 用例命中 · 检查 CSV automation_type 列与 --filter');
+  console.error(p0Only ? '⚠️ 0 条 P0 用例命中 · 检查 CSV priority 列与 --filter'
+                       : '⚠️ 0 条 e2e/hybrid 用例命中 · 检查 CSV automation_type 列与 --filter（或加 --p0-only bootstrap P0）');
   process.exit(2);
 }
 
@@ -308,7 +309,7 @@ console.log('');
 console.log(`📊 生成完成 · created=${created} · skipped=${skipped} · 输出目录=${targetDir}`);
 console.log('');
 console.log('下一步：');
-console.log(`  1. 进 ${targetDir} 把 TODO PM 处填实（参考 TC-DSH-002 reference impl）`);
+console.log(`  1. 进 ${targetDir} 把 TODO PM 处填实 UI 点击（验收环境就绪后）`);
 console.log(`  2. cd test/tools/e2e-scripts && pnpm install`);
 console.log(`  3. pnpm test --grep <case_id> --headed   # 单条调试`);
 console.log(`  4. pnpm test:regression                  # 批量跑`);

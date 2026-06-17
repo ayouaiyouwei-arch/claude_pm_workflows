@@ -5,7 +5,7 @@ description: 独立验收回归框架（L2 通用·跨项目）。当需要为�
 
 # 独立验收回归框架 · L2 通用引擎
 
-> 起源：robobus-workspace_pm 于 2026-06-01 抽象上 L2（CLAUDE 工作空间 P028 首次 L1→L2 实战）。
+> 起源：由某历史项目工作空间抽象上 L2（首次 L1→L2 实战，示例）。
 > 引擎项目无关；项目专属值（模块/角色/URL/路由）全部由 `acceptance.config.json` 注入。
 
 ## 一、是什么 · 为什么独立
@@ -49,7 +49,7 @@ spec 标题内打 tag（供 `--grep` 过滤），同时 push annotations（供�
 
 | 字段 | 必填 | 含义 |
 |---|---|---|
-| `projectLabel` | 否 | 报告标题前缀，如 `robobus` |
+| `projectLabel` | 否 | 报告标题前缀，如 `<本项目名>` |
 | `baseURL` | 是 | 真实环境地址（独立性铁证）|
 | `localBaseURL` | 否 | `PLAYWRIGHT_ENV=local` 时的本地地址 |
 | `reportsDir` | 否 | 报告根目录（默认 `test/reports`），引擎按 `<reportsDir>/<BASELINE_VERSION>/` 找 |
@@ -79,8 +79,10 @@ spec 标题内打 tag（供 `--grep` 过滤），同时 push annotations（供�
 - **L1（项目 · 专属）**：`acceptance.config.json` 值 + 用例 CSV + 填实的 spec + 登录实现（如 captcha 解析）+ 项目深耦合的验收环境约定。
 - **待抽 L2（roadmap）**：`csv-to-spec`（CSV→spec 骨架生成器，当前留 L1，因依赖项目专属的角色/模块/路由映射，参数化后可上 L2）。
 
-## 八、参考实例（robobus L1）
+## 八、参考实例（L1 · 占位示例）
 
-- 报告样例：`robobus-workspace_pm/test/reports/B1.2.0/独立验收回归报告.md`
-- L2 权限矩阵范本：`test/tools/e2e-scripts/tests/permission/{role-access-matrix.spec.ts,access-matrix.data.ts}`
-- L1 黑盒用例范本：`test/tools/e2e-scripts/tests/regression/订单中心/TC-ORD-001.spec.ts`（纯 UI 黑盒，对照旧 hybrid 白盒用例的正例）
+> 以下为占位路径示意；接入后由本项目 `/init-project` 或 `/init-docs` 按实际目录填充。
+
+- 报告样例：`<主仓>/<reportsDir>/<版本>/<reportFileName>`
+- L2 权限矩阵范本：`<e2e根>/tests/permission/{role-access-matrix.spec.ts,access-matrix.data.ts}`
+- L1 黑盒用例范本：`<e2e根>/tests/regression/<模块>/<用例ID>.spec.ts`（纯 UI 黑盒，对照旧 hybrid 白盒用例的正例）

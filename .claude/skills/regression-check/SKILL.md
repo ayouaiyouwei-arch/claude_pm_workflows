@@ -56,7 +56,7 @@ description: 用 Playwright 报告 + 历史对比，列出退化用例与新增�
 6. **联动**
    - 退化项调 `log-diff-entry` 登记新差异（type 视根因而定）
    - 通知测试负责人 + 修复人
-7. **更新 `测试说明文档.md`**
+7. **更新 `test/测试说明文档.md`**
    - § 三对应基线段落追加「回归对比完成，新增退化 N、新增通过 N」
 
 ## 输出
@@ -79,6 +79,6 @@ description: 用 Playwright 报告 + 历史对比，列出退化用例与新增�
 
 - ❌ 当前基线无 Playwright 报告时强行出对比（必须先跑 `run-acceptance-suite`）
 - ❌ 退化项不在 `执行清单.csv` / `缺陷清单.csv` 登记
-- ❌ 退化项不阻断发布（除非用户显式 override 并在 `测试说明文档.md` 留痕）
+- ❌ 退化项不阻断发布（除非用户显式 override 并在 `test/测试说明文档.md` 留痕）
 - ❌ 跨基线版本混用 `playwright-results/`
-- ❌ 不更新 `测试说明文档.md` § 三
+- ❌ 不更新 `test/测试说明文档.md` § 三

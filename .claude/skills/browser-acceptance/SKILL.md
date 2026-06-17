@@ -61,7 +61,7 @@ description: 用 cursor-ide-browser MCP 对单条 case_id 做手工辅助验收�
    - permission：换 `readonly` / `noauth` 账号重测
 7. **接口契约人工核对**
    - `browser_network_requests` 抓本次会话的关键请求
-   - 对照 `04-前后端接口契约核查表.md`，逐字段确认
+   - 对照 `product-docs/modules/<模块>/02-页面-产品-代码对照矩阵.md § 二 接口面汇总`，逐字段确认
 8. **判定**
    - pass / fail / blocked
    - 失败时调 `log-diff-entry` 登记新 `DIFF-XXX` 或在 `缺陷清单.csv` 登记 `BUG-XXX`
@@ -76,7 +76,7 @@ description: 用 cursor-ide-browser MCP 对单条 case_id 做手工辅助验收�
     - 不通过 → 改为「不通过-退回修复」并附原因
 12. **释放浏览器**
     - 完成所有操作后 `browser_lock {action:unlock}`
-13. **更新 `测试说明文档.md`**
+13. **更新 `test/测试说明文档.md`**
     - § 三对应基线段落追加「`case_id` 浏览器辅助验收完成，结论 pass/fail/blocked」
 
 ## 输出
@@ -104,4 +104,4 @@ description: 用 cursor-ide-browser MCP 对单条 case_id 做手工辅助验收�
 - ❌ 不写 `浏览器辅助验收记录.md` 或不存到 `evidence/<版本>/<case_id>/` 目录
 - ❌ 跳过 5 态核查
 - ❌ 替代 Playwright 跑「smoke + regression + scenario」自动化套件
-- ❌ 不更新 `测试说明文档.md` § 三
+- ❌ 不更新 `test/测试说明文档.md` § 三

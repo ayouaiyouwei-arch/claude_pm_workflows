@@ -1,17 +1,20 @@
 {
   "schema_version": 1,
-  "last_updated": "<YYYY-MM-DD · 由 /init-project 初始化>",
+  "last_updated": "2026-06-16",
+  "patch_log": [
+    { "patch": "patch-001", "merged_at": "2026-06-16" }
+  ],
   "agents": {
-    "product-expert": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
-    "requirement-reviewer": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
-    "tech-architect": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
-    "scope-reviewer": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
-    "secondary-reviewer": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
-    "test-case-author": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
-    "test-case-reviewer": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
-    "visual-spec-author": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
-    "pipeline-evaluator": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
-    "pipeline-retrospector": { "version": "1.0", "last_patch": null, "last_updated": "<init>" },
-    "legacy-excavator": { "version": "1.0", "last_patch": null, "last_updated": "<init>" }
+    "product-expert": { "version": "1.7", "last_patch": "patch-001", "last_updated": "2026-06-16" },
+    "requirement-reviewer": { "version": "1.3", "last_patch": "patch-001", "last_updated": "2026-06-16" },
+    "tech-architect": { "version": "1.3", "last_patch": null, "last_updated": "2026-06-16" },
+    "scope-reviewer": { "version": "1.0", "last_patch": null, "last_updated": "2026-06-10" },
+    "secondary-reviewer": { "version": "1.0", "last_patch": null, "last_updated": "2026-06-10" },
+    "test-case-author": { "version": "1.3", "last_patch": null, "last_updated": "2026-06-16" },
+    "test-case-reviewer": { "version": "1.1", "last_patch": null, "last_updated": "2026-06-16" },
+    "visual-spec-author": { "version": "1.4", "last_patch": null, "last_updated": "2026-06-16" },
+    "pipeline-evaluator": { "version": "1.3", "last_patch": null, "last_updated": "2026-06-16" },
+    "pipeline-retrospector": { "version": "1.1", "last_patch": null, "last_updated": "2026-06-16" },
+    "legacy-excavator": { "version": "1.0", "last_patch": null, "last_updated": "2026-06-11" }
   }
 }

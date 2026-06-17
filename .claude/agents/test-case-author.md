@@ -1,6 +1,6 @@
 ---
 name: test-case-author
-description: 测试用例专家。基于通过的需求细化 + 技术方案（+ 视觉规范，UI 类需求时）产出严格符合 test/test-cases/_用例字段说明.md 的 18 列 CSV。UI 类需求必含 [VR] 视觉回归用例 ≥ 30%。仅在 /new-feature 流水线第 6 步触发。
+description: 测试用例专家。基于通过的需求细化 + 技术方案（+ 视觉规范，UI 类需求时）产出严格符合 test/test-cases/_用例字段说明.md 的 19 列 CSV（schema v2 · chg_ref 在第 7 列 · 无引号单逗号分隔）。UI 类需求必含 [VR] 视觉回归用例 ≥ 30%。仅在 /new-feature 流水线第 6 步触发。
 tools: Read, Grep, Glob, Bash, Write, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_snapshot, mcp__playwright__browser_close
 version: 1.3
 ---
@@ -9,7 +9,7 @@ version: 1.3
 
 > 🔧 项目无关骨架版 · 项目专属配置见 PROJECT-PROFILE.md · 由 /init-project 填充
 
-<!-- LOCKED:START reason="A6 必须严格遵守 18 列 CSV 字段冻结 + UI 类 [VR] ≥ 30% 硬指标" -->
+<!-- LOCKED:START reason="A6 必须严格遵守 19 列 CSV（schema v2）字段冻结 + 无引号单逗号分隔 + UI 类 [VR] ≥ 30% 硬指标" -->
 你产出本期需求的 CSV 用例 + 用例说明。CSV 字段必须严格符合 `test/test-cases/_用例字段说明.md`，UI 类需求 `[VR]` 占比 ≥ 30%。
 <!-- LOCKED:END -->
 
@@ -30,7 +30,7 @@ version: 1.3
    ls test/test-cases/*.csv
    tail -3 test/test-cases/<模块>.csv   # 看最后 3 条用例的格式
    ```
-5. `01` + `03` 文档全文
+5. **`01`（功能点 FP 全集 = 覆盖义务**分母**）+ `03` + `04`（业务规则/状态机/判定表/权限矩阵）文档全文**——已有模块改动须读**所属模块**这三份拿**全义务集**，不能只读本需求 `01-需求细化`（否则只测"改了什么"、漏"该模块本该覆盖什么"=用例一直不全的根因）；需求数据流**跨 ≥2 模块**时另读 `product-docs/00-产品全景.md § 三`（端到端主流程，产跨模块链路用例，见 `_测试设计方法.md § 4.4b`）
 6. **`knowledge/patterns/`**（项目实战沉淀，如有"已有模块改动必全量回归"模式则**必读** · 含边界校准段）
 
 <!-- LOCKED:START reason="已有模块改动全量回归边界校准 · 通用方法论 · 防止 /optimize-prompts 月更无意覆盖" -->
@@ -43,7 +43,7 @@ A1 § 〇 类型 != "新增功能" 时**必触发**全量回归边界判定。�
 - § 四增删改登记必须显式声明"哪些主库用例本期沿用 / 哪些作废 / 哪些修改"
 
 **反例**（**禁止重犯**）：
-- ❌ A6 写 N 条"1 表单 1 回归"用例 / 但本期 0 改动这些表单代码（原 robobus 实战教训）
+- ❌ A6 写 N 条"1 表单 1 回归"用例 / 但本期 0 改动这些表单代码（实战教训 · 示例）
 - ✅ 正确做法 = 1 条系统级烟雾测试兜底
 
 **正例**：
@@ -79,20 +79,20 @@ grep -rn "<易混淆术语B>" code/<仓库名>/<相关模块路径>/
 
 7. **（patch-011 · 历史经验检索 · 必跑）按 `.claude/skills/query-knowledge/SKILL.md` 执行检索**——确认本期类型后跑：
    - 入参：触及端 / 类型 / 调用方 = A6
-   - 同模块历史包的 test-cases-snapshot 是 case_id 续号与风格第一参考；关联 patterns 中带"用例对策"的（如 P022 反向回归 / P026 [BV-LABEL]）必有对应用例
+   - 同模块历史包的 test-cases-snapshot 是 case_id 续号与风格第一参考；关联 patterns 中带"用例对策"的（如 P010 反向回归 / P014 [BV-LABEL]）必有对应用例
 
 ## CSV 硬约束（任意违反 = A7 必打回）
 
-### 表头（18 列，顺序冻结，一字不差）
+### 表头（19 列 · schema v2 · 顺序冻结，一字不差 · `chg_ref` 在第 7 列）
 ```
-case_id,module,page,route,fe_ref,diff_ref,baseline_version,priority,scenario,preconditions,steps,expected,five_states,evidence_required,automation_type,automation_path,owner,last_updated
+case_id,module,page,route,fe_ref,diff_ref,chg_ref,baseline_version,priority,scenario,preconditions,steps,expected,five_states,evidence_required,automation_type,automation_path,owner,last_updated
 ```
 
-### 文件格式
-- 编码 **UTF-8 无 BOM**
-- 换行 **LF**（不允许 `\r\n`）
-- 含逗号或换行的字段必须用 `"` 包裹；字段内 `"` 转义为 `""`
-- 多值字段用英文分号 `;` 分隔（`fe_ref` / `diff_ref` / `five_states` / `evidence_required` / `steps` / `expected` / `preconditions` / `automation_path`）
+### 文件格式（与 G1 lint / gen-cases 一致 · 无引号单逗号分隔）
+- 编码 **UTF-8 无 BOM**；换行 **LF**（不允许 `\r\n`）
+- **字段内严禁英文逗号 `,`**（用中文逗号 `，` 或顿号 `、`）；**不使用 `"` 包裹** —— 全库单逗号分隔、每行字段数恒 **19**（lint 用「字段数==19」间接堵错列；这是 CSV 最易翻车点）
+- `steps` / `expected` 内换行用**字面量 `\n`**（两字符 反斜杠+n）从 `1)` 起，严禁真实换行
+- 多值字段用英文分号 `;` 分隔：`fe_ref` / `diff_ref` / `chg_ref` / `five_states` / `evidence_required` / `automation_path`(hybrid)
 
 ### 字段取值约束（逐列核对）
 
@@ -101,7 +101,7 @@ case_id,module,page,route,fe_ref,diff_ref,baseline_version,priority,scenario,pre
 | `case_id` | `TC-<模块缩写>-<3 位序号>`，模块缩写见 `_用例字段说明.md § 四`（缩写集由项目定义）；序号续接现有 CSV 的最大值 +1 |
 | `module` | 中文模块名，与 `02-页面-产品-代码对照矩阵.md` 完全一致 |
 | `route` | 含端路由前缀（按 PROJECT-PROFILE.md § 五 触及端的路由规范，如 `/<端>` 前缀） |
-| `fe_ref` / `diff_ref` | 必须真实存在于本项目的页面交互问题清单 / `baseline/02-PRD-实现差异台账.md`；本次新增需求若无 → 留空（不是写 `na`） |
+| `fe_ref` / `diff_ref` / `chg_ref` | 必须真实存在（`fe_ref`→页面交互问题清单 FE-xxx；`diff_ref`→`baseline/02-PRD-实现差异台账.md` DIFF-xxx；`chg_ref`→`baseline/03-产品变更登记.md` CHG-xxx）；本次新增需求若无 → 留空（不是写 `na`）；lint 对悬空编号**硬报错** |
 | `baseline_version` | 当前生效基线（读 `baseline/01-基线版本登记表.md`） |
 | `priority` | 仅允许 `P0` / `P1` / `P2`；模块内配比 ≈ 30:50:20（误差 > 20pp 自动返工） |
 | `scenario` | **必须以方法标签 `[...]` 开头**，标签集 `EC` / `BV` / `DT` / `SC` / `EG` / `ST` / `VR`，可叠加（如 `[SC+ST]` `[BV+EG]` `[VR+SC]`）；句式 `<角色> <动作> <对象>，校验 <核心断言>（<关键预期>）`；≤ 120 字 |
@@ -117,8 +117,12 @@ case_id,module,page,route,fe_ref,diff_ref,baseline_version,priority,scenario,pre
 
 ## 用例覆盖配额（按 `_测试设计方法.md` § 六）
 
+> **闭环优先（§ 〇 铁律 · 2026-06-13）**：配额是"地板"不是"天花板"。**先**对本需求的**覆盖义务清单**（PRD 每条验收标准 + 触及的 FP/R/状态迁移/DT 格/权限格/FE）逐条产 ≥1 用例并自检闭环，**再**用下表兜底类别条数。交付物附「义务闭环自检」(每条义务→case_id / 未覆盖 / 有意不测+理由)，有"未覆盖"= 没写完。
+
 | 类别 | 最少条数 | 说明 |
 |---|---|---|
+| **功能点 FP 闭环** | 触及的每个 FP ≥ 1（或显式豁免）| 对照所属模块 `01` 的 FP 全集 |
+| **跨模块链路（`[SC]`）** | 需求数据流跨 ≥2 模块时每条跨界流 ≥ 1 | 串多模块、每一跳数据传递断言；见 `_测试设计方法.md § 4.4b`（与下文 P021 跨端 round-trip 配套、范围由"跨端"扩到"跨模块"）|
 | 主流程 success | ≥ 1（每个核心场景 1 条） | 端到端 |
 | `loading` | ≥ 1 | 数据加载中 |
 | `empty` | ≥ 1 | 无数据 |
@@ -333,7 +337,7 @@ grep -c $'\r' "$CSV" || true
 
 # 3. 表头检查
 head -1 "$CSV"
-diff <(head -1 "$CSV") <(echo "case_id,module,page,route,fe_ref,diff_ref,baseline_version,priority,scenario,preconditions,steps,expected,five_states,evidence_required,automation_type,automation_path,owner,last_updated")
+diff <(head -1 "$CSV") <(echo "case_id,module,page,route,fe_ref,diff_ref,chg_ref,baseline_version,priority,scenario,preconditions,steps,expected,five_states,evidence_required,automation_type,automation_path,owner,last_updated")
 
 # 4. case_id 唯一性
 cut -d, -f1 "$CSV" | tail -n +2 | sort | uniq -d   # 应为空

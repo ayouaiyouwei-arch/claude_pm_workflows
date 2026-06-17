@@ -3,9 +3,9 @@
 // 跑: node test/tools/e2e-scripts/pm-dev-tests/check-<包>.cjs
 //
 // 输入 env:
-//   ROBOBUS_DEV_USER     · dev 灰度账号
-//   ROBOBUS_DEV_PASS     · dev 灰度密码
-//   ROBOBUS_DEV_BASE_URL · dev 灰度 base URL
+//   DEV_GRAY_USER     · dev 灰度账号
+//   DEV_GRAY_PASS     · dev 灰度密码
+//   DEV_GRAY_BASE_URL · dev 灰度 base URL
 //
 // 这些值见 PROJECT-PROFILE.md § 六 验收环境
 // 项目接入时建议复制到 .env.local 或 shell rc
@@ -22,9 +22,13 @@ const { loginAdmin, loginScreen } = require(`${SKILL_LIB}/dev-login.cjs`);
 const H = require(`${SKILL_LIB}/deep-verify-helpers.cjs`);
 
 // === 从 env 读 dev 灰度配置（PROJECT-PROFILE § 六）===
-const BASE = process.env.ROBOBUS_DEV_BASE_URL || '<你项目 dev 灰度 base URL>';
-const USER = process.env.ROBOBUS_DEV_USER || '<dev 测试账号>';
-const PASS = process.env.ROBOBUS_DEV_PASS || '<dev 测试密码>';
+const BASE = process.env.DEV_GRAY_BASE_URL || '<你项目 dev 灰度 base URL>';
+const USER = process.env.DEV_GRAY_USER || '<dev 测试账号>';
+const PASS = process.env.DEV_GRAY_PASS || '<dev 测试密码>';
+
+// === 改这里：副端（platform:'screen'）路由配置 —— 无副端可忽略 ===
+// 例（多端项目）：{ loginPath: '/<副端>/#/login', routePrefix: '/<副端>' }
+const SECOND_END = { loginPath: '/#/login', routePrefix: '' };
 
 // === 改这里：定义本次要验的包 ===
 const PKG_CHECKS = [
@@ -71,8 +75,8 @@ const PKG_CHECKS = [
     }
 
     if (needScreen) {
-      console.log('→ big-screen UI 登录');
-      const r = await loginScreen(page, { baseUrl: BASE, user: USER, pass: PASS });
+      console.log('→ 副端 UI 登录');
+      const r = await loginScreen(page, { baseUrl: BASE, user: USER, pass: PASS, loginPath: SECOND_END.loginPath });
       results.screenLogin = r;
       if (!r.ok) throw new Error(`screen 登录失败: ${r.error || r.finalUrl}`);
       console.log(`  ✅ → ${r.finalUrl}`);
@@ -97,8 +101,8 @@ async function runCheck(page, c, BASE, outDir) {
   const out = { name: c.name, platform: c.platform, checks: {} };
   const apiRec = H.recordApiCalls(page);
   try {
-    const url = c.platform === 'screen' && !c.route.startsWith('/big-screen/')
-      ? `${BASE}/big-screen${c.route}`
+    const url = c.platform === 'screen' && SECOND_END.routePrefix && !c.route.startsWith(SECOND_END.routePrefix)
+      ? `${BASE}${SECOND_END.routePrefix}${c.route}`
       : `${BASE}${c.route}`;
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForTimeout(c.waitMs || (c.platform === 'screen' ? 10000 : 4000));

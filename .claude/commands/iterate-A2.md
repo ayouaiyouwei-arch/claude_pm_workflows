@@ -1,6 +1,6 @@
 ---
 description: A2 需求审核打回后自动闭环（A1 修 → 自检 → A2 重审），最多 2 轮，仅形式类问题可进闭环，决策类直接升 PM。patch-009 新增（Loop-2 · 对齐 iterate-A7 模式）。
-argument-hint: <_drafts 短名，如 2026-06-10-xxx-yyy>；留空则用 /tmp/new-feature-current.txt 内的最近一次
+argument-hint: <_drafts 短名，如 2026-06-10-xxx-yyy>；留空则自动取 product-docs/_drafts/ 下最近修改的目录
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
 ---
 
@@ -23,8 +23,8 @@ A2 需求审核打回（结论 = ❌ 打回，含 P1 必改项），主对话不
 ## 第 0 步：定位工作目录
 
 ```bash
-DRAFT="${ARGUMENTS:-$(cat /tmp/new-feature-current.txt 2>/dev/null)}"
-[ -z "$DRAFT" ] && echo "❌ 未指定短名，且 /tmp/new-feature-current.txt 为空" && exit 1
+DRAFT="${ARGUMENTS:-$(ls -dt product-docs/_drafts/*/ 2>/dev/null | head -1 | xargs -r basename)}"
+[ -z "$DRAFT" ] && echo "❌ 未指定 _drafts 短名，且 product-docs/_drafts/ 下无目录可自动选取" && exit 1
 DRAFT_DIR="product-docs/_drafts/$DRAFT"
 [ -d "$DRAFT_DIR" ] || { echo "❌ 工作目录不存在: $DRAFT_DIR"; exit 1; }
 ```

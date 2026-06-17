@@ -11,6 +11,13 @@
 # 设计约束：必须秒级返回（每次 Bash 调用都过这里）· 无跨次状态
 # ═══════════════════════════════════════════════════════════════
 INPUT=$(cat)
+# ── 0. python3 缺失 → fail-closed（安全守卫坏了必须大声阻断，不能静默放行）──
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "[GUARD-ENV] ❌ 缺 python3 → L4 安全守卫无法解析命令，已 fail-closed 阻断
+原因：guard-bash 依赖 python3 解析 hook JSON；若静默放行（旧行为）= 绕过收口的 mv/mkdir 全部失守
+下一步：安装 python3（macOS: brew install python3 · Debian: apt install python3）后重试；确需临时跳过则在 .claude/settings.json 摘除本 hook 并自行担责" >&2
+  exit 2
+fi
 CMD=$(printf '%s' "$INPUT" | python3 -c "import json,sys; print(json.load(sys.stdin).get('tool_input',{}).get('command',''))" 2>/dev/null)
 [ -z "$CMD" ] && exit 0
 

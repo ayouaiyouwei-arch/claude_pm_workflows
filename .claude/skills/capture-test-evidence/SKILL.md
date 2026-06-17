@@ -59,7 +59,7 @@ description: 用 cursor-ide-browser MCP 抓单条 case_id 的修复前后截图 
    - 把查询语句 + 结果以 plain text 落 `evidence/<版本>/<case_id>/after.sql.log`
 7. **校验完整性**
    - 对照 `evidence_required` 字段：所选项的文件必须全部存在；缺任一项 → 流程失败 + 通知
-8. **更新 `测试说明文档.md`**
+8. **更新 `test/测试说明文档.md`**
    - § 三对应基线段落追加「`case_id` 证据已采集」一行
 
 ## 输出
